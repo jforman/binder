@@ -1,1 +1,18 @@
-# I want to write a Django UI to manage BIND DNS Zones.
+Write a Django UI to manage BIND DNS Zones.
+
+Models:
+* tsig keys
+  * name
+  * key text
+* dns server
+  * alias
+  * hostname
+
+Forms:
+* print zone
+* edit zone
+  * do we just let user add/delete a record
+* perform lookup?
+
+Todo:
+* Be able to input tsig key into form and save in db. Then associate bind server with key. (Down to zone level?)
