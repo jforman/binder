@@ -4,9 +4,17 @@ Models:
 * tsig keys
   * name
   * key text
+  Methods:
+    * add key
+    * delete key
 * dns server
   * alias
   * hostname
+  Methods:
+    * list records
+    * delete record
+    * add record
+    * lookup record
 
 Forms:
 * print zone
