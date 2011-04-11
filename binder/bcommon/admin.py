@@ -1,4 +1,4 @@
-from bindercommon.models import BindServer, Key, Zone
+from bcommon.models import BindServer, Key, Zone
 from django.contrib import admin
 
 admin.site.register(BindServer)
