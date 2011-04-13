@@ -1,23 +1,24 @@
 from django.db import models
 
+import dns.query
+import dns.zone
+
 class BindServer(models.Model):
-    name = models.CharField(max_length=50)
     hostname = models.CharField(max_length=100)
 
     def __unicode__(self):
-        return self.name
+        return self.hostname
 
 class Key(models.Model):
     name = models.CharField(max_length=50)
-    data = models.TextField()
+    data = models.CharField(max_length=24)
 
     def __unicode__(self):
         return self.name
     
 class Zone(models.Model):
     server = models.ForeignKey('BindServer')
-    key = models.ForeignKey('Key')
-    name = models.CharField(max_length=50)
+    zone_name = models.CharField(max_length=50)
 
     def __unicode__(self):
-        return "%s: %s" % (self.server, self.name)
+        return self.zone_name
