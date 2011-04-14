@@ -1,0 +1,12 @@
+{% extends "base.htm" %}
+
+{% block body %}
+DNS Server Zone List:
+
+<ul>
+{% for current_zone in zone_array %}
+<li> {{ current_zone }} </li>
+{% endfor %}
+</ul>
+
+{% endblock body %}
