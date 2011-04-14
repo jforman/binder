@@ -8,6 +8,10 @@ import urllib2
 from BeautifulSoup import BeautifulStoneSoup as BS
 import re
 
+import dns.query
+import dns.zone
+import socket
+
 def list_servers(request):
     server_list = BindServer.objects.all().order_by('hostname')
     return render_to_response('bcommon/list_servers.htm',
@@ -33,4 +37,23 @@ def list_server_zones(request, dns_hostname):
 
     return render_to_response('bcommon/list_server_zones.htm',
                               { 'zone_array' : zone_array,
+                                'dns_hostname' : dns_hostname })
+
+def list_zone(request, dns_hostname, zone_name):
+    try:
+        z = dns.zone.from_xfr(dns.query.xfr(dns_hostname, zone_name))
+    except socket.gaierror, e:
+        print "Problems querying DNS server %s: %s\n" % (options.dns_server, e)
+        return # Need to handle this situation when it can't query the NS.
+
+    names = z.nodes.keys()
+    names.sort() # Sort the array alphabetically
+    record_array = []
+    for n in names:
+        current_record = z[n].to_text(n)
+        for split_record in current_record.split("\n"): # Split the records on the newline
+            record_array.append([split_record]) # Add each record to our array
+
+    return render_to_response('bcommon/list_zone.htm',
+                              { 'record_array' : record_array,
                                 'dns_hostname' : dns_hostname })

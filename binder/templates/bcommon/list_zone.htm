@@ -1,0 +1,10 @@
+{% extends "base.htm" %}
+
+{% block body %}
+
+<ul>
+{% for current_record in record_array %}
+<li> {{ current_record }}
+{% endfor %}
+
+{% endblock body %}
