@@ -5,7 +5,7 @@ DNS Server Zone List:
 
 <ul>
 {% for current_zone in zone_array %}
-<li> {{ current_zone }} </li>
+<li> <a href="/info/{{ dns_hostname }}/{{ current_zone }}/"> {{ current_zone }} </li>
 {% endfor %}
 </ul>
 
