@@ -23,10 +23,14 @@ def list_server_zones(request, dns_hostname):
     mysoup = BS(xmloutput)
     zones = mysoup.findAll('zone')
     zone_array = []
-    for current_zone in zones:
+    for current_zone in zones: # Interate over found zones
         zone_name = current_zone.find('name').contents[0]
-        if re.search(r".*\/IN", zone_name):
-            zone_array.append(zone_name)
+        try: # Is this zone of 'IN' type
+            in_zone = re.search(r"(.*)\/IN", zone_name).group(1)
+            zone_array.append(in_zone)
+        except:
+            pass
 
     return render_to_response('bcommon/list_server_zones.htm',
-                              { 'zone_array' : zone_array })
+                              { 'zone_array' : zone_array,
+                                'dns_hostname' : dns_hostname })
