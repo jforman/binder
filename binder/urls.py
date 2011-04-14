@@ -5,12 +5,9 @@ from django.contrib import admin
 admin.autodiscover()
 
 urlpatterns = patterns('',
-    # Example:
-    # (r'^binder/', include('binder.foo.urls')),
-
-    # Uncomment the admin/doc line below to enable admin documentation:
-    # (r'^admin/doc/', include('django.contrib.admindocs.urls')),
-
-    # Uncomment the next line to enable the admin:
     (r'^admin/', include(admin.site.urls)),
+
+    (r'^info/$', 'bcommon.views.list_servers'),
+#    (r'^info/(?P<dns_hostname>[a-zA-Z0-9.]+)$', 'bcommon.views.list_server_zones'),
+
 )

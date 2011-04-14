@@ -1,0 +1,12 @@
+{% extends "base.htm" %}
+
+{% block body %}
+list servers body
+
+<ul>
+{% for current_server in server_list %}
+<li> <a href="/info/{{ current_server }}/"> {{ current_server }} </li>
+{% endfor %}
+</ul>
+
+{% endblock body %}
