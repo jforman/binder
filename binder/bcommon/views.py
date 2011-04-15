@@ -12,9 +12,8 @@ import dns.query
 import dns.zone
 import socket
 
-def binder_index(request):
-    return render_to_response('bcommon/index.htm',
-                              { 'server_list' : server_list })
+def home_index(request):
+    return render_to_response('index.htm')
 
 def list_servers(request):
     server_list = BindServer.objects.all().order_by('hostname')
