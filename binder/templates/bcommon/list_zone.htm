@@ -2,9 +2,24 @@
 
 {% block body %}
 
-<ul>
+<table>
+<tr>
+  <th>Name</th>
+  <th>TTL</th>
+  <th>Class</th>
+  <th>Type</th>
+  <th>Data</th>
+</tr>
+
 {% for current_record in record_array %}
-<li> {{ current_record }}
+<tr>
+  <td>{{ current_record.rr_name }}</td>
+  <td>{{ current_record.rr_ttl }}</td>
+  <td>{{ current_record.rr_class }}</td>
+  <td>{{ current_record.rr_type }}</td>
+  <td>{{ current_record.rr_data }}</td>
+</tr>
 {% endfor %}
+</table>
 
 {% endblock body %}

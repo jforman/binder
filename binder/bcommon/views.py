@@ -12,6 +12,10 @@ import dns.query
 import dns.zone
 import socket
 
+def binder_index(request):
+    return render_to_response('bcommon/index.htm',
+                              { 'server_list' : server_list })
+
 def list_servers(request):
     server_list = BindServer.objects.all().order_by('hostname')
     return render_to_response('bcommon/list_servers.htm',
@@ -52,7 +56,11 @@ def list_zone(request, dns_hostname, zone_name):
     for n in names:
         current_record = z[n].to_text(n)
         for split_record in current_record.split("\n"): # Split the records on the newline
-            record_array.append([split_record]) # Add each record to our array
+            record_array.append({'rr_name'  : split_record.split(" ")[0],
+                                 'rr_ttl'  : split_record.split(" ")[1],
+                                 'rr_class' : split_record.split(" ")[2],
+                                 'rr_type'  : split_record.split(" ")[3],
+                                 'rr_data'  : split_record.split(" ")[4]})
 
     return render_to_response('bcommon/list_zone.htm',
                               { 'record_array' : record_array,
