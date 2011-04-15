@@ -1,6 +1,7 @@
 from django.conf.urls.defaults import *
+from django.conf import settings
+import os
 
-# Uncomment the next two lines to enable the admin:
 from django.contrib import admin
 admin.autodiscover()
 
@@ -11,3 +12,9 @@ urlpatterns = patterns('',
     (r'^info/(?P<dns_hostname>[a-zA-Z0-9.-]+)/$', 'bcommon.views.list_server_zones'),
     (r'^info/(?P<dns_hostname>[a-zA-Z0-9.-]+)/(?P<zone_name>[a-zA-Z0-9.-]+)/$', 'bcommon.views.list_zone'),
 )
+
+if settings.DEBUG:
+    urlpatterns += patterns('',
+        (r'^static/(?P<path>.*)$', 'django.views.static.serve', 
+         {'document_root' : os.path.join(settings.SITE_ROOT, 'static')}),
+    )
