@@ -8,6 +8,28 @@
 {% endblock header %}
 
 <body>
+{% block errors %}
+
+{% if errors %}
+<div class="errors">
+  Errors were encountered:
+  <br>
+
+  {{ errors }}
+
+  {% if error_context %}
+    <br>
+    {{ error_context }}
+  {% endif %}
+
+<hr>
+{% endif %}
+
+
+
+{% endblock errors %}
+
+<br>
 {% block body %}
 
 {% endblock body %}

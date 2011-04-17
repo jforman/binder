@@ -25,7 +25,15 @@ def list_server_zones(request, dns_hostname):
     # I should take the dns_hostname here, get the object from the DB,
     # and use the status port attribute for the urllib2 query.
     myreq = urllib2.Request("http://%s:853" % dns_hostname)
-    http_request = urllib2.urlopen(myreq)
+    try:
+        http_request = urllib2.urlopen(myreq)
+    except urllib2.URLError, err_reason: # Error retrieving zone list.
+        server_list = BindServer.objects.all().order_by('hostname')
+        return render_to_response('bcommon/list_servers.htm',
+                                  { 'server_list' : server_list,
+                                    'errors' : err_reason,
+                                    'error_context' : "Trying to retrieve zone list from %s" % dns_hostname})
+
     xmloutput = http_request.read()
     mysoup = BS(xmloutput)
     zones = mysoup.findAll('zone')
