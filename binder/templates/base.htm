@@ -8,6 +8,10 @@
 
 <body>
 {% block errors %}
+<<<<<<< HEAD
+=======
+
+>>>>>>> 885b106... Handle errors when trying to retrieve zone list from NS server
 {% if errors %}
 <div class="errors">
   Errors were encountered:
@@ -19,9 +23,22 @@
     <br>
     {{ error_context }}
   {% endif %}
+<<<<<<< HEAD
 <hr>
 {% endif %}
 {% endblock errors %}
+=======
+
+<hr>
+{% endif %}
+
+
+
+{% endblock errors %}
+
+<br>
+{% block body %}
+>>>>>>> 885b106... Handle errors when trying to retrieve zone list from NS server
 
 <br>
 {% block body %}
