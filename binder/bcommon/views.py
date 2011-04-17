@@ -2,7 +2,7 @@
 
 from bcommon.models import BindServer
 from django.template import Context
-from django.shortcuts import render_to_response
+from django.shortcuts import render_to_response, redirect
 
 import urllib2
 from BeautifulSoup import BeautifulStoneSoup as BS
@@ -40,7 +40,7 @@ def list_server_zones(request, dns_hostname):
     zone_array = []
     for current_zone in zones: # Interate over found zones
         zone_name = current_zone.find('name').contents[0]
-        try: # Is this zone of 'IN' type
+        try: # Is this zone of 'IN' type?
             in_zone = re.search(r"(.*)\/IN", zone_name).group(1)
             zone_array.append(in_zone)
         except:
@@ -52,16 +52,18 @@ def list_server_zones(request, dns_hostname):
 
 def list_zone(request, dns_hostname, zone_name):
     try:
-        z = dns.zone.from_xfr(dns.query.xfr(dns_hostname, zone_name))
+        zone = dns.zone.from_xfr(dns.query.xfr(dns_hostname, zone_name))
+    except dns.exception.FormError:
+        return redirect(list_server_zones)
     except socket.gaierror, e:
         print "Problems querying DNS server %s: %s\n" % (options.dns_server, e)
-        return # Need to handle this situation when it can't query the NS.
+        return # Need to handle this situation when it can't query the NS.'
 
-    names = z.nodes.keys()
+    names = zone.nodes.keys()
     names.sort() # Sort the array alphabetically
     record_array = []
-    for n in names:
-        current_record = z[n].to_text(n)
+    for current_name in names:
+        current_record = zone[current_name].to_text(current_name)
         for split_record in current_record.split("\n"): # Split the records on the newline
             record_array.append({'rr_name'  : split_record.split(" ")[0],
                                  'rr_ttl'  : split_record.split(" ")[1],
