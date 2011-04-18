@@ -54,8 +54,11 @@ def list_zone(request, dns_hostname, zone_name):
     try:
         zone = dns.zone.from_xfr(dns.query.xfr(dns_hostname, zone_name))
     except dns.exception.FormError:
-        return redirect(list_server_zones)
+        # There was an error querying the server for the specific zone.
+        # Example: a zone that does not exist on the server.
+        return redirect('/info/')
     except socket.gaierror, e:
+        # TODO: Need to better handle errors here.
         print "Problems querying DNS server %s: %s\n" % (options.dns_server, e)
         return # Need to handle this situation when it can't query the NS.'
 
