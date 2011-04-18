@@ -1,9 +1,9 @@
 {% extends "base.htm" %}
 
+{% block pageheader %}
+Server List:
+{% endblock pageheader %}
 {% block body %}
-DNS Server List:
-<br>
-
 <ul>
 {% for current_server in server_list %}
 <li> <a href="/info/{{ current_server }}/"> {{ current_server }} </li>

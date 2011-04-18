@@ -1,18 +1,22 @@
 <html>
 {% block header %}
 <head>
-  <title>Binder DNS Admin Tool</title>
+  <title>Binder DNS Admin</title>
   <link rel="stylesheet" type="text/css" href="/static/style.css" />
 </head>
 {% endblock header %}
 
-<body>
-{% block errors %}
-<<<<<<< HEAD
-=======
+{% block navigation %}
+<a href="/">Home</a>
+<hr>
+{% endblock navigation %}
 
->>>>>>> 885b106... Handle errors when trying to retrieve zone list from NS server
+{% block pageheader %}
+{% endblock pageheader %}
+
+<body>
 {% if errors %}
+{% block errors %}
 <div class="errors">
   Errors were encountered:
   <br>
@@ -23,23 +27,9 @@
     <br>
     {{ error_context }}
   {% endif %}
-<<<<<<< HEAD
 <hr>
-{% endif %}
 {% endblock errors %}
-=======
-
-<hr>
 {% endif %}
-
-
-
-{% endblock errors %}
-
-<br>
-{% block body %}
->>>>>>> 885b106... Handle errors when trying to retrieve zone list from NS server
-
 <br>
 {% block body %}
 {% endblock body %}
