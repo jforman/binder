@@ -5,6 +5,7 @@ from django.template import Context
 from django.shortcuts import render_to_response, redirect
 from bcommon.helpers import list_server_zones
 
+from bcommon.forms import FormAddRecord
 
 import dns.query
 import dns.zone
@@ -31,6 +32,7 @@ def view_server_zones(request, dns_hostname):
                                 'dns_hostname' : dns_hostname })
 
 def list_zone(request, dns_hostname, zone_name):
+    # Need to move most of this logic into a helper method.
     try:
         zone = dns.zone.from_xfr(dns.query.xfr(dns_hostname, zone_name))
     except dns.exception.FormError:
@@ -59,3 +61,9 @@ def list_zone(request, dns_hostname, zone_name):
                                 'dns_hostname' : dns_hostname,
                                 'rr_server' : dns_hostname,
                                 'rr_domain' : zone_name})
+
+def add_record(request, dns_hostname, zone_name):
+    form = FormAddRecord(initial={ 'dns_hostname' : dns_hostname,
+                                   'rr_domain' : zone_name })
+    return render_to_response('bcommon/add_record.htm',
+                              { 'form' : form })
