@@ -76,4 +76,6 @@ def list_zone(request, dns_hostname, zone_name):
 
     return render_to_response('bcommon/list_zone.htm',
                               { 'record_array' : record_array,
-                                'dns_hostname' : dns_hostname })
+                                'dns_hostname' : dns_hostname,
+                                'rr_server' : dns_hostname,
+                                'rr_domain' : zone_name})
