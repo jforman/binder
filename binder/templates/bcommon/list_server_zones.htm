@@ -1,12 +1,14 @@
 {% extends "base.htm" %}
 
 {% block body %}
+{% if not errors %}
 DNS Server Zone List:
 
-<ul>
-{% for current_zone in zone_array %}
-<li> <a href="/info/{{ dns_hostname }}/{{ current_zone }}/"> {{ current_zone }} </li>
-{% endfor %}
-</ul>
+  <ul>
+  {% for current_zone in zone_array %}
+    <li> <a href="/info/{{ dns_hostname }}/{{ current_zone }}/"> {{ current_zone }} </li>
+  {% endfor %}
+  </ul>
+{% endif %}
 
 {% endblock body %}
