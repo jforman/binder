@@ -15,10 +15,3 @@ class Key(models.Model):
 
     def __unicode__(self):
         return self.name
-    
-class Zone(models.Model):
-    server = models.ForeignKey('BindServer')
-    zone_name = models.CharField(max_length=50)
-
-    def __unicode__(self):
-        return self.zone_name
