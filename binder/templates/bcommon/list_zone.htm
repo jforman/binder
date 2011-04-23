@@ -4,6 +4,7 @@
 
 <table>
 <tr>
+  <th></th>
   <th>Name</th>
   <th>TTL</th>
   <th>Class</th>
@@ -11,8 +12,12 @@
   <th>Data</th>
 </tr>
 
+<form action="/modify/delete_record" method="post">
+<input type="hidden" name="rr_domain" value="{{ rr_domain }}">
+<input type="hidden" name="rr_server" value="{{ rr_server }}">
 {% for current_record in record_array %}
 <tr>
+  <td><input type="checkbox" name="rr_array" value="{{ current_record.rr_name }}"></td>
   <td>{{ current_record.rr_name }}</td>
   <td>{{ current_record.rr_ttl }}</td>
   <td>{{ current_record.rr_class }}</td>
@@ -21,5 +26,7 @@
 </tr>
 {% endfor %}
 </table>
+<input type="submit" value="Delete Selected"/>
+</form>
 
 {% endblock body %}
