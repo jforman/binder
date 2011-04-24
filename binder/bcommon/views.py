@@ -1,6 +1,6 @@
 # bcommon views
 
-from bcommon.models import BindServer
+from bcommon.models import BindServer, Key
 from django.template import Context
 from django.shortcuts import render_to_response, redirect
 from bcommon.helpers import list_server_zones
@@ -9,7 +9,9 @@ from bcommon.forms import FormAddRecord
 from django.template import RequestContext
 
 import dns.query
-import dns.zone
+import dns.update
+import dns.tsigkeyring
+
 import socket
 
 def home_index(request):
@@ -34,7 +36,7 @@ def view_server_zones(request, dns_hostname):
                                 'dns_hostname' : dns_hostname },
                               context_instance=RequestContext(request))
 
-def list_zone(request, dns_hostname, zone_name):
+def list_zone_records(request, dns_hostname, zone_name):
     # Need to move most of this logic into a helper method.
     try:
         zone = dns.zone.from_xfr(dns.query.xfr(dns_hostname, zone_name))
@@ -73,3 +75,21 @@ def add_record(request, dns_hostname, zone_name):
                               { 'form' : form },
                               context_instance=RequestContext(request))
 
+def add_record_result(request):
+    if request.method == "GET":
+        # Return home. You shouldn't be accessing the result
+        # via a GET.
+        return redirect('/')
+
+    # We got a POST to add the result.
+    form = FormAddRecord(request.POST)
+    if form.is_valid():
+        cd = form.cleaned_data
+        key_name = Key.objects.get(name=(cd['tsig_key'])).name
+        key_data = Key.objects.get(name=(cd['tsig_key'])).data
+        key_algorithm = Key.objects.get(name=(cd['tsig_key'])).algorithm
+        keyring = dns.tsigkeyring.from_text({ key_name : key_data })
+        dns_update = dns.update.Update(cd['rr_domain'], keyring = keyring, keyalgorithm=key_algorithm)
+        dns_update.replace(str(cd['rr_name']), 10, str(cd['rr_type']), str(cd['rr_data']))
+        response = dns.query.tcp(dns_update, cd['dns_hostname'])
+        print "dns update response: %s" % response

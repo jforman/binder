@@ -8,3 +8,4 @@ class FormAddRecord(forms.Form):
     rr_name = forms.CharField(max_length=256)
     rr_type = forms.ChoiceField(choices=(("A", "A"), ("MX", "MX"), ("CNAME", "CNAME"), ("AAAA", "AAAA")))
     rr_data = forms.CharField(max_length=256)
+    tsig_key = forms.ModelChoiceField(queryset=Key.objects.all(), empty_label=None)
