@@ -6,6 +6,7 @@ from django.shortcuts import render_to_response, redirect
 from bcommon.helpers import list_server_zones
 
 from bcommon.forms import FormAddRecord
+from django.template import RequestContext
 
 import dns.query
 import dns.zone
@@ -17,7 +18,8 @@ def home_index(request):
 def list_servers(request):
     server_list = BindServer.objects.all().order_by('hostname')
     return render_to_response('bcommon/list_servers.htm',
-                              { 'server_list' : server_list })
+                              { 'server_list' : server_list },
+                              context_instance=RequestContext(request))
 
 
 def view_server_zones(request, dns_hostname):
@@ -29,7 +31,8 @@ def view_server_zones(request, dns_hostname):
 
     return render_to_response('bcommon/list_server_zones.htm',
                               { 'zone_array' : zone_array,
-                                'dns_hostname' : dns_hostname })
+                                'dns_hostname' : dns_hostname },
+                              context_instance=RequestContext(request))
 
 def list_zone(request, dns_hostname, zone_name):
     # Need to move most of this logic into a helper method.
@@ -60,10 +63,13 @@ def list_zone(request, dns_hostname, zone_name):
                               { 'record_array' : record_array,
                                 'dns_hostname' : dns_hostname,
                                 'rr_server' : dns_hostname,
-                                'rr_domain' : zone_name})
+                                'rr_domain' : zone_name},
+                              context_instance=RequestContext(request))
 
 def add_record(request, dns_hostname, zone_name):
     form = FormAddRecord(initial={ 'dns_hostname' : dns_hostname,
                                    'rr_domain' : zone_name })
     return render_to_response('bcommon/add_record.htm',
-                              { 'form' : form })
+                              { 'form' : form },
+                              context_instance=RequestContext(request))
+
