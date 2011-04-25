@@ -13,6 +13,7 @@ urlpatterns = patterns('',
     (r'^info/(?P<dns_hostname>[a-zA-Z0-9.-]+)/(?P<zone_name>[a-zA-Z0-9.-]+)/$', 'bcommon.views.view_zone_records'),
     (r'^add_record/(?P<dns_hostname>[a-zA-Z0-9.-]+)/(?P<zone_name>[a-zA-Z0-9.-]+)/$', 'bcommon.views.view_add_record'),
     (r'^add_record/result/$', 'bcommon.views.add_record_result'),
+    (r'^delete_record/$', 'bcommon.views.view_delete_record'),
 )
 
 if settings.DEBUG:

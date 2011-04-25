@@ -83,3 +83,31 @@ def add_record_result(request):
         return render_to_response('bcommon/add_record_result.htm',
                                   { 'response' : response },
                                   context_instance=RequestContext(request))
+
+def view_delete_record(request):
+    if request.method == "GET":
+        # Return home. You shouldn't trying to directly acces
+        # the url for deleting records.
+        return redirect('/')
+
+    rr_server = request.POST['rr_server']
+    rr_domain = request.POST['rr_domain']
+    rr_array = request.POST.getlist('rr_array')
+
+    if request.POST['delete_step'] == "initial":
+        """ We need to confirm they really want to delete the items. """
+        return render_to_response('bcommon/delete_record_initial.htm',
+                           { 'rr_server' : rr_server,
+                             'rr_domain' : rr_domain,
+                             'rr_array' :  rr_array },
+                           context_instance=RequestContext(request))
+
+    if request.POST['delete_step'] == "finalize":
+        # TODO: Instrument
+        """ Time to actually delete the records requested """
+        pass
+
+    # If we hit a case where we don't know what's going on.
+    return render_to_response('bcommon/index.htm',
+                              { 'errors' : "We hit an unhandled exception in deleting your requested records." },
+                              context_instance=RequestContext(request))

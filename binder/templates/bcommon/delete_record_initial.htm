@@ -1,0 +1,19 @@
+{% extends "base.htm" %}
+
+{% block body %}
+
+<form action="/delete_record/" method="POST">{% csrf_token %}
+<input type="hidden" name="rr_server" value="{{ rr_server }}">
+<input type="hidden" name="rr_domain" value="{{ rr_domain }}">
+<input type="hidden" name="rr_array" value="{{ rr_array }}">
+<input type="hidden" name="delete_step" value="finalize">
+Do you really want to delete the following records?
+<ul>
+<li>Server: {{ rr_server }}</li>
+<li>Domain: {{ rr_domain }}</li>
+<li>Records: {{ rr_array }}</li>
+</ul>
+<input type="submit" value="Yes, I really want to really them."/>
+</form>
+
+{% endblock body %}
