@@ -3,12 +3,12 @@
 from bcommon.models import BindServer, Key
 from django.template import Context
 from django.shortcuts import render_to_response, redirect
-from bcommon.helpers import list_server_zones
+from bcommon.helpers import list_server_zones, list_zone_records, add_record
 
 from bcommon.forms import FormAddRecord
 from django.template import RequestContext
 
-import dns.query
+
 import dns.update
 import dns.tsigkeyring
 
@@ -18,6 +18,7 @@ def home_index(request):
     return render_to_response('index.htm')
 
 def list_servers(request):
+    """ List the DNS servers configured in the Django DB. """
     server_list = BindServer.objects.all().order_by('hostname')
     return render_to_response('bcommon/list_servers.htm',
                               { 'server_list' : server_list },
@@ -25,6 +26,7 @@ def list_servers(request):
 
 
 def view_server_zones(request, dns_hostname):
+    """ Display the list of DNS zones a particular DNS host provides. """
     zone_array = list_server_zones(dns_hostname)
     if 'errors' in zone_array:
         return render_to_response('bcommon/list_server_zones.htm',
@@ -36,30 +38,14 @@ def view_server_zones(request, dns_hostname):
                                 'dns_hostname' : dns_hostname },
                               context_instance=RequestContext(request))
 
-def list_zone_records(request, dns_hostname, zone_name):
-    # Need to move most of this logic into a helper method.
-    try:
-        zone = dns.zone.from_xfr(dns.query.xfr(dns_hostname, zone_name))
-    except dns.exception.FormError:
-        # There was an error querying the server for the specific zone.
-        # Example: a zone that does not exist on the server.
-        return redirect('/info/')
-    except socket.gaierror, e:
-        # TODO: Need to better handle errors here.
-        print "Problems querying DNS server %s: %s\n" % (options.dns_server, e)
-        return # Need to handle this situation when it can't query the NS.'
-
-    names = zone.nodes.keys()
-    names.sort() # Sort the array alphabetically
-    record_array = []
-    for current_name in names:
-        current_record = zone[current_name].to_text(current_name)
-        for split_record in current_record.split("\n"): # Split the records on the newline
-            record_array.append({'rr_name'  : split_record.split(" ")[0],
-                                 'rr_ttl'  : split_record.split(" ")[1],
-                                 'rr_class' : split_record.split(" ")[2],
-                                 'rr_type'  : split_record.split(" ")[3],
-                                 'rr_data'  : split_record.split(" ")[4]})
+def view_zone_records(request, dns_hostname, zone_name):
+    """ Display the list of records a particular zone on a DNS host provides. """
+    record_array = list_zone_records(dns_hostname, zone_name)
+    if 'errors' in record_array:
+        return render_to_response('bcommon/list_server_zones.htm',
+                                  { 'errors' : record_array['errors'],
+                                  'error_context' : record_array['error_context']},
+                                  context_instance=RequestContext(request))
 
     return render_to_response('bcommon/list_zone.htm',
                               { 'record_array' : record_array,
@@ -68,14 +54,16 @@ def list_zone_records(request, dns_hostname, zone_name):
                                 'rr_domain' : zone_name},
                               context_instance=RequestContext(request))
 
-def add_record(request, dns_hostname, zone_name):
+def view_add_record(request, dns_hostname, zone_name):
+    """ View to provide form to add a DNS record. """
     form = FormAddRecord(initial={ 'dns_hostname' : dns_hostname,
                                    'rr_domain' : zone_name })
-    return render_to_response('bcommon/add_record.htm',
+    return render_to_response('bcommon/add_record_form.htm',
                               { 'form' : form },
                               context_instance=RequestContext(request))
 
 def add_record_result(request):
+    """ Process the input given to add a DNS record. """
     if request.method == "GET":
         # Return home. You shouldn't be accessing the result
         # via a GET.
@@ -85,11 +73,7 @@ def add_record_result(request):
     form = FormAddRecord(request.POST)
     if form.is_valid():
         cd = form.cleaned_data
-        key_name = Key.objects.get(name=(cd['tsig_key'])).name
-        key_data = Key.objects.get(name=(cd['tsig_key'])).data
-        key_algorithm = Key.objects.get(name=(cd['tsig_key'])).algorithm
-        keyring = dns.tsigkeyring.from_text({ key_name : key_data })
-        dns_update = dns.update.Update(cd['rr_domain'], keyring = keyring, keyalgorithm=key_algorithm)
-        dns_update.replace(str(cd['rr_name']), 10, str(cd['rr_type']), str(cd['rr_data']))
-        response = dns.query.tcp(dns_update, cd['dns_hostname'])
-        print "dns update response: %s" % response
+        response = add_record(cd)
+        return render_to_response('bcommon/add_record_result.htm',
+                                  { 'response' : response },
+                                  context_instance=RequestContext(request))
