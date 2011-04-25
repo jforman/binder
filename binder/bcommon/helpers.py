@@ -62,5 +62,9 @@ def add_record(clean_data):
     keyring = dns.tsigkeyring.from_text({ key_name : key_data })
     dns_update = dns.update.Update(clean_data['rr_domain'], keyring = keyring, keyalgorithm=key_algorithm)
     dns_update.replace(str(clean_data['rr_name']), 10, str(clean_data['rr_type']), str(clean_data['rr_data']))
-    response = dns.query.tcp(dns_update, clean_data['dns_hostname'])
+    try:
+        response = dns.query.tcp(dns_update, clean_data['dns_hostname'])
+    except dns.tsig.PeerBadKey:
+        return {'errors' : "There was a problem adding your record due to a TSIG key issue. Please resolve that first." }
+
     return response

@@ -2,11 +2,14 @@
 
 
 {% block pageheader %}
-Result:
+
 {% endblock pageheader %}
 
 {% block body %}
-<pre>
-  {{ response }}
-</pre>
+{% if not errors %}
+  Result:
+  <pre>
+    {{ response }}
+  </pre>
+{% endif %}
 {% endblock body %}

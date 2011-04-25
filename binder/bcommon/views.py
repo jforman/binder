@@ -74,6 +74,12 @@ def add_record_result(request):
     if form.is_valid():
         cd = form.cleaned_data
         response = add_record(cd)
+
+    if 'errors' in response:
+        return render_to_response('bcommon/add_record_result.htm',
+                                  { 'errors' : response['errors'] },
+                                  context_instance=RequestContext(request))
+    else:
         return render_to_response('bcommon/add_record_result.htm',
                                   { 'response' : response },
                                   context_instance=RequestContext(request))
