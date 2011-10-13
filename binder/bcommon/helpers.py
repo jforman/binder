@@ -43,4 +43,4 @@ def add_record(clean_data):
     except dns.tsig.PeerBadKey:
         return {'errors' : "There was a problem adding your record due to a TSIG key issue. Please resolve that first." }
 
-    return response
+    return {'response' : response }
