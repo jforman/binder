@@ -2,7 +2,7 @@
 
 {% block body %}
 {% if not errors %}
-DNS Server Zone List:
+DNS Server Zone List for {{ dns_hostname }}:
 
   <ul>
   {% for current_zone in zone_array %}

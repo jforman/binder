@@ -15,7 +15,6 @@
 <form action="/delete_record/" method="post">{% csrf_token %}
 <input type="hidden" name="rr_server" value="{{ rr_server }}">
 <input type="hidden" name="rr_domain" value="{{ rr_domain }}">
-<input type="hidden" name="delete_step" value="initial">
 {% for current_record in record_array %}
 <tr>
   <td><input type="checkbox" name="rr_array" value="{{ current_record.rr_name }}"></td>

@@ -1,12 +1,13 @@
-import urllib2
-from BeautifulSoup import BeautifulStoneSoup as BS
-import re
+from bcommon.keyutils import create_keyring
 
-from bcommon.models import Key, BindServer
+import re
 import dns.query
+import dns.reversename
+import dns.update
 
 def list_zone_records(dns_hostname, zone_name):
-    """ Take a DNS zone, and list all the records it contains. """
+    """Take a DNS server and a zone name,
+    and return an array of its records."""
     # Need to move most of this logic into a helper method.
     try:
         zone = dns.zone.from_xfr(dns.query.xfr(dns_hostname, zone_name))
@@ -31,16 +32,48 @@ def list_zone_records(dns_hostname, zone_name):
                                  'rr_data'  : split_record.split(" ")[4]})
     return record_array
 
-def add_record(clean_data):
-    key_name = Key.objects.get(name=(clean_data['tsig_key'])).name
-    key_data = Key.objects.get(name=(clean_data['tsig_key'])).data
-    key_algorithm = Key.objects.get(name=(clean_data['tsig_key'])).algorithm
-    keyring = dns.tsigkeyring.from_text({ key_name : key_data })
-    dns_update = dns.update.Update(clean_data['rr_domain'], keyring = keyring, keyalgorithm=key_algorithm)
-    dns_update.replace(str(clean_data['rr_name']), 86400, str(clean_data['rr_type']), str(clean_data['rr_data']))
-    try:
-        response = dns.query.tcp(dns_update, clean_data['dns_hostname'])
-    except dns.tsig.PeerBadKey:
-        return {'errors' : "There was a problem adding your record due to a TSIG key issue. Please resolve that first." }
+def add_forward_record(form_data, zone_keyring):
+    """Take in data from FormAddRecord and a keyring object,
+    return a response from the DNS server about adding the record."""
 
-    return {'response' : response }
+    re_form_data = re.search(r"(\w+).(.*)", form_data["name"])
+    hostname = re_form_data.group(1)
+    domain = re_form_data.group(2)
+
+    dns_update = dns.update.Update(domain, keyring = zone_keyring)
+    dns_update.replace(hostname, int(form_data["ttl"]), str(form_data["record_type"]), str(form_data["data"]))
+
+    try:
+        response = dns.query.tcp(dns_update, form_data["dns_server"])
+    except dns.tsig.BadPeerKey:
+        response = "There was a problem adding your forward record due to a TSIG key issue."
+
+    return response
+
+def add_reverse_record(form_data, zone_keyring):
+
+    reverse_ip_fqdn = str(dns.reversename.from_address(form_data["data"]))
+    reverse_ip = re.search(r"([0-9]+).(.*).$", reverse_ip_fqdn).group(1)
+    reverse_domain = re.search(r"([0-9]+).(.*).$", reverse_ip_fqdn).group(2)
+
+    dns_update = dns.update.Update(reverse_domain, keyring = zone_keyring)
+    dns_update.replace(reverse_ip, int(form_data["ttl"]), "PTR", str(form_data["name"]) + ".")
+
+    response = dns.query.tcp(dns_update, form_data["dns_server"])
+
+    return response
+
+def add_record(form_data, key_dict):
+    """Add a DNS record with data from a FormAddRecord object.
+    If a reverse PTR record is requested, this will be added too."""
+
+    keyring = create_keyring(key_dict)
+    response = {}
+    forward_response = add_forward_record(form_data, keyring)
+    response["forward_response"] = forward_response
+
+    if form_data["create_reverse"]:
+        reverse_response = add_reverse_record(form_data, keyring)
+        response["reverse_response"] = reverse_response
+
+    return response

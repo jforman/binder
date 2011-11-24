@@ -6,10 +6,19 @@
 {% endblock pageheader %}
 
 {% block body %}
-{% if not errors %}
-  Result:
-  <pre>
-    {{ response }}
-  </pre>
+{% if response.forward_response %}
+Forward Record Creation Output
+<pre>
+{{ response.forward_response }}
+</pre>
 {% endif %}
+
+<p>
+{% if response.reverse_response %}
+Reverse Record Creation Output
+<pre>
+{{ response.reverse_response }}
+</pre>
+{% endif %}
+
 {% endblock body %}
