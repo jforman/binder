@@ -15,8 +15,8 @@
 {% endblock pageheader %}
 
 <body>
-{% if errors %}
 {% block errors %}
+{% if errors %}
 <div class="errors">
   Errors were encountered:
   <br>
@@ -28,8 +28,9 @@
     {{ error_context }}
   {% endif %}
 <hr>
-{% endblock errors %}
 {% endif %}
+{% endblock errors %}
+
 <br>
 {% block body %}
 {% endblock body %}

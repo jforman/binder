@@ -6,7 +6,6 @@ import urllib2
 from BeautifulSoup import BeautifulStoneSoup as BS
 import re
 
-
 TSIG_ALGORITHMS = (('hmac-md5', 'MD5'),('hmac-sha1', 'SHA1'),('hmac-224', 'SHA224'),('hmac-sha256', 'SHA256'),('hmac-sha384', 'SHA384'),('hmac-sha512', 'SHA512'))
 
 class BindServer(models.Model):
@@ -25,7 +24,7 @@ class BindServer(models.Model):
         try:
             http_request = urllib2.urlopen(myreq)
         except urllib2.URLError, err_reason: # Error retrieving zone list.
-            return { 'errors' : err_reason, 'error_context' : "Trying to retrieve zone list from %s" % dns_hostname }
+            return { 'errors' : err_reason, 'error_context' : "Trying to retrieve zone list from %s" % self.hostname }
 
         return_array = []
         xmloutput = http_request.read()
