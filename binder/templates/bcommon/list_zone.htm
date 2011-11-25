@@ -17,7 +17,7 @@
 <input type="hidden" name="rr_domain" value="{{ rr_domain }}">
 {% for current_record in record_array %}
 <tr>
-  <td><input type="checkbox" name="rr_array" value="{{ current_record.rr_name }}"></td>
+  <td><input type="checkbox" name="rr_array" value="{{ current_record.rr_name }}.{{ rr_domain }}"></td>
   <td>{{ current_record.rr_name }}</td>
   <td>{{ current_record.rr_ttl }}</td>
   <td>{{ current_record.rr_class }}</td>

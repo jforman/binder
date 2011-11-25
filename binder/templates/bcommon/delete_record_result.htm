@@ -1,0 +1,17 @@
+{% extends "base.htm" %}
+
+
+{% block pageheader %}
+
+{% endblock pageheader %}
+
+{% block body %}
+
+{% for current_response in delete_result %}
+Record: {{ current_response.rr_item }}
+<pre>
+{{ current_response.output }}
+</pre>
+{% endfor %}
+
+{% endblock body %}

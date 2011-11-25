@@ -5,6 +5,8 @@ import dns.query
 import dns.reversename
 import dns.update
 
+re_IPADDRESS = re.compile(r"\d+.\d+.\d+.\d+")
+
 def list_zone_records(dns_hostname, zone_name):
     """Take a DNS server and a zone name,
     and return an array of its records."""
@@ -59,15 +61,15 @@ def add_reverse_record(form_data, zone_keyring):
     dns_update = dns.update.Update(reverse_domain, keyring = zone_keyring)
     dns_update.replace(reverse_ip, int(form_data["ttl"]), "PTR", str(form_data["name"]) + ".")
 
-    response = dns.query.tcp(dns_update, form_data["dns_server"])
+    output = dns.query.tcp(dns_update, form_data["dns_server"])
 
-    return response
+    return output
 
-def add_record(form_data, key_dict):
+def add_record(form_data):
     """Add a DNS record with data from a FormAddRecord object.
     If a reverse PTR record is requested, this will be added too."""
 
-    keyring = create_keyring(key_dict)
+    keyring = create_keyring(form_data["key_name"])
     response = {}
     forward_response = add_forward_record(form_data, keyring)
     response["forward_response"] = forward_response
@@ -77,3 +79,19 @@ def add_record(form_data, key_dict):
         response["reverse_response"] = reverse_response
 
     return response
+
+def delete_record(form_data, rr_items):
+    keyring = create_keyring(form_data["key_name"])
+    dns_server = form_data["rr_server"]
+    delete_response = []
+    for current_rr_item in rr_items:
+        re_record = re.search(r"(\w+)\.(.*)$", current_rr_item)
+        record = re_record.group(1)
+        domain = re_record.group(2)
+
+        dns_update = dns.update.Update(domain, keyring = keyring)
+        dns_update.delete(record)
+        output = dns.query.tcp(dns_update, dns_server)
+        delete_response.append({ "rr_item" : current_rr_item, "output" : output })
+
+    return delete_response

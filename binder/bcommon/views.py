@@ -3,10 +3,15 @@
 from bcommon.models import BindServer, Key
 from django.template import Context
 from django.shortcuts import render_to_response, redirect
-from bcommon.helpers import list_zone_records, add_record #, delete_record
+from bcommon.helpers import list_zone_records, add_record, delete_record
 
 from bcommon.forms import FormAddRecord
 from django.template import RequestContext
+from bcommon.keyutils import create_keyring
+
+import re
+
+RE_UNICODEARRAY = re.compile(r"u'(.*?)'")
 
 def home_index(request):
     return render_to_response('index.htm')
@@ -73,16 +78,14 @@ def view_add_record_result(request):
                                   context_instance=RequestContext(request))
 
 
-    key_dict = Key.objects.get(name=cd["key_name"])
-    add_record_response = add_record(cd, key_dict)
+    add_record_response = add_record(cd)
 
     return render_to_response('bcommon/add_record_result.htm',
                               { 'response' : add_record_response },
                               context_instance=RequestContext(request))
 
 
-### WORK ON BELOW
-def confirm_delete_record(request):
+def view_delete_record(request):
     if request.method == "GET":
         # Return home. You shouldn't trying to directly acces
         # the url for deleting records.
@@ -92,8 +95,6 @@ def confirm_delete_record(request):
     rr_domain = request.POST['rr_domain']
     rr_array = request.POST.getlist('rr_array')
 
-    ## TODO(jforman): We need to handle the case where the POST data
-    ## is somehow bad.
     return render_to_response('bcommon/delete_record_initial.htm',
                               { 'rr_server' : rr_server,
                                 'rr_domain' : rr_domain,
@@ -101,24 +102,20 @@ def confirm_delete_record(request):
                                 'tsig_keys' : Key.objects.all() },
                               context_instance=RequestContext(request))
 
-    # If we hit a case where we don't know what's going on.
-    # return render_to_response('bcommon/index.htm',
-    #                           { 'errors' : "We hit an unhandled exception in deleting your requested records." },
-    #                           context_instance=RequestContext(request))
 
-def delete_result(request):
+def view_delete_result(request):
     if request.method == "GET":
-        # Return home. You shouldn't trying to directly acces
+        # Return home. You shouldn't trying to directly access
         # the url for deleting records.
         return redirect('/')
 
-    to_delete_array = {}
-    to_delete_array['rr_server'] = request.POST['rr_server']
-    to_delete_array['rr_domain'] = request.POST['rr_domain']
-    to_delete_array['rr_array'] = eval(request.POST.getlist('rr_array')[0])
-    for current in to_delete_array['rr_array']:
-        print "current: %s" % current
+    # What seems like an ugly hack to get around the fact
+    # that the array comes back as Unicode values.
+    rr_unicode_array = request.POST.getlist('rr_array')[0]
+    rr_items = RE_UNICODEARRAY.findall(rr_unicode_array)
 
-    to_delete_array['key_name'] = request.POST['key_name']
-    to_delete_array['key_data'] = Key.objects.get(name=(to_delete_array['key_name'])).data
-    delete_result = delete_record(to_delete_array)
+    delete_result = delete_record(request.POST, rr_items)
+
+    return render_to_response('bcommon/delete_record_result.htm',
+                              { 'delete_result' : delete_result },
+                              context_instance=RequestContext(request))
