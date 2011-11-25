@@ -26,8 +26,14 @@ def list_servers(request):
 
 def view_server_zones(request, dns_hostname):
     """ Display the list of DNS zones a particular DNS host provides. """
-    this_server = BindServer.objects.get(hostname=dns_hostname)
-    zone_array = this_server.list_zones()
+    try:
+        this_server = BindServer.objects.get(hostname=dns_hostname)
+        zone_array = this_server.list_zones()
+    except BindServer.DoesNotExist, err:
+        return render_to_response('bcommon/list_server_zones.htm',
+                                  { 'errors' : "The server %s does not exist in this Binder instance." % dns_hostname },
+                                  context_instance=RequestContext(request))
+
     if 'errors' in zone_array:
         return render_to_response('bcommon/list_server_zones.htm',
                                   { 'errors' : zone_array['errors'],
