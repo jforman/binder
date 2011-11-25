@@ -40,6 +40,26 @@ class BindServer(models.Model):
 
         return return_array
 
+    def list_zone_records(self, zone):
+        """Given a zone, produce an array of dicts containing
+        each RR record and its attributes."""
+        try:
+            zone = dns.zone.from_xfr(dns.query.xfr(self.hostname, zone))
+        except dns.exception.FormError, err:
+            raise Exception("The zone requested %s is not found on %s." % (zone, self.hostname))
+
+        names = zone.nodes.keys()
+        names.sort()
+        record_array = []
+        for current_name in names:
+            current_record = zone[current_name].to_text(current_name)
+            for split_record in current_record.split("\n"): # Split the records on the newline
+                record_array.append({'rr_name'  : split_record.split(" ")[0],
+                                     'rr_ttl'  : split_record.split(" ")[1],
+                                     'rr_class' : split_record.split(" ")[2],
+                                     'rr_type'  : split_record.split(" ")[3],
+                                     'rr_data'  : split_record.split(" ")[4]})
+        return record_array
 
 class Key(models.Model):
     name = models.CharField(max_length=50)

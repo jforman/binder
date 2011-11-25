@@ -8,7 +8,7 @@ admin.autodiscover()
 urlpatterns = patterns('',
     (r'^admin/', include(admin.site.urls)),
     (r'^$', 'bcommon.views.home_index'),
-    (r'^info/$', 'bcommon.views.list_servers'),
+    (r'^info/$', 'bcommon.views.view_server_list'),
 
     (r'^info/(?P<dns_hostname>[a-zA-Z0-9.-]+)/$', 'bcommon.views.view_server_zones'),
     (r'^info/(?P<dns_hostname>[a-zA-Z0-9.-]+)/(?P<zone_name>[a-zA-Z0-9.-]+)/$', 'bcommon.views.view_zone_records'),

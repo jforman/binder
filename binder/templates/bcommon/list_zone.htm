@@ -2,6 +2,7 @@
 
 {% block body %}
 
+{% if not errors %}
 <table>
 <tr>
   <th></th>
@@ -13,9 +14,9 @@
 </tr>
 
 <form action="/delete_record/" method="post">{% csrf_token %}
-<input type="hidden" name="rr_server" value="{{ rr_server }}">
-<input type="hidden" name="rr_domain" value="{{ rr_domain }}">
-{% for current_record in record_array %}
+<input type="hidden" name="dns_server" value="{{ rr_server }}">
+<input type="hidden" name="zone_name" value="{{ rr_domain }}">
+{% for current_record in zone_array %}
 <tr>
   <td><input type="checkbox" name="rr_array" value="{{ current_record.rr_name }}.{{ rr_domain }}"></td>
   <td>{{ current_record.rr_name }}</td>
@@ -30,4 +31,5 @@
 <input type="submit" value="Delete Selected"/>
 </form>
 
+{% endif %}
 {% endblock body %}

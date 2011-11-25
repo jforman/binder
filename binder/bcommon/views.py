@@ -3,7 +3,7 @@
 from bcommon.models import BindServer, Key
 from django.template import Context
 from django.shortcuts import render_to_response, redirect
-from bcommon.helpers import list_zone_records, add_record, delete_record
+from bcommon.helpers import add_record, delete_record
 
 from bcommon.forms import FormAddRecord
 from django.template import RequestContext
@@ -16,13 +16,12 @@ RE_UNICODEARRAY = re.compile(r"u'(.*?)'")
 def home_index(request):
     return render_to_response('index.htm')
 
-def list_servers(request):
+def view_server_list(request):
     """ List the DNS servers configured in the Django DB. """
     server_list = BindServer.objects.all().order_by('hostname')
     return render_to_response('bcommon/list_servers.htm',
-                              { 'server_list' : server_list },
+                              { "server_list" : server_list},
                               context_instance=RequestContext(request))
-
 
 def view_server_zones(request, dns_hostname):
     """ Display the list of DNS zones a particular DNS host provides. """
@@ -45,18 +44,18 @@ def view_server_zones(request, dns_hostname):
                               context_instance=RequestContext(request))
 
 def view_zone_records(request, dns_hostname, zone_name):
-    """ Display the list of records a particular zone on a DNS host provides. """
-    record_array = list_zone_records(dns_hostname, zone_name)
-    if 'errors' in record_array:
-        return render_to_response('bcommon/list_server_zones.htm',
-                                  { 'errors' : record_array['errors'],
-                                  'error_context' : record_array['error_context']},
+    """ Display the list of records for a a particular zone."""
+    try:
+        this_server = BindServer.objects.get(hostname=dns_hostname)
+        zone_array = this_server.list_zone_records(zone_name)
+    except Exception, err:
+        return render_to_response('bcommon/list_zone.htm',
+                                  { 'errors' : err},
                                   context_instance=RequestContext(request))
 
     return render_to_response('bcommon/list_zone.htm',
-                              { 'record_array' : record_array,
+                              { 'zone_array' : zone_array,
                                 'dns_hostname' : dns_hostname,
-                                'rr_server' : dns_hostname,
                                 'rr_domain' : zone_name},
                               context_instance=RequestContext(request))
 
@@ -83,8 +82,12 @@ def view_add_record_result(request):
                                   { 'form' : form },
                                   context_instance=RequestContext(request))
 
-
-    add_record_response = add_record(cd)
+    try:
+        add_record_response = add_record(cd)
+    except Exception, err:
+        return render_to_response('bcommon/add_record_result.htm',
+                                  { "errors" : err },
+                                  context_instance=RequestContext(request))
 
     return render_to_response('bcommon/add_record_result.htm',
                               { 'response' : add_record_response },

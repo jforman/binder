@@ -17,12 +17,12 @@ def list_zone_records(dns_hostname, zone_name):
         # There was an error querying the server for the specific zone.
         # Example: a zone that does not exist on the server.
         return { 'errors' : 'Encountered a FormError when querying %s on %s' % (zone_name, dns_hostname) }
-    except socket.gaierror, e:
+    except socket.gaierror, err:
         # TODO: Need to better handle errors here.
-        return { 'errors' : "Problems querying DNS server %s: %s" % (dns_hostname, e)  }
+        return { 'errors' : "Problems querying DNS server %s: %s" % (dns_hostname, err)  }
 
     names = zone.nodes.keys()
-    names.sort() # Sort the array alphabetically
+    names.sort()
     record_array = []
     for current_name in names:
         current_record = zone[current_name].to_text(current_name)
@@ -46,10 +46,13 @@ def add_forward_record(form_data, zone_keyring):
     dns_update.replace(hostname, int(form_data["ttl"]), str(form_data["record_type"]), str(form_data["data"]))
 
     try:
+        print "in try in add_forward_record"
         response = dns.query.tcp(dns_update, form_data["dns_server"])
     except dns.tsig.BadPeerKey:
-        response = "There was a problem adding your forward record due to a TSIG key issue."
+        print "in except dns.tsig.badpeerkey"
+        raise Exception("There was a problem adding your forward record due to a TSIG key issue.")
 
+    print "add forward record response: %s" % response
     return response
 
 def add_reverse_record(form_data, zone_keyring):
@@ -69,7 +72,11 @@ def add_record(form_data):
     """Add a DNS record with data from a FormAddRecord object.
     If a reverse PTR record is requested, this will be added too."""
 
-    keyring = create_keyring(form_data["key_name"])
+    try:
+        keyring = create_keyring(form_data["key_name"])
+    except Exception, err:
+        raise Exception("Error creating keyring in add_record: %s" % err)
+
     response = {}
     forward_response = add_forward_record(form_data, keyring)
     response["forward_response"] = forward_response
