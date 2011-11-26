@@ -2,11 +2,11 @@
 
 {% block body %}
 {% if not errors %}
-DNS Server Zone List for {{ dns_hostname }}:
+DNS Server Zone List for {{ dns_server }}:
 
   <ul>
   {% for current_zone in zone_array %}
-    <li> <a href="/info/{{ dns_hostname }}/{{ current_zone }}/"> {{ current_zone }} </li>
+    <li> <a href="/info/{{ dns_server }}/{{ current_zone }}/"> {{ current_zone }} </li>
   {% endfor %}
   </ul>
 {% endif %}

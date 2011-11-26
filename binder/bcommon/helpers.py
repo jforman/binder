@@ -7,19 +7,19 @@ import dns.update
 
 re_IPADDRESS = re.compile(r"\d+.\d+.\d+.\d+")
 
-def list_zone_records(dns_hostname, zone_name):
+def list_zone_records(dns_server, zone_name):
     """Take a DNS server and a zone name,
     and return an array of its records."""
     # Need to move most of this logic into a helper method.
     try:
-        zone = dns.zone.from_xfr(dns.query.xfr(dns_hostname, zone_name))
+        zone = dns.zone.from_xfr(dns.query.xfr(dns_server, zone_name))
     except dns.exception.FormError:
         # There was an error querying the server for the specific zone.
         # Example: a zone that does not exist on the server.
-        return { 'errors' : 'Encountered a FormError when querying %s on %s' % (zone_name, dns_hostname) }
+        return { 'errors' : 'Encountered a FormError when querying %s on %s' % (zone_name, dns_server) }
     except socket.gaierror, err:
         # TODO: Need to better handle errors here.
-        return { 'errors' : "Problems querying DNS server %s: %s" % (dns_hostname, err)  }
+        return { 'errors' : "Problems querying DNS server %s: %s" % (dns_server, err)  }
 
     names = zone.nodes.keys()
     names.sort()
@@ -46,13 +46,10 @@ def add_forward_record(form_data, zone_keyring):
     dns_update.replace(hostname, int(form_data["ttl"]), str(form_data["record_type"]), str(form_data["data"]))
 
     try:
-        print "in try in add_forward_record"
         response = dns.query.tcp(dns_update, form_data["dns_server"])
     except dns.tsig.BadPeerKey:
-        print "in except dns.tsig.badpeerkey"
         raise Exception("There was a problem adding your forward record due to a TSIG key issue.")
 
-    print "add forward record response: %s" % response
     return response
 
 def add_reverse_record(form_data, zone_keyring):
@@ -88,8 +85,12 @@ def add_record(form_data):
     return response
 
 def delete_record(form_data, rr_items):
-    keyring = create_keyring(form_data["key_name"])
-    dns_server = form_data["rr_server"]
+    try:
+        keyring = create_keyring(form_data["key_name"])
+    except Exception, err:
+        raise Exception("Error creating keyring in delete_record: %s" % err)
+
+    dns_server = form_data["dns_server"]
     delete_response = []
     for current_rr_item in rr_items:
         re_record = re.search(r"(\w+)\.(.*)$", current_rr_item)

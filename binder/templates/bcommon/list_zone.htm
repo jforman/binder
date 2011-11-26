@@ -14,11 +14,11 @@
 </tr>
 
 <form action="/delete_record/" method="post">{% csrf_token %}
-<input type="hidden" name="dns_server" value="{{ rr_server }}">
-<input type="hidden" name="zone_name" value="{{ rr_domain }}">
+<input type="hidden" name="dns_server" value="{{ dns_server }}">
+<input type="hidden" name="zone_name" value="{{ zone_name }}">
 {% for current_record in zone_array %}
 <tr>
-  <td><input type="checkbox" name="rr_array" value="{{ current_record.rr_name }}.{{ rr_domain }}"></td>
+  <td><input type="checkbox" name="rr_array" value="{{ current_record.rr_name }}.{{ zone_name }}"></td>
   <td>{{ current_record.rr_name }}</td>
   <td>{{ current_record.rr_ttl }}</td>
   <td>{{ current_record.rr_class }}</td>
@@ -26,7 +26,7 @@
   <td>{{ current_record.rr_data }}</td>
 </tr>
 {% endfor %}
-<td colspan="6" align="right"><a href="/add_record/{{ rr_server }}/{{ rr_domain }}/">Add Record</a></td>
+<td colspan="6" align="right"><a href="/add_record/{{ dns_server }}/{{ zone_name }}/">Add Record</a></td>
 </table>
 <input type="submit" value="Delete Selected"/>
 </form>
