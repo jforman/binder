@@ -43,7 +43,12 @@ def add_forward_record(form_data, zone_keyring):
     domain = re_form_data.group(2)
 
     dns_update = dns.update.Update(domain, keyring = zone_keyring)
-    dns_update.replace(hostname, int(form_data["ttl"]), str(form_data["record_type"]), str(form_data["data"]))
+    if str(form_data["record_type"]) == "CNAME":
+        data_suffix = "."
+    else:
+        data_suffix = ""
+
+    dns_update.replace(hostname, int(form_data["ttl"]), str(form_data["record_type"]), str(form_data["data"]) + data_suffix)
 
     try:
         response = dns.query.tcp(dns_update, form_data["dns_server"])
