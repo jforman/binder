@@ -1,0 +1,25 @@
+<VirtualHost *:80>
+  ServerName binder.yourdomain.org
+
+  # The first argument to WSGIScriptAlias is the absolute path
+  # under your domain where Binder lives.
+  # The second argument is the absolute path to the django.wsgi file
+  # from the Binder checkout.
+  WSGIScriptAlias / /opt/binder/config/django.wsgi
+
+  # The second argument to this alias should be the absolute path
+  # to the 'files/static' directory under a Binder checkout.
+  # This is where various CSS files live.
+  Alias /files/static /opt/binder/binder/files/static
+  <Directory /opt/binder/binder/files/static>
+    Order allow,deny
+    Allow from all
+  </Directory>
+
+  Alias /media /usr/lib/pymodules/python2.7/django/contrib/admin/media
+  <Directory /usr/lib/pymodules/python2.7/django/contrib/admin/media>
+    Order allow,deny
+    Allow from all
+  </Directory>
+
+</VirtualHost>
