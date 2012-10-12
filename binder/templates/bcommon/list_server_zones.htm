@@ -1,14 +1,21 @@
 {% extends "base.htm" %}
 
-{% block body %}
-{% if not errors %}
-DNS Server Zone List for {{ dns_server }}:
+{% block pageheader %}
+<div class="navbar">
+  <div class="navbar-inner">
+    <a class="brand" href="#">Server Zone List for {{ dns_server }}</a>
+  </div>
+</div>
+{% endblock pageheader %}
 
-  <ul>
-  {% for current_zone in zone_array %}
-    <li> <a href="/info/{{ dns_server }}/{{ current_zone }}/"> {{ current_zone }} </li>
-  {% endfor %}
-  </ul>
-{% endif %}
+
+{% block body %}
+<table class="table">
+{% for current_zone in zone_array %}
+  <tr>
+    <td><a href="/info/{{ dns_server }}/{{ current_zone }}/"> {{ current_zone }}</td>
+  </tr>
+{% endfor %}
+</table>
 
 {% endblock body %}

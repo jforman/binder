@@ -1,42 +1,53 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 {% block header %}
 <head>
   <title>Binder DNS Admin</title>
-  <link rel="stylesheet" type="text/css" href="/files/static/bootstrap.css" />
+  <link rel="stylesheet" type="text/css" href="/files/static/bootstrap/css/bootstrap.css" />
 </head>
 {% endblock header %}
 
-{% block navigation %}
-<a href="/">Home</a>
-<hr>
-{% endblock navigation %}
+<div class="row-fluid">
 
+<div class="span2">
+{% block navigation %}
+<ul class="nav nav-list">
+  <li class="nav-header">Actions</li>
+  <li><a href="/">Home</a></li>
+  <li><a href="/info">Server List</a></li>
+</ul>
+{% endblock navigation %}
+</div>
+
+<div class="span10">
+
+
+<body>
+  <script src="http://code.jquery.com/jquery.js"></script>
+  <script src="/files/static/bootstrap/js/bootstrap.min.js"></script>
 {% block pageheader %}
 {% endblock pageheader %}
 
-<body>
 {% block errors %}
+
 {% if errors %}
-<div class="errors">
   Errors were encountered:
   <br>
-
   {{ errors }}
 
   {% if error_context %}
-    <br>
     {{ error_context }}
   {% endif %}
-<hr>
 {% endif %}
+
 {% endblock errors %}
 
-<br>
 {% block body %}
 {% endblock body %}
 </body>
 
+</div>
+</div>
 {% block footer %}
 {% endblock footer %}
 </html>

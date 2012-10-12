@@ -2,13 +2,20 @@
 
 
 {% block pageheader %}
-Server List:
+<div class="navbar">
+  <div class="navbar-inner">
+    <a class="brand" href="#">Server List</a>
+  </div>
+</div>
 {% endblock pageheader %}
 
 {% block body %}
-<ul>
-  {% for current_server in server_list %}
-  <li> <a href="/info/{{ current_server }}/"> {{ current_server }} </li>
-  {% endfor %}
-</ul>
+<table class="table">
+{% for current_server in server_list %}
+  <tr>
+    <td><a href="/info/{{ current_server }}/"> {{ current_server }}</td>
+  </tr>
+{% endfor %}
+</table>
+
 {% endblock body %}
