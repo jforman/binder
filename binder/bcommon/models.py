@@ -1,10 +1,10 @@
+from BeautifulSoup import BeautifulStoneSoup as BS
 from django.db import models
 
 import dns.query
 import dns.zone
-import urllib2
-from BeautifulSoup import BeautifulStoneSoup as BS
 import re
+import urllib2
 
 TSIG_ALGORITHMS = (('hmac-md5', 'MD5'),('hmac-sha1', 'SHA1'),('hmac-224', 'SHA224'),('hmac-sha256', 'SHA256'),('hmac-sha384', 'SHA384'),('hmac-sha512', 'SHA512'))
 
@@ -31,12 +31,11 @@ class BindServer(models.Model):
         mysoup = BS(xmloutput)
         zones = mysoup.findAll('zone')
         for current_zone in zones: # Interate over found zones
-            zone_name = current_zone.find('name').contents[0]
-            try: # Is this zone of 'IN' type?
-                in_zone = re.search(r"(.*)\/IN", zone_name).group(1)
-                return_array.append(in_zone)
-            except:
-                pass
+            zone_name = current_zone.find("name").string.split("/IN")[0]
+            zone_serial = current_zone.find("serial").string
+            zone_class = current_zone.find("rdataclass").string
+            if zone_class == "IN":
+                return_array.append({"zone_name" : zone_name, "zone_serial" : zone_serial })
 
         return return_array
 
