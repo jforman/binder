@@ -74,10 +74,10 @@ def add_record(form_data):
     """Add a DNS record with data from a FormAddRecord object.
     If a reverse PTR record is requested, this will be added too."""
 
-    try:
+    if form_data["key_name"]:
         keyring = create_keyring(form_data["key_name"])
-    except Exception, err:
-        raise Exception("Error creating keyring in add_record: %s" % err)
+    else:
+        keyring = None
 
     response = {}
     forward_response = add_forward_record(form_data, keyring)

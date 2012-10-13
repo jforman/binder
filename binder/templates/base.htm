@@ -25,8 +25,16 @@
 <body>
   <script src="http://code.jquery.com/jquery.js"></script>
   <script src="/files/static/bootstrap/js/bootstrap.min.js"></script>
-{% block pageheader %}
-{% endblock pageheader %}
+
+<div class="navbar">
+  <div class="navbar-inner">
+    <a class="brand" href="#">
+      {% block pageheader %}
+      {% endblock pageheader %}
+    </a>
+  </div>
+</div>
+
 
 {% block errors %}
 

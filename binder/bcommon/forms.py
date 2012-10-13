@@ -16,4 +16,4 @@ class FormAddRecord(forms.Form):
     ttl = forms.ChoiceField(choices=TTL_CHOICES, label="TTL", initial=86400)
     create_reverse = forms.BooleanField(label="Create Reverse Record (PTR)?", required=False)
     data = forms.CharField(max_length=256, label="Record Data (IP/Hostname)")
-    key_name = forms.ModelChoiceField(queryset=Key.objects.all(), empty_label=None, label="TSIG Key")
+    key_name = forms.ModelChoiceField(queryset=Key.objects.all(), empty_label=None, label="TSIG Key", required=False)

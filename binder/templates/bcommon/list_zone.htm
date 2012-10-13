@@ -1,9 +1,13 @@
 {% extends "base.htm" %}
 
+{% block pageheader %}
+Zone listing for  {{ zone_name }}
+{% endblock pageheader %}
+
 {% block body %}
 
 {% if not errors %}
-<table>
+<table class="table">
 <tr>
   <th></th>
   <th>Name</th>
