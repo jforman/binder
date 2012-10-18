@@ -90,10 +90,11 @@ def add_record(form_data):
     return response
 
 def delete_record(form_data, rr_items):
-    try:
+    """Delete a list of DNS records passed as strings in rr_items."""
+    if ("key_name" in form_data and form_data["key_name"]):
         keyring = create_keyring(form_data["key_name"])
-    except Exception, err:
-        raise Exception("Error creating keyring in delete_record: %s" % err)
+    else:
+        keyring = None
 
     dns_server = form_data["dns_server"]
     delete_response = []
