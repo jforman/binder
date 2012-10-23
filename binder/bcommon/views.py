@@ -90,7 +90,8 @@ def view_add_record_result(request):
                                   context_instance=RequestContext(request))
 
     return render_to_response('bcommon/add_record_result.htm',
-                              { 'response' : add_record_response },
+                              { 'response' : add_record_response,
+                                'rr_data' : cd },
                               context_instance=RequestContext(request))
 
 

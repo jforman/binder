@@ -2,16 +2,22 @@
 
 
 {% block pageheader %}
-
+Delete Record(s) Result
 {% endblock pageheader %}
 
 {% block body %}
 
+<table class="table">
 {% for current_response in delete_result %}
-Record: {{ current_response.rr_item }}
-<pre>
-{{ current_response.output }}
-</pre>
+<tr>
+  <th>Record</th>
+  <th>Delete Result</th>
+</tr>
+<tr>
+  <td>{{ current_response.rr_item }}</td>
+  <td><pre>{{ current_response.output }}</pre></td>
+</tr>
 {% endfor %}
+</table>
 
 {% endblock body %}

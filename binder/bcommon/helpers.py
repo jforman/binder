@@ -58,20 +58,20 @@ def add_forward_record(form_data, zone_keyring):
     return response
 
 def add_reverse_record(form_data, zone_keyring):
-
+    """ Given a FormAddRecord dict and zone_keyring,
+    add/update a reverse PTR record."""
     reverse_ip_fqdn = str(dns.reversename.from_address(form_data["data"]))
     reverse_ip = re.search(r"([0-9]+).(.*).$", reverse_ip_fqdn).group(1)
     reverse_domain = re.search(r"([0-9]+).(.*).$", reverse_ip_fqdn).group(2)
 
     dns_update = dns.update.Update(reverse_domain, keyring = zone_keyring)
     dns_update.replace(reverse_ip, int(form_data["ttl"]), "PTR", str(form_data["name"]) + ".")
-
     output = dns.query.tcp(dns_update, form_data["dns_server"])
 
     return output
 
 def add_record(form_data):
-    """Add a DNS record with data from a FormAddRecord object.
+    """Add a DNS record with data from a FormAddRecord dict.
     If a reverse PTR record is requested, this will be added too."""
 
     if form_data["key_name"]:

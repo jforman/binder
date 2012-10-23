@@ -2,23 +2,29 @@
 
 
 {% block pageheader %}
-
+Add Record Result
 {% endblock pageheader %}
 
 {% block body %}
+<table class="table">
 {% if response.forward_response %}
-Forward Record Creation Output
-<pre>
-{{ response.forward_response }}
-</pre>
+<tr>
+  <th>Record: {{ response.name }}</th>
+  <th>Add Result</th>
+</tr>
+<tr>
+  <td>Forward: {{ rr_data.name }}</td>
+  <td><pre>{{ response.forward_response }}</pre></td>
+</tr>
 {% endif %}
 
-<p>
 {% if response.reverse_response %}
-Reverse Record Creation Output
-<pre>
-{{ response.reverse_response }}
-</pre>
+<tr>
+  <td>Reverse: {{ rr_data.data }}</td>
+  <td><pre>{{ response.reverse_response }}</pre></td>
+</tr>
+
 {% endif %}
+</table>
 
 {% endblock body %}
