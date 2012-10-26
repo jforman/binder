@@ -17,3 +17,12 @@ class FormAddRecord(forms.Form):
     create_reverse = forms.BooleanField(label="Create Reverse Record (PTR)?", required=False)
     data = forms.CharField(max_length=256, label="Record Data (IP/Hostname)")
     key_name = forms.ModelChoiceField(queryset=Key.objects.all(), empty_label=None, label="TSIG Key", required=False)
+
+
+class FormAddCnameRecord(forms.Form):
+    dns_server = forms.CharField(max_length=100)
+    originating_record = forms.CharField(max_length=100)
+    cname = forms.RegexField(max_length=100, regex="^[a-zA-Z0-9-_]+$")
+    zone_name = forms.CharField(max_length=256)
+    ttl = forms.ChoiceField(choices=TTL_CHOICES)
+    key_name = forms.ModelChoiceField(queryset=Key.objects.all(), empty_label=None, required=False)

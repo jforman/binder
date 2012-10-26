@@ -18,6 +18,10 @@ urlpatterns = patterns('',
 
     (r'^delete_record/$', 'bcommon.views.view_delete_record'),
     (r'^delete_record/result/$', 'bcommon.views.view_delete_result'),
+
+    (r'^add_cname/(?P<dns_server>[a-zA-Z0-9.-]+)/(?P<zone_name>[a-zA-Z0-9.-]+)/(?P<record_name>[a-zA-Z0-9-]+)/$', 'bcommon.views.view_add_cname_record'),
+    (r'^add_cname_record/result/$', 'bcommon.views.view_add_cname_result'),
+
 )
 
 if settings.DEBUG:

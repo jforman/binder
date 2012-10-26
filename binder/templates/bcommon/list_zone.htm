@@ -9,12 +9,13 @@ Zone listing for  {{ zone_name }}
 {% if not errors %}
 <table class="table">
 <tr>
-  <th></th>
+  <th>Select</th>
   <th>Name</th>
   <th>TTL</th>
   <th>Class</th>
   <th>Type</th>
   <th>Data</th>
+  <th></th>
 </tr>
 
 <form action="/delete_record/" method="post">{% csrf_token %}
@@ -28,6 +29,19 @@ Zone listing for  {{ zone_name }}
   <td>{{ current_record.rr_class }}</td>
   <td>{{ current_record.rr_type }}</td>
   <td>{{ current_record.rr_data }}</td>
+  <td>
+    <div class="btn-toolbar" style="margin: 0;">
+      <div class="btn-group">
+	<button class="btn dropdown-toggle" data-toggle="dropdown">Record Actions  <span class="caret"></span></button>
+	<ul class="dropdown-menu">
+	  <li><a href="#">Edit Record</a></li>
+	  {% if current_record.rr_type == "A" %}
+	  <li><a href="/add_cname/{{dns_server}}/{{zone_name}}/{{current_record.rr_name}}/">Add CNAME Pointer</a></li>
+	  {% endif %}
+	</ul>
+      </div>
+    </div>
+  </td>
 </tr>
 {% endfor %}
 <td colspan="6" align="right"><a href="/add_record/{{ dns_server }}/{{ zone_name }}/">Add Record</a></td>

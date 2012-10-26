@@ -1,0 +1,63 @@
+{% extends "base.htm" %}
+
+{% block pageheader %}
+Add cname record for {{record_name}}.{{zone_name}}
+{% endblock pageheader %}
+
+{% block body %}
+<form class="form-horizontal" action="/add_cname_record/result/" method="post">{% csrf_token %}
+  <legend>Create CNAME record</legend>
+  <div class="control-group">
+    <label class="control-label">DNS Server: </label>
+    <div class="controls">
+      <span class="input-xlarge uneditable-input">{{dns_server}}</span>
+      <input type="hidden" name="dns_server" value="{{dns_server}}"/>
+    </div>
+  </div>
+
+  <div class="control-group">
+    <label class="control-label">Originating Record: </label>
+    <div class="controls">
+      <span class="input-xlarge uneditable-input">{{record_name}}.{{zone_name}}</span>
+      <input type="hidden" name="originating_record" value="{{record_name}}.{{zone_name}}"/>
+    </div>
+  </div>
+
+  <div class="control-group">
+    <label class="control-label">CNAME: </label>
+    <div class="controls">
+      <div class="input-append">
+	<input class="span2" size="100" name="cname" type="text"><span class="add-on">.{{zone_name}}</span>
+	<input type="hidden" name="zone_name" value="{{zone_name}}"/>
+      </div>
+    </div>
+  </div>
+
+  <div class="control-group">
+    <label class="control-label">TTL: </label>
+    <div class="controls">
+      <select name="ttl">
+	<!-- {% for key in tsig_keys %} -->
+	<!--   <option value="{{key}}">{{key}}</option> -->
+	<!-- {% endfor %} -->
+	<option value="86400">86400 (1 day)</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="control-group">
+    <label class="control-label">TSIG Key: </label>
+    <div class="controls">
+      <select name="key_name">
+	  <option selected="selected" value=""></option>
+	{% for key in tsig_keys %}
+	  <option value="{{key}}">{{key}}</option>
+	{% endfor %}
+      </select>
+    </div>
+  </div>
+
+  <button type="submit" class="btn">Save Changes</button>
+</form>
+
+{% endblock body %}
