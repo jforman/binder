@@ -1,13 +1,13 @@
 {% extends "base.htm" %}
 
 {% block pageheader %}
-Zone listing for  {{ zone_name }}
+Zone listing for {{ zone_name }}
 {% endblock pageheader %}
 
 {% block body %}
 
 {% if not errors %}
-<table class="table">
+<table class="table table-hover">
 <tr>
   <th>Select</th>
   <th>Name</th>
@@ -44,7 +44,8 @@ Zone listing for  {{ zone_name }}
   </td>
 </tr>
 {% endfor %}
-<td colspan="6" align="right"><a href="/add_record/{{ dns_server }}/{{ zone_name }}/">Add Record</a></td>
+
+<td colspan="7"><a href="/add_record/{{ dns_server }}/{{ zone_name }}/">Add Record</a></td>
 </table>
 <input type="submit" value="Delete Selected"/>
 </form>
