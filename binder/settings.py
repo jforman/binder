@@ -53,10 +53,7 @@ MEDIA_ROOT = os.path.join(SITE_ROOT, "files")
 # Examples: "http://media.lawrence.com", "http://example.com/media/"
 MEDIA_URL = "/files/"
 
-# URL prefix for admin media -- CSS, JavaScript and images. Make sure to use a
-# trailing slash.
-# Examples: "http://foo.com/media/", "/media/".
-ADMIN_MEDIA_PREFIX = '/media/'
+STATIC_URL = '/media/'
 
 # Make this unique, and don't share it with anybody.
 SECRET_KEY = 'iuo-zka8nnv0o+b*7#_*fcep$@f^35=)c#7_20z6i8g0oc&r!g'
@@ -88,5 +85,6 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     'django.contrib.messages',
     'django.contrib.admin',
+    'django.contrib.staticfiles',
     'bcommon',
 )
