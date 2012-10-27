@@ -9,53 +9,51 @@
 
 <div class="row-fluid">
 
-<div class="span2">
-{% block navigation %}
-<ul class="nav nav-list">
-  <li class="nav-header">Actions</li>
-  <li><a href="/">Home</a></li>
-  <li><a href="/info">Server List</a></li>
-</ul>
-{% endblock navigation %}
-</div>
+  <div class="span2">
+    {% block navigation %}
+    <ul class="nav nav-list">
+      <li class="nav-header">Actions</li>
+      <li><a href="/">Home</a></li>
+      <li><a href="/server_list">Server List</a></li>
+    </ul>
+    {% endblock navigation %}
+  </div>
 
-<div class="span10">
+  <div class="span10">
+    <body>
+      <script src="http://code.jquery.com/jquery.js"></script>
+      <script src="/files/static/bootstrap/js/bootstrap.min.js"></script>
 
+      <div class="navbar">
+        <div class="navbar-inner">
+          <a class="brand" href="#">
+            {% block pageheader %}
+            {% endblock pageheader %}
+          </a>
+        </div>
+      </div>
 
-<body>
-  <script src="http://code.jquery.com/jquery.js"></script>
-  <script src="/files/static/bootstrap/js/bootstrap.min.js"></script>
+     {% block errors %}
 
-<div class="navbar">
-  <div class="navbar-inner">
-    <a class="brand" href="#">
-      {% block pageheader %}
-      {% endblock pageheader %}
-    </a>
+       {% if errors %}
+         <div class="alert alert-error">
+           Errors were encountered:
+           <br>
+          {{ errors }}
+          {% if error_context %}
+            {{ error_context }}
+          {% endif %}
+        </div>
+      {% endif %}
+
+    {% endblock errors %}
+
+    {% block body %}
+    {% endblock body %}
+     </body>
   </div>
 </div>
 
-{% block errors %}
-
-{% if errors %}
-  <div class="alert alert-error">
-  Errors were encountered:
-  <br>
-  {{ errors }}
-  {% if error_context %}
-    {{ error_context }}
-  {% endif %}
-  </div>
-{% endif %}
-
-{% endblock errors %}
-
-{% block body %}
-{% endblock body %}
-  </body>
-
-</div>
-</div>
 {% block footer %}
 {% endblock footer %}
 </html>

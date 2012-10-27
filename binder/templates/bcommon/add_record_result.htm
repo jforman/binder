@@ -7,24 +7,15 @@ Add Record Result
 
 {% block body %}
 <table class="table">
-{% if response.forward_response %}
+{% for current_response in response %}
 <tr>
-  <th>Record: {{ response.name }}</th>
-  <th>Add Result</th>
+  <th>Record:</th>
+  <th>Output</th>
 </tr>
 <tr>
-  <td>Forward: {{ rr_data.name }}</td>
-  <td><pre>{{ response.forward_response }}</pre></td>
+  <td>{{ current_response.type }}</td>
+  <td><pre>{{ current_response.output }}</pre></td>
 </tr>
-{% endif %}
-
-{% if response.reverse_response %}
-<tr>
-  <td>Reverse: {{ rr_data.data }}</td>
-  <td><pre>{{ response.reverse_response }}</pre></td>
-</tr>
-
-{% endif %}
+{% endfor %}
 </table>
-
 {% endblock body %}

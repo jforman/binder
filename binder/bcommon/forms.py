@@ -1,6 +1,6 @@
 from django import forms
 
-from bcommon.models import BindServer, Key
+from bcommon.models import Key
 
 RECORD_TYPE_CHOICES = (("A", "A"), ("AAAA", "AAAA"), ("CNAME", "CNAME"))
 TTL_CHOICES = ((300, "5 minutes"),
@@ -10,13 +10,14 @@ TTL_CHOICES = ((300, "5 minutes"),
                (86400, "1 day"))
 
 class FormAddRecord(forms.Form):
-    dns_server = forms.CharField(max_length=100, label="Hostname of DNS Server", widget=forms.TextInput(attrs={'readonly':'readonly'}))
-    name = forms.CharField(max_length=100, label="Record Name (FQDN)")
-    record_type = forms.ChoiceField(choices=RECORD_TYPE_CHOICES, label="Record Type")
-    ttl = forms.ChoiceField(choices=TTL_CHOICES, label="TTL", initial=86400)
-    create_reverse = forms.BooleanField(label="Create Reverse Record (PTR)?", required=False)
-    data = forms.CharField(max_length=256, label="Record Data (IP/Hostname)")
-    key_name = forms.ModelChoiceField(queryset=Key.objects.all(), empty_label=None, label="TSIG Key", required=False)
+    dns_server = forms.CharField(max_length=100)
+    record_name = forms.RegexField(max_length=100, regex="^[a-zA-Z0-9-_]+$", required=False)
+    record_type = forms.CharField(max_length=10)
+    zone_name = forms.CharField(max_length=100)
+    record_data = forms.GenericIPAddressField()
+    ttl = forms.IntegerField(min_value=1)
+    create_reverse = forms.BooleanField(required=False)
+    key_name = forms.ModelChoiceField(queryset=Key.objects.all(), empty_label=None, required=False)
 
 
 class FormAddCnameRecord(forms.Form):

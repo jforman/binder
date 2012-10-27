@@ -5,7 +5,12 @@ import dns.query
 import dns.reversename
 import dns.update
 
+import keyutils
+
 re_IPADDRESS = re.compile(r"\d+.\d+.\d+.\d+")
+
+class BinderException(Exception):
+    pass
 
 def list_zone_records(dns_server, zone_name):
     """Take a DNS server and a zone name,
@@ -34,39 +39,29 @@ def list_zone_records(dns_server, zone_name):
                                  'rr_data'  : split_record.split(" ")[4]})
     return record_array
 
-def add_forward_record(form_data, zone_keyring):
+def add_forward_record(dns_server, zone_name, record_name, record_type, record_data, ttl, keyring):
     """Take in data from FormAddRecord and a keyring object,
     return a response from the DNS server about adding the record."""
 
-    re_form_data = re.search(r"(\w+).(.*)", form_data["name"])
-    hostname = re_form_data.group(1)
-    domain = re_form_data.group(2)
-
-    dns_update = dns.update.Update(domain, keyring = zone_keyring)
-    if str(form_data["record_type"]) == "CNAME":
-        data_suffix = "."
-    else:
-        data_suffix = ""
-
-    dns_update.replace(hostname, int(form_data["ttl"]), str(form_data["record_type"]), str(form_data["data"]) + data_suffix)
+    dns_update = dns.update.Update(zone_name, keyring = keyring)
+    dns_update.replace(record_name, ttl, record_type, record_data)
 
     try:
-        response = dns.query.tcp(dns_update, form_data["dns_server"])
+        response = dns.query.tcp(dns_update, dns_server)
     except dns.tsig.BadPeerKey:
-        raise Exception("There was a problem adding your forward record due to a TSIG key issue.")
+        raise BinderException("There was a problem adding your forward record due to a TSIG key issue.")
 
     return response
 
-def add_reverse_record(form_data, zone_keyring):
-    """ Given a FormAddRecord dict and zone_keyring,
-    add/update a reverse PTR record."""
-    reverse_ip_fqdn = str(dns.reversename.from_address(form_data["data"]))
+def add_reverse_record(dns_server, zone_name, record_name, record_data, ttl, keyring):
+    """ Given passed arguments, add/update a reverse PTR record."""
+    reverse_ip_fqdn = str(dns.reversename.from_address(record_data))
     reverse_ip = re.search(r"([0-9]+).(.*).$", reverse_ip_fqdn).group(1)
     reverse_domain = re.search(r"([0-9]+).(.*).$", reverse_ip_fqdn).group(2)
 
-    dns_update = dns.update.Update(reverse_domain, keyring = zone_keyring)
-    dns_update.replace(reverse_ip, int(form_data["ttl"]), "PTR", str(form_data["name"]) + ".")
-    output = dns.query.tcp(dns_update, form_data["dns_server"])
+    dns_update = dns.update.Update(reverse_domain, keyring = keyring)
+    dns_update.replace(reverse_ip, ttl, "PTR", "%s.%s." % (record_name, zone_name))
+    output = dns.query.tcp(dns_update, dns_server)
 
     return output
 
@@ -75,23 +70,50 @@ def add_record(form_data):
     If a reverse PTR record is requested, this will be added too."""
 
     if form_data["key_name"]:
-        keyring = create_keyring(form_data["key_name"])
+        keyring = keyutils.create_keyring(form_data["key_name"])
     else:
         keyring = None
 
-    response = {}
-    forward_response = add_forward_record(form_data, keyring)
-    response["forward_response"] = forward_response
+    response = []
+    response.append({ "type" : "Forward Record: %s.%s" % (str(form_data["record_name"]),
+                                                          str(form_data["zone_name"])),
+                      "output" : add_forward_record(str(form_data["dns_server"]),
+                                                    str(form_data["zone_name"]),
+                                                    str(form_data["record_name"]),
+                                                    str(form_data["record_type"]),
+                                                    str(form_data["record_data"]),
+                                                    form_data["ttl"],
+                                                    keyring)})
 
     if form_data["create_reverse"]:
-        reverse_response = add_reverse_record(form_data, keyring)
-        response["reverse_response"] = reverse_response
+        response.append({ "type" : "Reverse Record: %s" % form_data["record_data"],
+                          "output" : add_reverse_record(str(form_data["dns_server"]),
+                                                        str(form_data["zone_name"]),
+                                                        str(form_data["record_name"]),
+                                                        str(form_data["record_data"]),
+                                                        form_data["ttl"],
+                                                        keyring)})
+
+    return response
+
+def add_cname_record(dns_server, zone_name, originating_record, cname, ttl, key_name):
+    """Add a Cname record."""
+
+    if key_name is None:
+        keyring = create_keyring(key_name)
+    else:
+        keyring = None
+
+    update = dns.update.Update(zone_name, keyring = keyring)
+    update.replace(cname, int(ttl), 'CNAME', originating_record + ".")
+    response = dns.query.tcp(update, dns_server)
 
     return response
 
 def delete_record(form_data, rr_items):
     """Delete a list of DNS records passed as strings in rr_items."""
-    if ("key_name" in form_data and form_data["key_name"]):
+
+    if form_data["key_name"]:
         keyring = create_keyring(form_data["key_name"])
     else:
         keyring = None
@@ -102,7 +124,6 @@ def delete_record(form_data, rr_items):
         re_record = re.search(r"(\w+)\.(.*)$", current_rr_item)
         record = re_record.group(1)
         domain = re_record.group(2)
-
         dns_update = dns.update.Update(domain, keyring = keyring)
         dns_update.delete(record)
         output = dns.query.tcp(dns_update, dns_server)

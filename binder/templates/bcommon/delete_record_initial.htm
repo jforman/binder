@@ -31,6 +31,7 @@ Delete record(s) in {{ zone_name }}
   <tr>
     <td>Key</td>
     <td> <select name="key_name">
+      <option selected="selected" value=""/>
     {% for current_key in tsig_keys %}
       <option value="{{current_key}}">{{current_key}}</option>
     {% endfor %}</td>

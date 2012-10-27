@@ -2,7 +2,7 @@
 
 from bcommon.models import BindServer, Key
 from django.template import Context
-from django.shortcuts import render_to_response, redirect
+from django.shortcuts import render_to_response, redirect, render
 from bcommon.helpers import add_record, delete_record, add_cname_record
 
 from bcommon.forms import FormAddRecord, FormAddCnameRecord
@@ -49,6 +49,7 @@ def view_zone_records(request, dns_server, zone_name):
         this_server = BindServer.objects.get(hostname=dns_server)
         zone_array = this_server.list_zone_records(zone_name)
     except Exception, err:
+        # TODO: Use a custom exception here.
         return render_to_response('bcommon/list_zone.htm',
                                   { 'errors' : err},
                                   context_instance=RequestContext(request))
@@ -59,41 +60,35 @@ def view_zone_records(request, dns_server, zone_name):
                                 'zone_name' : zone_name},
                               context_instance=RequestContext(request))
 
-def view_add_record(request, dns_server, zone):
+def view_add_record(request, dns_server, zone_name):
     """ View to provide form to add a DNS record. """
-    form = FormAddRecord(initial={ 'dns_server' : dns_server,
-                                   'zone' : zone })
-    return render_to_response('bcommon/add_record_form.htm',
-                              { 'form' : form },
-                              context_instance=RequestContext(request))
+    return render(request, 'bcommon/add_record_form.htm',
+                  { "dns_server" : dns_server,
+                    "zone_name" : zone_name })
 
 def view_add_record_result(request):
     """ Process the input given to add a DNS record. """
+    errors = None
     if request.method == "GET":
-        # Return home. You shouldn't be accessing this url via a GET.
         return redirect('/')
 
     form = FormAddRecord(request.POST)
     if form.is_valid():
         cd = form.cleaned_data
-    else:
-        form = FormAddRecord(request.POST)
-        return render_to_response('bcommon/add_record_form.htm',
-                                  { 'form' : form },
-                                  context_instance=RequestContext(request))
-
-    try:
-        add_record_response = add_record(cd)
-    except Exception, err:
+        try:
+          add_record_response = add_record(cd)
+        except BinderException, errors:
+          pass
         return render_to_response('bcommon/add_record_result.htm',
-                                  { "errors" : err },
+                                  { "errors" : errors,
+                                    "response" : add_record_response },
                                   context_instance=RequestContext(request))
 
-    return render_to_response('bcommon/add_record_result.htm',
-                              { 'response' : add_record_response,
-                                'rr_data' : cd },
-                              context_instance=RequestContext(request))
-
+    return render(request, 'bcommon/add_record_form.htm',
+                  { "dns_server" : request.POST["dns_server"],
+                    "zone_name" : request.POST["zone_name"],
+                    "form_errors" : form.errors,
+                    "form_data" : request.POST })
 
 def view_add_cname_record(request, dns_server, zone_name, record_name):
     """ Process given input to add a CNAME pointer."""
@@ -171,7 +166,6 @@ def view_delete_result(request):
         return render_to_response('bcommon/delete_record_result.htm',
                                   { "errors" : err },
                                   context_instance=RequestContext(request))
-
 
     return render_to_response('bcommon/delete_record_result.htm',
                               { 'delete_result' : delete_result },

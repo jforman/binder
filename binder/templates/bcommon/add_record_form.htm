@@ -1,15 +1,91 @@
 {% extends "base.htm" %}
 
 {% block pageheader %}
-Add record in {{ dns_server }}
+Add record in {{ zone_name }}
 {% endblock pageheader %}
 
 {% block body %}
-<form action="/add_record/result/" method="post">{% csrf_token %}
-  <table class="table">
-    {{ form.as_table }}
-  </table>
-  <input type="submit" value="Submit" />
+<form class="form-horizontal" action="/add_record/result/" method="post">{% csrf_token %}
+  <legend>Create Foward Record</legend>
+	<input type="hidden" name="zone_name" value="{{zone_name}}"/>
 
+  <div class="control-group">
+    <label class="control-label">DNS Server: </label>
+    <div class="controls">
+      <span class="input-xlarge uneditable-input">{{dns_server}}</span>
+      <input type="hidden" name="dns_server" value="{{dns_server}}"/>
+    </div>
+  </div>
+
+
+  <div class="control-group">
+    <label class="control-label">Record Name: </label>
+    <div class="controls">
+      <div class="input-append">
+	    <input class="span2" size="100" name="record_name" type="text"/><span class="add-on">.{{zone_name}}</span>
+      </div>
+      {% if form_errors.record_name %}
+      <div class="alert alert-error">
+        Record Name: {{ form_errors.record_name|stringformat:"s"|striptags }} Previous Value: {{ form_data.record_name }}
+      </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="control-group">
+    <label class="control-label">Record Type: </label>
+    <div class="controls">
+      <select name="record_type">
+	    <option value="A" selected="selected">A</option>
+	    <option value="AAAA">AAAA</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="control-group">
+    <label class="control-label">Record Data: </label>
+    <div class="controls">
+      <div class="input-append">
+	    <input class="input-large" size="100" name="record_data" type="text"/>
+      </div>
+      {% if form_errors.record_data %}
+      <div class="alert alert-error">
+        Record Name: {{ form_errors.record_data|stringformat:"s"|striptags }} Previous Value: {{ form_data.record_data }}
+      </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="control-group">
+    <label class="control-label">TTL: </label>
+    <div class="controls">
+      <select name="ttl">
+	    <option value="86400">86400 (1 day)</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="control-group">
+    <div class="controls">
+      <label class="checkbox">
+        <input type="checkbox" name="create_reverse" value="True">Create Reverse Record
+      </label>
+    </div>
+  </div>
+
+  <div class="control-group">
+    <label class="control-label">TSIG Key: </label>
+    <div class="controls">
+      <select name="key_name">
+      <option selected="selected" value=""/>
+        {% for key in tsig_keys %}
+          <option value="{{key}}">{{key}}</option>
+        {% endfor %}
+      </select>
+    </div>
+  </div>
+
+  <button type="submit" class="btn">Save Changes</button>
 </form>
+
 {% endblock body %}
