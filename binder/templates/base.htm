@@ -34,18 +34,13 @@
       </div>
 
      {% block errors %}
-
        {% if errors %}
          <div class="alert alert-error">
            Errors were encountered:
            <br>
           {{ errors }}
-          {% if error_context %}
-            {{ error_context }}
-          {% endif %}
         </div>
       {% endif %}
-
     {% endblock errors %}
 
     {% block body %}

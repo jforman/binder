@@ -24,7 +24,7 @@ class BindServer(models.Model):
         try:
             http_request = urllib2.urlopen(myreq)
         except urllib2.URLError, err_reason: # Error retrieving zone list.
-            return { 'errors' : err_reason, 'error_context' : "Trying to retrieve zone list from %s" % self.hostname }
+            return { 'errors' : "Trying to retrieve zone list from %s: %s" % (self.hostname, err_reason) }
 
         return_array = []
         xmloutput = http_request.read()
