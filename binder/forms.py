@@ -1,6 +1,6 @@
 from django import forms
 
-from bcommon.models import Key
+from models import Key
 
 RECORD_TYPE_CHOICES = (("A", "A"), ("AAAA", "AAAA"), ("CNAME", "CNAME"))
 TTL_CHOICES = ((300, "5 minutes"),

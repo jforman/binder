@@ -1,6 +1,6 @@
 import dns.tsigkeyring
 import sys
-from bcommon.models import Key
+from models import Key
 
 def create_keyring(key_name):
     """Accept a TSIG keyfile and a key name to retrieve.

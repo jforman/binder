@@ -3,7 +3,7 @@
 {% block header %}
 <head>
   <title>Binder DNS Admin</title>
-  <link rel="stylesheet" type="text/css" href="/files/static/bootstrap/css/bootstrap.css" />
+  <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}bootstrap/css/bootstrap.css" />
 </head>
 {% endblock header %}
 
@@ -22,7 +22,7 @@
   <div class="span10">
     <body>
       <script src="http://code.jquery.com/jquery.js"></script>
-      <script src="/files/static/bootstrap/js/bootstrap.min.js"></script>
+      <script src="{{ STATIC_URL }}bootstrap/js/bootstrap.min.js"></script>
 
       <div class="navbar">
         <div class="navbar-inner">

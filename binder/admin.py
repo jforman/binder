@@ -1,4 +1,4 @@
-from bcommon.models import BindServer, Key
+from models import BindServer, Key
 from django.contrib import admin
 
 class ZoneAdmin(admin.ModelAdmin):

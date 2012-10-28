@@ -1,4 +1,4 @@
-from bcommon.keyutils import create_keyring
+import keyutils
 
 import re
 import dns.query
@@ -100,7 +100,7 @@ def add_cname_record(dns_server, zone_name, originating_record, cname, ttl, key_
     """Add a Cname record."""
 
     if key_name is None:
-        keyring = create_keyring(key_name)
+        keyring = keyutils.create_keyring(key_name)
     else:
         keyring = None
 
@@ -114,7 +114,7 @@ def delete_record(form_data, rr_items):
     """Delete a list of DNS records passed as strings in rr_items."""
 
     if form_data["key_name"]:
-        keyring = create_keyring(form_data["key_name"])
+        keyring = keyutils.create_keyring(form_data["key_name"])
     else:
         keyring = None
 
