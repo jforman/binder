@@ -6,6 +6,9 @@ import re
 
 RE_UNICODEARRAY = re.compile(r"u'(.*?)'")
 
+class BinderException(Exception):
+    pass
+
 def home_index(request):
     return render(request, 'index.htm')
 
@@ -52,11 +55,11 @@ def view_add_record(request, dns_server, zone_name):
     """ View to provide form to add a DNS record. """
     return render(request, 'bcommon/add_record_form.htm',
                   { "dns_server" : dns_server,
-                    "zone_name" : zone_name })
+                    "zone_name" : zone_name,
+                    "tsig_keys" : models.Key.objects.all() })
 
 def view_add_record_result(request):
     """ Process the input given to add a DNS record. """
-    errors = None
     if request.method == "GET":
         return redirect('/')
 
@@ -65,10 +68,10 @@ def view_add_record_result(request):
         cd = form.cleaned_data
         try:
             add_record_response = helpers.add_record(cd)
-        except BinderException, errors:
+        except BinderException, error:
             pass
-        return render(request, 'bcommon/add_record_result.htm',
-                      { "errors" : errors,
+        return render(request, 'bcommon/response_result.htm',
+                      { "errors" : error,
                         "response" : add_record_response })
 
     return render(request, 'bcommon/add_record_form.htm',
@@ -81,38 +84,41 @@ def view_add_cname_record(request, dns_server, zone_name, record_name):
     """ Process given input to add a CNAME pointer."""
     return render(request, "bcommon/add_cname_record_form.htm",
                   { "dns_server" : dns_server,
+                    "originating_record" : "%s.%s" % (record_name, zone_name),
                     "zone_name" : zone_name,
-                    "record_name" :  record_name,
                     "tsig_keys" : models.Key.objects.all() })
 
 def view_add_cname_result(request):
     if request.method == "GET":
-        # Return home. You shouldn't trying to directly access
-        # the url for deleting records.
         return redirect('/')
 
     form = forms.FormAddCnameRecord(request.POST)
     if form.is_valid():
         cd = form.cleaned_data
-    else:
-        return "bad form" # TODO: Send back the form pre-populated with the error
+        try:
+            add_cname_response = helpers.add_cname_record(
+                str(cd["dns_server"]),
+                str(cd["zone_name"]),
+                str(cd["originating_record"]),
+                str(cd["cname"]),
+                str(cd["ttl"]),
+                str(cd["key_name"]))
+        except BinderException, error:
+            pass
 
-    try:
-        add_cname_response = helpers.add_cname_record(
-            str(cd["dns_server"]),
-            str(cd["zone_name"]),
-            str(cd["originating_record"]),
-            str(cd["cname"]),
-            str(cd["ttl"]),
-            str(cd["key_name"]))
-    except Exception, err:
-        return render(request, 'bcommon/add_cname_result.htm',
-                      { 'errors' : err,
-                        'rr_data' : cd })
+        return render(request, 'bcommon/response_result.htm',
+                      { 'errors' : error,
+                        'response' : add_cname_response })
 
-    return render(request, 'bcommon/add_cname_result.htm',
-                  { 'response' : add_cname_response,
-                    'rr_data' : cd })
+    return render(request, "bcommon/add_cname_record_form.htm",
+                  { "dns_server" : request.POST["dns_server"],
+                    "zone_name" : request.POST["zone_name"],
+                    "record_name" : request.POST["cname"],
+                    "originating_record" : request.POST["originating_record"],
+                    "form_data" : request.POST,
+                    "form_errors" : form.errors,
+                    "tsig_keys" : models.Key.objects.all() })
+
 
 def view_delete_record(request):
     if request.method == "GET":
@@ -145,8 +151,8 @@ def view_delete_result(request):
     try:
         delete_result = helpers.delete_record(request.POST, rr_items)
     except Exception, err:
-        return render(request, 'bcommon/delete_record_result.htm',
-                      { "errors" : err }),
+        return render(request, 'bcommon/response_result.htm.htm',
+                      { "errors" : err })
 
-    return render(request, 'bcommon/delete_record_result.htm',
-                  { 'delete_result' : delete_result })
+    return render(request, 'bcommon/response_result.htm',
+                  { 'response' : delete_result })

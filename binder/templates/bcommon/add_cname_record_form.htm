@@ -1,7 +1,7 @@
 {% extends "base.htm" %}
 
 {% block pageheader %}
-Add cname record for {{record_name}}.{{zone_name}}
+Add CNAME record for {{ originating_record }}
 {% endblock pageheader %}
 
 {% block body %}
@@ -18,8 +18,8 @@ Add cname record for {{record_name}}.{{zone_name}}
   <div class="control-group">
     <label class="control-label">Originating Record: </label>
     <div class="controls">
-      <span class="input-xlarge uneditable-input">{{record_name}}.{{zone_name}}</span>
-      <input type="hidden" name="originating_record" value="{{record_name}}.{{zone_name}}"/>
+      <span class="input-xlarge uneditable-input">{{originating_record}}</span>
+      <input type="hidden" name="originating_record" value="{{originating_record}}"/>
     </div>
   </div>
 
@@ -27,9 +27,14 @@ Add cname record for {{record_name}}.{{zone_name}}
     <label class="control-label">CNAME: </label>
     <div class="controls">
       <div class="input-append">
-	<input class="span2" size="100" name="cname" type="text"><span class="add-on">.{{zone_name}}</span>
-	<input type="hidden" name="zone_name" value="{{zone_name}}"/>
+	      <input class="span2" size="100" name="cname" type="text"><span class="add-on">.{{zone_name}}</span>
+	      <input type="hidden" name="zone_name" value="{{zone_name}}"/>
       </div>
+      {% if form_errors.cname  %}
+      <div class="alert alert-error">
+        CNAME: {{ form_errors.cname|stringformat:"s"|striptags }} Previous Value: {{ form_data.cname }}
+      </div>
+      {% endif %}
     </div>
   </div>
 

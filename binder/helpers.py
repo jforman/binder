@@ -75,8 +75,7 @@ def add_record(form_data):
         keyring = None
 
     response = []
-    response.append({ "type" : "Forward Record: %s.%s" % (str(form_data["record_name"]),
-                                                          str(form_data["zone_name"])),
+    response.append({ "description" : "Forward Record Added: %(record_name)s.%(zone_name)s" % form_data,
                       "output" : add_forward_record(str(form_data["dns_server"]),
                                                     str(form_data["zone_name"]),
                                                     str(form_data["record_name"]),
@@ -86,7 +85,7 @@ def add_record(form_data):
                                                     keyring)})
 
     if form_data["create_reverse"]:
-        response.append({ "type" : "Reverse Record: %s" % form_data["record_data"],
+        response.append({ "description" : "Reverse Record Added: %(record_data)s" % form_data,
                           "output" : add_reverse_record(str(form_data["dns_server"]),
                                                         str(form_data["zone_name"]),
                                                         str(form_data["record_name"]),
@@ -108,7 +107,9 @@ def add_cname_record(dns_server, zone_name, originating_record, cname, ttl, key_
     update.replace(cname, int(ttl), 'CNAME', originating_record + ".")
     response = dns.query.tcp(update, dns_server)
 
-    return response
+    return [{ "description" : "CNAME %s.%s points to %s" % (cname, zone_name, originating_record),
+              "output" : response}]
+
 
 def delete_record(form_data, rr_items):
     """Delete a list of DNS records passed as strings in rr_items."""
@@ -127,6 +128,6 @@ def delete_record(form_data, rr_items):
         dns_update = dns.update.Update(domain, keyring = keyring)
         dns_update.delete(record)
         output = dns.query.tcp(dns_update, dns_server)
-        delete_response.append({ "rr_item" : current_rr_item, "output" : output })
+        delete_response.append({ "description" : "Delete record %s" % current_rr_item, "output" : output })
 
     return delete_response
