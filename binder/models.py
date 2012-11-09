@@ -44,8 +44,8 @@ class BindServer(models.Model):
         each RR record and its attributes."""
         try:
             zone = dns.zone.from_xfr(dns.query.xfr(self.hostname, zone))
-        except dns.exception.FormError, err:
-            raise Exception("The zone requested %s is not found on %s." % (zone, self.hostname))
+        except dns.exception.FormError:
+            raise Exception("There was an error attempting to retrieve zone %s on %s." % (zone, self.hostname))
 
         names = zone.nodes.keys()
         names.sort()
