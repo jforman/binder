@@ -8,10 +8,19 @@ import urllib2
 
 TSIG_ALGORITHMS = (('hmac-md5', 'MD5'),('hmac-sha1', 'SHA1'),('hmac-224', 'SHA224'),('hmac-sha256', 'SHA256'),('hmac-sha384', 'SHA384'),('hmac-sha512', 'SHA512'))
 
+class Key(models.Model):
+    name = models.CharField(max_length=50)
+    data = models.CharField(max_length=150)
+    algorithm = models.CharField(max_length=200, choices=TSIG_ALGORITHMS)
+
+    def __unicode__(self):
+        return self.name
+
+
 class BindServer(models.Model):
     hostname = models.CharField(max_length=100)
     statistics_port = models.IntegerField()
-    control_port = models.IntegerField()
+    default_transfer_key = models.ForeignKey(Key,null=True,blank=True)
 
     def __unicode__(self):
         return self.hostname
@@ -60,10 +69,3 @@ class BindServer(models.Model):
                                      'rr_data'  : split_record.split(" ")[4]})
         return record_array
 
-class Key(models.Model):
-    name = models.CharField(max_length=50)
-    data = models.CharField(max_length=150)
-    algorithm = models.CharField(max_length=200, choices=TSIG_ALGORITHMS)
-
-    def __unicode__(self):
-        return self.name
