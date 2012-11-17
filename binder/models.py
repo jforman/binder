@@ -1,8 +1,11 @@
 from BeautifulSoup import BeautifulStoneSoup as BS
 from django.db import models
+from binder import exceptions
 
 import dns.query
 import dns.zone
+import dns.tsig
+import keyutils
 import re
 import urllib2
 
@@ -20,7 +23,7 @@ class Key(models.Model):
 class BindServer(models.Model):
     hostname = models.CharField(max_length=100)
     statistics_port = models.IntegerField()
-    default_transfer_key = models.ForeignKey(Key,null=True,blank=True)
+    default_transfer_key = models.ForeignKey(Key, null=True, blank=True)
 
     def __unicode__(self):
         return self.hostname
@@ -51,10 +54,18 @@ class BindServer(models.Model):
     def list_zone_records(self, zone):
         """Given a zone, produce an array of dicts containing
         each RR record and its attributes."""
+        if self.default_transfer_key:
+            keyring = keyutils.create_keyring(self.default_transfer_key.name,
+                                              self.default_transfer_key.data)
+        else:
+            keyring = None
+
         try:
-            zone = dns.zone.from_xfr(dns.query.xfr(self.hostname, zone))
-        except dns.exception.FormError:
-            raise Exception("There was an error attempting to retrieve zone %s on %s." % (zone, self.hostname))
+            zone = dns.zone.from_xfr(dns.query.xfr(self.hostname, zone, keyring=keyring))
+        except dns.exception.FormError, err:
+            raise exceptions.TransferException("There was an error attempting to list zone records.")
+        except dns.tsig.PeerBadKey:
+            raise exceptions.TransferException("Unable to list zone records because of a TSIG key mismatch.")
 
         names = zone.nodes.keys()
         names.sort()
