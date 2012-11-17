@@ -1,15 +1,17 @@
 import dns.tsigkeyring
-import sys
-from models import Key
 
-def create_keyring(key_name):
-    """Accept a TSIG keyfile and a key name to retrieve.
-    Return a keyring object with the key name and TSIG secret."""
+def create_keyring(key_name, key_data):
+    """Return a tsigkeyring object from key name and key data.
 
-    key_dict = Key.objects.get(name=key_name)
+    Args:
+      key_name: String representation of key name
+      key_data: String representation of TSIG key hash
+
+    Return:
+      keyring object with the key name and TSIG secret."""
 
     keyring = dns.tsigkeyring.from_text({
-            key_dict.name : key_dict.data
+            key_name : key_data
     })
 
     return keyring
