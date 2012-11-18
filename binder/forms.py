@@ -1,5 +1,4 @@
 from django import forms
-
 from models import Key
 
 RECORD_TYPE_CHOICES = (("A", "A"), ("AAAA", "AAAA"), ("CNAME", "CNAME"))
@@ -17,7 +16,7 @@ class FormAddRecord(forms.Form):
     record_data = forms.GenericIPAddressField()
     ttl = forms.IntegerField(min_value=1)
     create_reverse = forms.BooleanField(required=False)
-    key_name = forms.ModelChoiceField(queryset=Key.objects.all(), empty_label=None, required=False)
+    key_name = forms.ModelChoiceField(queryset=Key.objects.all(), required=False)
 
 
 class FormAddCnameRecord(forms.Form):
@@ -26,4 +25,4 @@ class FormAddCnameRecord(forms.Form):
     cname = forms.RegexField(max_length=100, regex="^[a-zA-Z0-9-_]+$")
     zone_name = forms.CharField(max_length=256)
     ttl = forms.ChoiceField(choices=TTL_CHOICES)
-    key_name = forms.ModelChoiceField(queryset=Key.objects.all(), empty_label=None, required=False)
+    key_name = forms.ModelChoiceField(queryset=Key.objects.all(), required=False)
