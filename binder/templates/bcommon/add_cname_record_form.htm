@@ -42,10 +42,7 @@ Add CNAME record for {{ originating_record }}
     <label class="control-label">TTL: </label>
     <div class="controls">
       <select name="ttl">
-	<!-- {% for key in tsig_keys %} -->
-	<!--   <option value="{{key}}">{{key}}</option> -->
-	<!-- {% endfor %} -->
-	<option value="86400">86400 (1 day)</option>
+	      <option value="86400">86400 (1 day)</option>
       </select>
     </div>
   </div>
@@ -56,7 +53,7 @@ Add CNAME record for {{ originating_record }}
       <select name="key_name">
 	  <option selected="selected" value=""></option>
 	{% for key in tsig_keys %}
-	  <option value="{{key}}">{{key}}</option>
+	  <option value="{{key.id}}">{{key}}</option>
 	{% endfor %}
       </select>
     </div>

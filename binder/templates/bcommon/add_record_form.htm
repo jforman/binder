@@ -77,9 +77,9 @@ Add record in {{ zone_name }}
     <label class="control-label">TSIG Key: </label>
     <div class="controls">
       <select name="key_name">
-      <option selected="selected" value=""/>
+        <option selected="selected" value=""/>
         {% for key in tsig_keys %}
-          <option value="{{key}}">{{key}}</option>
+          <option value="{{key.id}}">{{key}}</option>
         {% endfor %}
       </select>
     </div>
