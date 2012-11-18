@@ -1,15 +1,13 @@
-from django.template import Context
 from django.shortcuts import redirect, render
-from binder import forms, helpers, keyutils, models
+
+from binder import exceptions, forms, helpers, models
 
 import re
 
 RE_UNICODEARRAY = re.compile(r"u'(.*?)'")
 
-class BinderException(Exception):
-    pass
-
 def home_index(request):
+    """ List the main index page for Binder. """
     return render(request, 'index.htm')
 
 def view_server_list(request):
@@ -25,11 +23,10 @@ def view_server_zones(request, dns_server):
     try:
         this_server = models.BindServer.objects.get(hostname=dns_server)
         zone_array = this_server.list_zones()
-    except BindServer.DoesNotExist, err:
-        errors = err
-
-    if "errors" in zone_array:
-        errors = zone_array["errors"]
+    except models.BindServer.DoesNotExist, err:
+        errors = "Configured server does not exist: %s" % dns_server
+    except exceptions.ZoneException, err:
+        errors = "Unable to list server zones. Error: %s" % err
 
     return render(request, 'bcommon/list_server_zones.htm',
                   { "errors" : errors,
@@ -41,10 +38,10 @@ def view_zone_records(request, dns_server, zone_name):
     try:
         this_server = models.BindServer.objects.get(hostname=dns_server)
         zone_array = this_server.list_zone_records(zone_name)
-    except Exception, err:
-        # TODO: Use a custom exception here.
+    except exceptions.TransferException, err:
         return render(request, 'bcommon/list_zone.htm',
-                      { 'errors' : err})
+                      { 'errors' : err,
+                        'zone_name' : zone_name})
 
     return render(request, 'bcommon/list_zone.htm',
                   { 'zone_array' : zone_array,
@@ -53,6 +50,8 @@ def view_zone_records(request, dns_server, zone_name):
 
 def view_add_record(request, dns_server, zone_name):
     """ View to provide form to add a DNS record. """
+    print "keys: %r" % models.Key.objects.all()
+    form = forms.FormAddRecord()
     return render(request, 'bcommon/add_record_form.htm',
                   { "dns_server" : dns_server,
                     "zone_name" : zone_name,
@@ -60,6 +59,7 @@ def view_add_record(request, dns_server, zone_name):
 
 def view_add_record_result(request):
     """ Process the input given to add a DNS record. """
+    errors = ""
     if request.method == "GET":
         return redirect('/')
 
@@ -68,10 +68,11 @@ def view_add_record_result(request):
         cd = form.cleaned_data
         try:
             add_record_response = helpers.add_record(cd)
-        except BinderException, error:
-            pass
+        except exceptions.RecordException, err:
+            errors = err
+
         return render(request, 'bcommon/response_result.htm',
-                      { "errors" : error,
+                      { "errors" : errors,
                         "response" : add_record_response })
 
     return render(request, 'bcommon/add_record_form.htm',
@@ -89,10 +90,12 @@ def view_add_cname_record(request, dns_server, zone_name, record_name):
                     "tsig_keys" : models.Key.objects.all() })
 
 def view_add_cname_result(request):
+    """ Process input on the CNAME form and provide a response."""
     if request.method == "GET":
         return redirect('/')
 
     form = forms.FormAddCnameRecord(request.POST)
+    errors = ""
     if form.is_valid():
         cd = form.cleaned_data
         try:
@@ -103,12 +106,11 @@ def view_add_cname_result(request):
                 str(cd["cname"]),
                 str(cd["ttl"]),
                 str(cd["key_name"]))
-        except BinderException, error:
-            pass
+        except:
+            print "hit exception in view_add_cname_result"
 
         return render(request, 'bcommon/response_result.htm',
-                      { 'errors' : error,
-                        'response' : add_cname_response })
+                      {'response' : add_cname_response })
 
     return render(request, "bcommon/add_cname_record_form.htm",
                   { "dns_server" : request.POST["dns_server"],
@@ -121,6 +123,7 @@ def view_add_cname_result(request):
 
 
 def view_delete_record(request):
+    """Provide the initial form for deleting records."""
     if request.method == "GET":
         # Return home. You shouldn't trying to directly acces
         # the url for deleting records.
@@ -138,6 +141,7 @@ def view_delete_record(request):
 
 
 def view_delete_result(request):
+    """ View that deletes records and returns the response."""
     if request.method == "GET":
         # Return home. You shouldn't trying to directly access
         # the url for deleting records.
@@ -150,7 +154,7 @@ def view_delete_result(request):
 
     try:
         delete_result = helpers.delete_record(request.POST, rr_items)
-    except Exception, err:
+    except exceptions.RecordException, err:
         return render(request, 'bcommon/response_result.htm.htm',
                       { "errors" : err })
 
