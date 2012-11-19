@@ -1,4 +1,6 @@
-from binder import keyutils
+from binder import keyutils, exceptions
+# TODO: Start using exceptions here, force a record/add/delete on
+#        an unresponsive Bind server.
 
 import re
 import dns.query
@@ -15,10 +17,9 @@ def add_forward_record(dns_server, zone_name, record_name, record_type, record_d
 
     dns_update = dns.update.Update(zone_name, keyring = keyring)
     dns_update.replace(record_name, ttl, record_type, record_data)
+    output = dns.query.tcp(dns_update, dns_server)
 
-    response = dns.query.tcp(dns_update, dns_server)
-
-    return response
+    return output
 
 def add_reverse_record(dns_server, zone_name, record_name, record_data, ttl, keyring):
     """ Given passed arguments, add/update a reverse PTR record."""
@@ -66,10 +67,10 @@ def add_record(form_data):
 def add_cname_record(dns_server, zone_name, originating_record, cname, ttl, key_name):
     """Add a Cname record."""
 
-    if key_name is None:
+    if key_name == "None":
         keyring = None
     else:
-        this_key = models.Key.objects.get(name=str(key_name))
+        this_key = models.Key.objects.get(name=key_name)
         keyring = keyutils.create_keyring(this_key.name, this_key.data)
 
     update = dns.update.Update(zone_name, keyring = keyring)
@@ -98,6 +99,7 @@ def delete_record(form_data, rr_items):
         dns_update = dns.update.Update(domain, keyring = keyring)
         dns_update.delete(record)
         output = dns.query.tcp(dns_update, dns_server)
-        delete_response.append({ "description" : "Delete record %s" % current_rr_item, "output" : output })
+        delete_response.append({ "description" : "Delete record %s" % current_rr_item,
+                                 "output" : output })
 
     return delete_response

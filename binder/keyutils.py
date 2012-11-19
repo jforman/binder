@@ -12,6 +12,6 @@ def create_keyring(key_name, key_data):
 
     keyring = dns.tsigkeyring.from_text({
             key_name : key_data
-    })
+            })
 
     return keyring
