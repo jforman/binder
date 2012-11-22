@@ -66,7 +66,14 @@ def view_add_record_result(request):
     if form.is_valid():
         form_cleaned = form.cleaned_data
         try:
-            add_record_response = helpers.add_record(form_cleaned)
+            add_record_response = helpers.add_record(form_cleaned["dns_server"],
+                                                     str(form_cleaned["zone_name"]),
+                                                     str(form_cleaned["record_name"]),
+                                                     str(form_cleaned["record_type"]),
+                                                     str(form_cleaned["record_data"]),
+                                                     form_cleaned["ttl"],
+                                                     form_cleaned["key_name"],
+                                                     form_cleaned["create_reverse"])
         except exceptions.RecordException, err:
             # TODO: Start using this exception.
             errors = err

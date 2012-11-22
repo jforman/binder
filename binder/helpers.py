@@ -12,8 +12,20 @@ from binder import exceptions, models
 re_IPADDRESS = re.compile(r"\d+.\d+.\d+.\d+")
 
 def add_forward_record(dns_server, zone_name, record_name, record_type, record_data, ttl, keyring):
-    """Take in data from FormAddRecord and a keyring object,
-    return a response from the DNS server about adding the record."""
+    """ Create a forward DNS record given passed arguments.
+
+    Args:
+      String dns_server
+      String zone_name
+      String record_name (just record name, not FQDN)
+      String record_type (A, AAAA, etc)
+      String record_data (IP address)
+      Int ttl
+      Dict keyring object
+
+    Return:
+      String representation of DNS update output from record creation.
+    """
 
     dns_update = dns.update.Update(zone_name, keyring = keyring)
     dns_update.replace(record_name, ttl, record_type, record_data)
@@ -22,7 +34,21 @@ def add_forward_record(dns_server, zone_name, record_name, record_type, record_d
     return output
 
 def add_reverse_record(dns_server, zone_name, record_name, record_data, ttl, keyring):
-    """ Given passed arguments, add/update a reverse PTR record."""
+    """ Create a reverse DNS record (PTR) given passed arguments.
+
+    Args:
+      String dns_server
+      String zone_name
+      String record_name (just record name, not FQDN)
+      String record_type (A, AAAA, etc)
+      String record_data (IP address)
+      Int ttl
+      Dict keyring object
+
+    Return:
+      String representation of DNS update output from record creation.
+    """
+
     reverse_ip_fqdn = str(dns.reversename.from_address(record_data))
     reverse_ip = re.search(r"([0-9]+).(.*).$", reverse_ip_fqdn).group(1)
     reverse_domain = re.search(r"([0-9]+).(.*).$", reverse_ip_fqdn).group(2)
@@ -33,33 +59,46 @@ def add_reverse_record(dns_server, zone_name, record_name, record_data, ttl, key
 
     return output
 
-def add_record(form_data):
-    """Add a DNS record with data from a FormAddRecord dict.
-    If a reverse PTR record is requested, this will be added too."""
+def add_record(dns_server, zone_name, record_name, record_type, record_data, ttl, key_name, create_reverse):
+    """ Create DNS record(s) given passed arguments.
 
-    if form_data["key_name"]:
-        this_key = models.Key.objects.get(name=form_data["key_name"])
-        keyring = keyutils.create_keyring(this_key.name, this_key.data)
-    else:
+    Args:
+      String dns_server
+      String zone_name
+      String record_name (just record name, not FQDN)
+      String record_type (A, AAAA, etc)
+      String record_data (IP address)
+      Int ttl
+      String key_name (from Key model)
+      Boolean create_reverse
+
+    Return:
+      Dict containing {description, output} from record creation
+    """
+
+    if key_name is None:
         keyring = None
+    else:
+        this_key = models.Key.objects.get(name=key_name)
+        keyring = keyutils.create_keyring(this_key.name, this_key.data)
 
     response = []
-    response.append({ "description" : "Forward Record Added: %(record_name)s.%(zone_name)s" % form_data,
-                      "output" : add_forward_record(str(form_data["dns_server"]),
-                                                    str(form_data["zone_name"]),
-                                                    str(form_data["record_name"]),
-                                                    str(form_data["record_type"]),
-                                                    str(form_data["record_data"]),
-                                                    form_data["ttl"],
+    response.append({ "description" : "Forward Record Added: %s.%s" % (record_name, zone_name),
+                      "output" : add_forward_record(dns_server,
+                                                    zone_name,
+                                                    record_name,
+                                                    record_type,
+                                                    record_data,
+                                                    ttl,
                                                     keyring)})
 
-    if form_data["create_reverse"]:
-        response.append({ "description" : "Reverse Record Added: %(record_data)s" % form_data,
-                          "output" : add_reverse_record(str(form_data["dns_server"]),
-                                                        str(form_data["zone_name"]),
-                                                        str(form_data["record_name"]),
-                                                        str(form_data["record_data"]),
-                                                        form_data["ttl"],
+    if create_reverse:
+        response.append({ "description" : "Reverse Record Added: %s" % record_data,
+                          "output" : add_reverse_record(dns_server,
+                                                        zone_name,
+                                                        record_name,
+                                                        record_data,
+                                                        ttl,
                                                         keyring)})
 
     return response
