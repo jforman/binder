@@ -74,7 +74,7 @@ def add_cname_record(dns_server, zone_name, originating_record, cname, ttl, key_
         keyring = keyutils.create_keyring(this_key.name, this_key.data)
 
     update = dns.update.Update(zone_name, keyring = keyring)
-    update.replace(cname, int(ttl), 'CNAME', originating_record + ".")
+    update.replace(cname, ttl, 'CNAME', originating_record + ".")
     response = dns.query.tcp(update, dns_server)
 
     return [{ "description" : "CNAME %s.%s points to %s" % (cname, zone_name, originating_record),

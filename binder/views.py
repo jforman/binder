@@ -99,12 +99,12 @@ def view_add_cname_result(request):
     if form.is_valid():
         cd = form.cleaned_data
         add_cname_response = helpers.add_cname_record(
-            str(cd["dns_server"]),
-            str(cd["zone_name"]),
-            str(cd["originating_record"]),
-            str(cd["cname"]),
-            str(cd["ttl"]),
-            str(cd["key_name"]))
+            cd["dns_server"],
+            cd["zone_name"],
+            str(cd["originating_record"]), # This needs to be cast as a String for some reason.
+            cd["cname"],
+            cd["ttl"],
+            cd["key_name"])
 
         return render(request, "bcommon/response_result.htm",
                       {"response" : add_cname_response })
