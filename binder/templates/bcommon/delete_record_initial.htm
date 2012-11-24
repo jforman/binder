@@ -8,11 +8,9 @@ Delete record(s) in {{ zone_name }}
 
 <table class="table">
 <form action="/delete_record/result/" method="POST">{% csrf_token %}
-<input type="hidden" name="dns_server" value="{{ dns_server }}">
-<input type="hidden" name="zone_name" value="{{ zone_name }}">
-<input type="hidden" name="rr_array" value="{{ rr_array }}">
-<!-- <input type="hidden" name="delete_step" value="finalize"> -->
-
+  <input type="hidden" name="dns_server" value="{{ dns_server }}">
+  <input type="hidden" name="zone_name" value="{{ zone_name }}">
+  <input type="hidden" name="rr_list" value="{{ rr_list }}">
   <tr>
     <th colspan="2">Do you really want to delete the following records?</th>
   </tr>
@@ -22,23 +20,30 @@ Delete record(s) in {{ zone_name }}
   </tr>
   <tr>
     <td>Zone</td>
-    <td> {{ zone_name }} </td>
+    <td>{{ zone_name }}</td>
   </tr>
   <tr>
     <td>Records</td>
-    <td>{% for current_rr in rr_array %} {{ current_rr}} {% endfor %}</td>
+    <td>{% for current_rr in rr_list %}{{ current_rr }}<br> {% endfor %}</td>
   </tr>
   <tr>
     <td>Key</td>
-    <td> <select name="key_name">
-      <option selected="selected" value=""/>
-    {% for current_key in tsig_keys %}
-      <option value="{{current_key}}">{{current_key}}</option>
-    {% endfor %}</td>
-    </tr>
-    </select>
+    <td>
+      <select name="key_name">
+        <option selected="selected" value=""/>
+        {% for current_key in tsig_keys %}
+        <option value="{{current_key.id}}">{{current_key}}</option>
+        {% endfor %}
+      </select>
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2">
+      <input type="submit" value="Yes, I really want to delete them."/>
+    </td>
+  </tr>
 </table>
 
-<input type="submit" value="Yes, I really want to delete them."/>
 </form>
+
 {% endblock body %}
