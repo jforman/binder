@@ -1,9 +1,7 @@
-from binder import exceptions, forms, helpers, models
 from django.shortcuts import redirect, render
+from binder import exceptions, forms, helpers, models
 
-import re
-
-RE_UNICODEARRAY = re.compile(r"u'(.*?)'")
+# Views
 
 def home_index(request):
     """ List the main index page for Binder. """
@@ -34,8 +32,6 @@ def view_server_zones(request, dns_server):
 
 def view_zone_records(request, dns_server, zone_name):
     """ Display the list of records for a particular zone. """
-    # Have we tried here to transfer for a zone that does not exist?
-    # Try with a transfer key and without.
     try:
         this_server = models.BindServer.objects.get(hostname=dns_server)
         zone_array = this_server.list_zone_records(zone_name)
@@ -108,7 +104,7 @@ def view_add_cname_result(request):
         add_cname_response = helpers.add_cname_record(
             cd["dns_server"],
             cd["zone_name"],
-            str(cd["originating_record"]), # This needs to be cast as a String for some reason.
+            str(cd["originating_record"]),
             cd["cname"],
             cd["ttl"],
             cd["key_name"])
@@ -129,35 +125,35 @@ def view_add_cname_result(request):
 def view_delete_record(request):
     """ Provide the initial form for deleting records. """
     if request.method == "GET":
-        # Return home. You shouldn't trying to directly acces
-        # the url for deleting records.
         return redirect("/")
 
     dns_server = request.POST["dns_server"]
     zone_name = request.POST["zone_name"]
-    rr_array = request.POST.getlist("rr_array")
+    rr_list = request.POST.getlist("rr_list")
 
     return render(request, "bcommon/delete_record_initial.htm",
                   { "dns_server" : dns_server,
                     "zone_name" : zone_name,
-                    "rr_array" :  rr_array,
+                    "rr_list" :  rr_list,
                     "tsig_keys" : models.Key.objects.all() })
 
 
 def view_delete_result(request):
     """ View that deletes records and returns the response. """
     if request.method == "GET":
-        # Return home. You shouldn't trying to directly access
-        # the url for deleting records.
         return redirect("/")
 
-    # What seems like an ugly hack to get around the fact
-    # that the array comes back as Unicode values.
-    # TODO: Can we make this cleaner?
-    rr_unicode_array = request.POST.getlist("rr_array")[0]
-    rr_items = RE_UNICODEARRAY.findall(rr_unicode_array)
+    form = forms.FormDeleteRecord(request.POST)
 
-    delete_result = helpers.delete_record(request.POST, rr_items)
+    if form.is_valid():
+        clean_form = form.cleaned_data
+    else:
+        # TODO: Add unit test here.
+        print "form not valid"
+
+    delete_result = helpers.delete_record(clean_form["dns_server"],
+                                          clean_form["rr_list"],
+                                          clean_form["key_name"])
 
     return render(request, "bcommon/response_result.htm",
                   { "response" : delete_result })
