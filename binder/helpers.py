@@ -107,6 +107,7 @@ def add_cname_record(dns_server, zone_name, originating_record, cname, ttl, key_
     """Add a Cname record."""
 
     if key_name == "None":
+        # TODO: Does this need to be changed to "key_name is None"
         keyring = None
     else:
         this_key = models.Key.objects.get(name=key_name)
@@ -120,25 +121,24 @@ def add_cname_record(dns_server, zone_name, originating_record, cname, ttl, key_
               "output" : response}]
 
 
-def delete_record(form_data, rr_items):
+def delete_record(dns_server, rr_list, key_name):
     """Delete a list of DNS records passed as strings in rr_items."""
 
-    if form_data["key_name"]:
-        this_key = models.Key.objects.get(name=form_data["key_name"])
-        keyring = keyutils.create_keyring(this_key.name, this_key.data)
-    else:
+    if key_name is None:
         keyring = None
+    else:
+        this_key = models.Key.objects.get(name=key_name)
+        keyring = keyutils.create_keyring(this_key.name, this_key.data)
 
-    dns_server = form_data["dns_server"]
     delete_response = []
-    for current_rr_item in rr_items:
-        re_record = re.search(r"(\w+)\.(.*)$", current_rr_item)
+    for current_rr in rr_list:
+        re_record = re.search(r"(\w+)\.(.*)$", current_rr)
         record = re_record.group(1)
         domain = re_record.group(2)
         dns_update = dns.update.Update(domain, keyring = keyring)
         dns_update.delete(record)
         output = dns.query.tcp(dns_update, dns_server)
-        delete_response.append({ "description" : "Delete record %s" % current_rr_item,
+        delete_response.append({ "description" : "Delete record %s" % current_rr,
                                  "output" : output })
 
     return delete_response
