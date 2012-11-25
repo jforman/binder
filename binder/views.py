@@ -1,4 +1,5 @@
 from django.shortcuts import redirect, render
+
 from binder import exceptions, forms, helpers, models
 
 # Views
@@ -32,18 +33,24 @@ def view_server_zones(request, dns_server):
 
 def view_zone_records(request, dns_server, zone_name):
     """ Display the list of records for a particular zone. """
+    errors = ""
+    zone_array = {}
     try:
         this_server = models.BindServer.objects.get(hostname=dns_server)
         zone_array = this_server.list_zone_records(zone_name)
     except exceptions.TransferException, err:
         return render(request, "bcommon/list_zone.htm",
                       { "errors" : err,
-                        "zone_name" : zone_name})
+                        "zone_name" : zone_name,
+                        "dns_server" : dns_server})
+    except models.BindServer.DoesNotExist:
+        errors = "Requesting a zone listing for a Bind server that is not configured: %s" % dns_server
 
     return render(request, "bcommon/list_zone.htm",
                   { "zone_array" : zone_array,
                     "dns_server" : dns_server,
-                    "zone_name" : zone_name})
+                    "zone_name" : zone_name,
+                    "errors" : errors})
 
 def view_add_record(request, dns_server, zone_name):
     """ View to provide form to add a DNS record. """
@@ -72,6 +79,8 @@ def view_add_record_result(request):
                                                      form_cleaned["create_reverse"])
         except exceptions.RecordException, err:
             # TODO: Start using this exception.
+            # What would cause this?
+            print "In view_add_record_result, catching RecordException: %s" % err
             errors = err
 
         return render(request, "bcommon/response_result.htm",
@@ -98,19 +107,24 @@ def view_add_cname_result(request):
         return redirect("/")
 
     errors = ""
+    add_cname_response = ""
     form = forms.FormAddCnameRecord(request.POST)
     if form.is_valid():
         cd = form.cleaned_data
-        add_cname_response = helpers.add_cname_record(
-            cd["dns_server"],
-            cd["zone_name"],
-            str(cd["originating_record"]),
-            cd["cname"],
-            cd["ttl"],
-            cd["key_name"])
+        try:
+            add_cname_response = helpers.add_cname_record(
+                cd["dns_server"],
+                cd["zone_name"],
+                str(cd["originating_record"]),
+                cd["cname"],
+                cd["ttl"],
+                cd["key_name"])
+        except exceptions.RecordException, err:
+            errors = err
 
         return render(request, "bcommon/response_result.htm",
-                      {"response" : add_cname_response })
+                      {"response" : add_cname_response,
+                       "errors" : errors })
 
     return render(request, "bcommon/add_cname_record_form.htm",
                   { "dns_server" : request.POST["dns_server"],
