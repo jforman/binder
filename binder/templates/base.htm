@@ -7,8 +7,11 @@
 </head>
 {% endblock header %}
 
-<div class="row-fluid">
+<body>
+  <script src="http://code.jquery.com/jquery.js"></script>
+  <script src="{{ STATIC_URL }}bootstrap/js/bootstrap.min.js"></script>
 
+<div class="row-fluid">
   <div class="span2">
     {% block navigation %}
     <ul class="nav nav-list">
@@ -20,10 +23,6 @@
   </div>
 
   <div class="span10">
-    <body>
-      <script src="http://code.jquery.com/jquery.js"></script>
-      <script src="{{ STATIC_URL }}bootstrap/js/bootstrap.min.js"></script>
-
       <div class="navbar">
         <div class="navbar-inner">
           <a class="brand" href="#">
@@ -45,9 +44,10 @@
 
     {% block body %}
     {% endblock body %}
-     </body>
   </div>
 </div>
+</body>
+
 
 {% block footer %}
 {% endblock footer %}
