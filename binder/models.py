@@ -1,11 +1,13 @@
+from django.db import models
+
 from BeautifulSoup import BeautifulStoneSoup as BS
 from binder import exceptions
-from django.db import models
 
 import dns.query
 import dns.tsig
 import dns.zone
 import keyutils
+import socket
 import urllib2
 
 TSIG_ALGORITHMS = (('hmac-md5', 'MD5'),
@@ -15,7 +17,7 @@ TSIG_ALGORITHMS = (('hmac-md5', 'MD5'),
                    ('hmac-sha512', 'SHA512'))
 
 class Key(models.Model):
-    """ Class to store and reference TSIG keys.
+    """ Store and reference TSIG keys.
 
     TODO: Should/Can we encrypt these DNS keys in the DB?
     """
@@ -28,7 +30,7 @@ class Key(models.Model):
 
 
 class BindServer(models.Model):
-    """ Class to store DNS servers and attributes for referencing their
+    """ Store DNS servers and attributes for referencing their
         statistics ports. Also reference FK for TSIG transfer keys,
         if required.
     """
@@ -94,9 +96,14 @@ class BindServer(models.Model):
         try:
             zone = dns.zone.from_xfr(dns.query.xfr(self.hostname, zone_name, keyring=keyring))
         except dns.exception.FormError, err:
+            # TODO: What throws this?
             raise exceptions.TransferException("There was an error attempting to list zone records.")
         except dns.tsig.PeerBadKey:
+            # The incorrect TSIG key was selected for transfers.
             raise exceptions.TransferException("Unable to list zone records because of a TSIG key mismatch.")
+        except socket.error, err:
+            # Thrown when the DNS server does not respond for a zone transfer (XFR).
+            raise exceptions.TransferException("DNS server did not respond for transfer. Reason: %s" % err)
 
         names = zone.nodes.keys()
         names.sort()
