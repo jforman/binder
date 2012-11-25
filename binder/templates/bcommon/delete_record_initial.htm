@@ -7,10 +7,11 @@ Delete record(s) in {{ zone_name }}
 {% block body %}
 
 <table class="table">
-<form action="/delete_record/result/" method="POST">{% csrf_token %}
-  <input type="hidden" name="dns_server" value="{{ dns_server }}">
-  <input type="hidden" name="zone_name" value="{{ zone_name }}">
-  <input type="hidden" name="rr_list" value="{{ rr_list }}">
+<form action="/delete_record/result/" method="POST">
+  {% csrf_token %}
+  <input type="hidden" name="dns_server" value="{{ dns_server }}" />
+  <input type="hidden" name="zone_name" value="{{ zone_name }}" />
+  <input type="hidden" name="rr_list" value="{{ rr_list }}" />
   <tr>
     <th colspan="2">Do you really want to delete the following records?</th>
   </tr>
@@ -42,8 +43,7 @@ Delete record(s) in {{ zone_name }}
       <input type="submit" value="Yes, I really want to delete them."/>
     </td>
   </tr>
+  </form>
 </table>
-
-</form>
 
 {% endblock body %}
