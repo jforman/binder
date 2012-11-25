@@ -45,7 +45,10 @@ class BindServer(models.Model):
         TODO: Parse these XML more intelligently. Grab the view name. Any other data available?
 
         Returns:
-          List of Dicts { String zone_name, String zone_serial }
+          List of Dicts { String view_name,
+                          String zone_name,
+                          String zone_class,
+                          String zone_serial }
         """
         zone_req  = urllib2.Request("http://%s:%s" % (self.hostname, self.statistics_port))
         try:
@@ -56,13 +59,17 @@ class BindServer(models.Model):
         return_array = []
         xmloutput = http_request.read()
         mysoup = BS(xmloutput)
-        zones = mysoup.findAll('zone')
-        for current_zone in zones:
-            zone_name = current_zone.find("name").string.split("/IN")[0]
-            zone_serial = current_zone.find("serial").string
-            zone_class = current_zone.find("rdataclass").string
-            if zone_class == "IN":
-                return_array.append({"zone_name" : zone_name, "zone_serial" : zone_serial })
+        views = mysoup.findAll("view")
+        for view in views:
+            view_name = view.find("name").string
+            for zone in view.findAll("zone"):
+                zone_name, zone_class = zone.find("name").string.split("/")
+                zone_serial = zone.find("serial").string
+                if zone_class == "IN":
+                    return_array.append({"view_name" : view_name,
+                                         "zone_name" : zone_name,
+                                         "zone_class" : zone_class,
+                                         "zone_serial" : zone_serial })
 
         return return_array
 
