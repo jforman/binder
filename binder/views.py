@@ -80,7 +80,6 @@ def view_add_record_result(request):
         except exceptions.RecordException, err:
             # TODO: Start using this exception.
             # What would cause this?
-            print "In view_add_record_result, catching RecordException: %s" % err
             errors = err
 
         return render(request, "bcommon/response_result.htm",
@@ -163,7 +162,7 @@ def view_delete_result(request):
         clean_form = form.cleaned_data
     else:
         # TODO: Add unit test here.
-        print "form not valid"
+        pass
 
     delete_result = helpers.delete_record(clean_form["dns_server"],
                                           clean_form["rr_list"],
