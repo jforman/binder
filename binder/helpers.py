@@ -1,15 +1,10 @@
-from binder import keyutils, exceptions
-# TODO: Start using exceptions here, force a record/add/delete on
-#        an unresponsive Bind server.
+from binder import exceptions, keyutils, models
 
-import re
 import dns.query
 import dns.reversename
 import dns.update
-
-from binder import exceptions, models
-
-re_IPADDRESS = re.compile(r"\d+.\d+.\d+.\d+")
+import dns.tsig
+import re
 
 def add_forward_record(dns_server, zone_name, record_name, record_type, record_data, ttl, keyring):
     """ Create a forward DNS record given passed arguments.
@@ -106,8 +101,7 @@ def add_record(dns_server, zone_name, record_name, record_type, record_data, ttl
 def add_cname_record(dns_server, zone_name, originating_record, cname, ttl, key_name):
     """Add a Cname record."""
 
-    if key_name == "None":
-        # TODO: Does this need to be changed to "key_name is None"
+    if key_name is None:
         keyring = None
     else:
         this_key = models.Key.objects.get(name=key_name)
@@ -115,7 +109,16 @@ def add_cname_record(dns_server, zone_name, originating_record, cname, ttl, key_
 
     update = dns.update.Update(zone_name, keyring = keyring)
     update.replace(cname, ttl, 'CNAME', originating_record + ".")
-    response = dns.query.tcp(update, dns_server)
+
+    try:
+        response = dns.query.tcp(update, dns_server)
+    except dns.tsig.PeerBadKey, err:
+        # There is a mismatch between TSIG key configuration
+        # for allow-update in the named.conf, and the key
+        # selected to be used for the update.
+        # Combos that are tripped:
+        # * allow-update is a netmask, but key selected on form.
+        raise exceptions.RecordException("TSIG key mismatch between your BIND configuration and what was selected on the form.")
 
     return [{ "description" : "CNAME %s.%s points to %s" % (cname, zone_name, originating_record),
               "output" : response}]
