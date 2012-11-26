@@ -69,14 +69,14 @@ def view_add_record_result(request):
     if form.is_valid():
         form_cleaned = form.cleaned_data
         try:
-            add_record_response = helpers.add_record(form_cleaned["dns_server"],
-                                                     str(form_cleaned["zone_name"]),
-                                                     str(form_cleaned["record_name"]),
-                                                     str(form_cleaned["record_type"]),
-                                                     str(form_cleaned["record_data"]),
-                                                     form_cleaned["ttl"],
-                                                     form_cleaned["key_name"],
-                                                     form_cleaned["create_reverse"])
+            response = helpers.add_record(form_cleaned["dns_server"],
+                                          str(form_cleaned["zone_name"]),
+                                          str(form_cleaned["record_name"]),
+                                          str(form_cleaned["record_type"]),
+                                          str(form_cleaned["record_data"]),
+                                          form_cleaned["ttl"],
+                                          form_cleaned["key_name"],
+                                          form_cleaned["create_reverse"])
         except exceptions.RecordException, err:
             # TODO: Start using this exception.
             # What would cause this?
@@ -84,7 +84,7 @@ def view_add_record_result(request):
 
         return render(request, "bcommon/response_result.htm",
                       { "errors" : errors,
-                        "response" : add_record_response })
+                        "response" : response })
 
     return render(request, "bcommon/add_record_form.htm",
                   { "dns_server" : request.POST["dns_server"],
@@ -114,8 +114,8 @@ def view_add_cname_result(request):
             add_cname_response = helpers.add_cname_record(
                 cd["dns_server"],
                 cd["zone_name"],
-                str(cd["originating_record"]),
                 cd["cname"],
+                str(cd["originating_record"]),
                 cd["ttl"],
                 cd["key_name"])
         except exceptions.RecordException, err:
