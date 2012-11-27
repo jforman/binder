@@ -4,6 +4,7 @@ import dns.query
 import dns.reversename
 import dns.update
 import dns.tsig
+import socket
 import re
 
 def add_record(dns_server, zone_name, record_name, record_type, record_data, ttl, key_name, create_reverse=False):
@@ -106,3 +107,20 @@ def update_record(dns_server, zone_name, record_name, record_type, record_data, 
     output = dns.query.tcp(dns_update, dns_server)
 
     return output
+
+def ip_info(host_name): # , family_dict, socket_dict):
+    """Create a dictionary mapping address types to their IP's.
+    If an error is encountered, key to error is "Error".
+    """
+    info = {}
+
+    try:
+        for s_family, s_type, s_proto, s_cannoname, s_sockaddr in socket.getaddrinfo(host_name.hostname, None):
+            if s_family == 2 and s_type == 1:
+                info["IPv4"] = s_sockaddr[0]
+            if s_family == 10 and s_type == 1:
+                info["IPv6"] = s_sockaddr[0]
+    except socket.gaierror, err:
+        info["Error"] = "Unable to resolve %s: %s" % (host_name, err)
+
+    return info

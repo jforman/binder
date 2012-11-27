@@ -11,8 +11,12 @@ def home_index(request):
 def view_server_list(request):
     """ List the DNS servers configured in the database. """
     server_list = models.BindServer.objects.all().order_by("hostname")
+    server_info = []
+    for current in server_list:
+        server_info.append({"host_name" : current, "ip_address" : helpers.ip_info(current)})
+
     return render(request, "bcommon/list_servers.htm",
-                  { "server_list" : server_list})
+                  { "server_info" : server_info})
 
 def view_server_zones(request, dns_server):
     """ Display the list of DNS zones a particular DNS host provides. """

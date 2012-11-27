@@ -7,9 +7,17 @@ Server List
 
 {% block body %}
 <table class="table">
-{% for current_server in server_list %}
   <tr>
-    <td><a href="/info/{{ current_server }}/"> {{ current_server }}</td>
+    <th>Hostname</th>
+    <th>IP Address</th>
+  </tr>
+{% for current_server in server_info %}
+  <tr>
+    <td><a href="/info/{{ current_server.host_name }}/"> {{ current_server.host_name }}</td>
+    <td>{% for key, value in current_server.ip_address.items %}
+      {{key}}: {{value}}<br>
+      {% endfor %}
+    </td>
   </tr>
 {% endfor %}
 </table>
