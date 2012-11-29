@@ -1,4 +1,9 @@
+### Binder Forms
+
+# 3rd Party
 from django import forms
+
+# App Imports
 from models import Key
 
 TTL_CHOICES = ((300, "5 minutes"),

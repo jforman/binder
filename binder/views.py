@@ -1,8 +1,10 @@
+### Binder VIews
+
+# 3rd Party
 from django.shortcuts import redirect, render
 
+# App Imports
 from binder import exceptions, forms, helpers, models
-
-# Views
 
 def home_index(request):
     """ List the main index page for Binder. """
@@ -13,7 +15,7 @@ def view_server_list(request):
     server_list = models.BindServer.objects.all().order_by("hostname")
     server_info = []
     for current in server_list:
-        server_info.append({"host_name" : current, "ip_address" : helpers.ip_info(current)})
+        server_info.append({"host_name" : current, "ip_address" : helpers.ip_info(current.hostname)})
 
     return render(request, "bcommon/list_servers.htm",
                   { "server_info" : server_info})

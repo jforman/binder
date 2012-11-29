@@ -1,11 +1,17 @@
-from binder import exceptions, keyutils, models
+### Binder Helpers
 
+# Standard Imports
+from collections import OrderedDict
+import re
+import socket
+
+# 3rd Party
 import dns.query
 import dns.reversename
 import dns.update
-import dns.tsig
-import socket
-import re
+
+# App Imports
+from binder import exceptions, keyutils, models
 
 def add_record(dns_server, zone_name, record_name, record_type, record_data, ttl, key_name, create_reverse=False):
     """ Parse passed elements and determine which records to create.
@@ -108,19 +114,22 @@ def update_record(dns_server, zone_name, record_name, record_type, record_data, 
 
     return output
 
-def ip_info(host_name): # , family_dict, socket_dict):
+def ip_info(host_name):
     """Create a dictionary mapping address types to their IP's.
     If an error is encountered, key to error is "Error".
     """
-    info = {}
-
+    info = []
+    ipv4_count = 0
+    ipv6_count = 0
     try:
-        for s_family, s_type, s_proto, s_cannoname, s_sockaddr in socket.getaddrinfo(host_name.hostname, None):
+        for s_family, s_type, s_proto, s_cannoname, s_sockaddr in socket.getaddrinfo(host_name, None):
             if s_family == 2 and s_type == 1:
-                info["IPv4"] = s_sockaddr[0]
+                ipv4_count += 1
+                info.append(["IPv4 (%d)" % ipv4_count, s_sockaddr[0]])
             if s_family == 10 and s_type == 1:
-                info["IPv6"] = s_sockaddr[0]
+                ipv6_count += 1
+                info.append(["IPv6 (%d)" % ipv6_count, s_sockaddr[0]])
     except socket.gaierror, err:
-        info["Error"] = "Unable to resolve %s: %s" % (host_name, err)
+        info.append(["Error", "Unable to resolve %s: %s" % (host_name, err)])
 
     return info

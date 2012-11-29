@@ -1,14 +1,20 @@
-from django.db import models
+### Binder Models
 
+# Standard Imports
+import socket
+import urllib2
+
+# 3rd Party
 from BeautifulSoup import BeautifulStoneSoup as BS
-from binder import exceptions
-
+import dns.exception
 import dns.query
 import dns.tsig
 import dns.zone
+
+# App Imports
+from binder import exceptions
+from django.db import models
 import keyutils
-import socket
-import urllib2
 
 TSIG_ALGORITHMS = (('hmac-md5', 'MD5'),
                    ('hmac-sha1', 'SHA1'),
@@ -95,15 +101,16 @@ class BindServer(models.Model):
 
         try:
             zone = dns.zone.from_xfr(dns.query.xfr(self.hostname, zone_name, keyring=keyring))
-        except dns.exception.FormError, err:
-            # TODO: What throws this?
-            raise exceptions.TransferException("There was an error attempting to list zone records.")
         except dns.tsig.PeerBadKey:
             # The incorrect TSIG key was selected for transfers.
             raise exceptions.TransferException("Unable to list zone records because of a TSIG key mismatch.")
         except socket.error, err:
             # Thrown when the DNS server does not respond for a zone transfer (XFR).
             raise exceptions.TransferException("DNS server did not respond for transfer. Reason: %s" % err)
+        # except exception.FormError, err:
+        #     # TODO: What throws this?
+        #     raise exceptions.TransferException("There was an error attempting to list zone records.")
+
 
         names = zone.nodes.keys()
         names.sort()
