@@ -1,18 +1,20 @@
 ### Binder Helpers
 
 # Standard Imports
-from collections import OrderedDict
+import binascii
 import re
 import socket
+import sys
 
 # 3rd Party
 import dns.query
 import dns.reversename
-import dns.update
 import dns.tsig
+import dns.tsigkeyring
+import dns.update
 
 # App Imports
-from binder import exceptions, keyutils, models
+from binder import exceptions, models
 
 def add_record(dns_server, zone_name, record_name, record_type, record_data, ttl, key_name, create_reverse=False):
     """ Parse passed elements and determine which records to create.
@@ -25,15 +27,15 @@ def add_record(dns_server, zone_name, record_name, record_type, record_data, ttl
       String record_data (IP address)
       Int ttl
       String key_name (from Key model)
-      Boolean create_reverse
+      Boolean create_reverse (Whether to create a PTR record, default False)
 
     Return:
       Dict containing {description, output} from record creation
     """
 
     response = []
-    response.append({ "description" : "Forward Record Added: %s.%s" % (record_name, zone_name),
-                      "output" : update_record(dns_server,
+    response.append({ "description" : "Forward Record Creation: %s.%s" % (record_name, zone_name),
+                      "output" : create_update(dns_server,
                                                zone_name,
                                                record_name,
                                                record_type,
@@ -53,8 +55,8 @@ def add_record(dns_server, zone_name, record_name, record_type, record_data, ttl
         # for this reverse DNS record parsing.
         reverse_ip = re.search(r"([0-9]+).(.*)$", reverse_ip_fqdn).group(1)
         reverse_domain = re.search(r"([0-9]+).(.*)$", reverse_ip_fqdn).group(2)
-        response.append({ "description" : "Reverse Record Added: %s" % record_data,
-                          "output" : update_record(dns_server,
+        response.append({ "description" : "Reverse Record Creation: %s" % record_data,
+                          "output" : create_update(dns_server,
                                                    reverse_domain,
                                                    reverse_ip,
                                                    "PTR",
@@ -67,7 +69,7 @@ def add_record(dns_server, zone_name, record_name, record_type, record_data, ttl
 def add_cname_record(dns_server, zone_name, cname, originating_record, ttl, key_name):
     """Add a Cname record."""
 
-    output = update_record(dns_server,
+    output = create_update(dns_server,
                            zone_name,
                            cname,
                            "CNAME",
@@ -81,15 +83,11 @@ def add_cname_record(dns_server, zone_name, cname, originating_record, ttl, key_
 def delete_record(dns_server, rr_list, key_name):
     """Delete a list of DNS records passed as strings in rr_items."""
 
-    if key_name is None:
-        keyring = None
-    else:
-        try:
-            this_key = models.Key.objects.get(name=key_name)
-            keyring = keyutils.create_keyring(this_key.name, this_key.data)
-        except exceptions.KeyringException, err:
-            return([{ "description" : "Error in deletion process",
-                      "output" : err }])
+    try:
+        keyring = create_keyring(key_name)
+    except exceptions.KeyringException, err:
+        return([{ "description" : "Error in deletion process",
+                  "output" : err }])
 
     delete_response = []
     for current_rr in rr_list:
@@ -98,28 +96,24 @@ def delete_record(dns_server, rr_list, key_name):
         domain = re_record.group(2)
         dns_update = dns.update.Update(domain, keyring = keyring)
         dns_update.delete(record)
-        try:
-            output = dns.query.tcp(dns_update, dns_server)
-        except dns.tsig.PeerBadKey:
-            output = "The DNS server does not know about the TSIG key: %s" % key_name
+        output = send_dns_update(dns_update, dns_server, key_name)
 
         delete_response.append({ "description" : "Delete Record: %s" % current_rr,
                                  "output" : output })
 
     return delete_response
 
-def update_record(dns_server, zone_name, record_name, record_type, record_data, ttl, key_name):
+def create_update(dns_server, zone_name, record_name, record_type, record_data, ttl, key_name):
     """ Update/Create DNS record of name and type with passed data and ttl. """
 
-    if key_name is None:
-        keyring = None
-    else:
-        this_key = models.Key.objects.get(name=key_name)
-        keyring = keyutils.create_keyring(this_key.name, this_key.data)
+    try:
+        keyring = create_keyring(key_name)
+    except exceptions.KeyringException, err:
+        return(err)
 
     dns_update = dns.update.Update(zone_name, keyring = keyring)
     dns_update.replace(record_name, ttl, record_type, record_data)
-    output = dns.query.tcp(dns_update, dns_server)
+    output = send_dns_update(dns_update, dns_server, key_name)
 
     return output
 
@@ -142,3 +136,57 @@ def ip_info(host_name):
         info.append(["Error", "Unable to resolve %s: %s" % (host_name, err)])
 
     return info
+
+def send_dns_update(dns_message, dns_server, key_name):
+    """ Send DNS message to server and return response.
+
+    Args:
+        Update dns_update
+        String dns_server
+        String key_name
+
+    Returns:
+        String output
+    """
+
+    try:
+        output = dns.query.tcp(dns_message, dns_server)
+    except dns.tsig.PeerBadKey:
+        output = ("DNS server %s is not configured for TSIG key: %s." %
+                  (dns_server, key_name))
+    except dns.tsig.PeerBadSignature:
+        output = ("DNS server %s did like the TSIG signature we sent. Check key %s "
+                  "for correctness." % (dns_server, key_name))
+
+    return output
+
+def create_keyring(key_name):
+
+    """Return a tsigkeyring object from key name and key data.
+
+    Args:
+      key_name: String representation of Key name object
+
+    Return:
+      None if key_name is none.
+      keyring object with the key name and TSIG secret.
+
+    Raises:
+      KeyringException: For incorrect key data.
+    """
+
+    if key_name is None:
+        return None
+
+    # TODO: Unittest here for key_name that does not exist
+    # Stick this in a try/except and catch models.Key.DoesNotExist
+    this_key = models.Key.objects.get(name=key_name)
+
+    try:
+        keyring = dns.tsigkeyring.from_text({
+                this_key.name : this_key.data
+                })
+    except binascii.Error, err:
+        raise exceptions.KeyringException("Incorrect key data. Verify key: %s. Reason: %s" % (key_name, err))
+
+    return keyring
