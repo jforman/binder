@@ -9,6 +9,7 @@ import socket
 import dns.query
 import dns.reversename
 import dns.update
+import dns.tsig
 
 # App Imports
 from binder import exceptions, keyutils, models
@@ -83,8 +84,12 @@ def delete_record(dns_server, rr_list, key_name):
     if key_name is None:
         keyring = None
     else:
-        this_key = models.Key.objects.get(name=key_name)
-        keyring = keyutils.create_keyring(this_key.name, this_key.data)
+        try:
+            this_key = models.Key.objects.get(name=key_name)
+            keyring = keyutils.create_keyring(this_key.name, this_key.data)
+        except exceptions.KeyringException, err:
+            return([{ "description" : "Error in deletion process",
+                      "output" : err }])
 
     delete_response = []
     for current_rr in rr_list:
@@ -93,8 +98,12 @@ def delete_record(dns_server, rr_list, key_name):
         domain = re_record.group(2)
         dns_update = dns.update.Update(domain, keyring = keyring)
         dns_update.delete(record)
-        output = dns.query.tcp(dns_update, dns_server)
-        delete_response.append({ "description" : "Delete record %s" % current_rr,
+        try:
+            output = dns.query.tcp(dns_update, dns_server)
+        except dns.tsig.PeerBadKey:
+            output = "The DNS server does not know about the TSIG key: %s" % key_name
+
+        delete_response.append({ "description" : "Delete Record: %s" % current_rr,
                                  "output" : output })
 
     return delete_response

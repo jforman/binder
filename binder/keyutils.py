@@ -1,4 +1,9 @@
+import binascii
+
 import dns.tsigkeyring
+
+from binder import exceptions
+
 
 def create_keyring(key_name, key_data):
     """Return a tsigkeyring object from key name and key data.
@@ -11,8 +16,10 @@ def create_keyring(key_name, key_data):
       keyring object with the key name and TSIG secret.
     """
 
-    keyring = dns.tsigkeyring.from_text({
-            key_name : key_data
-            })
-
+    try:
+        keyring = dns.tsigkeyring.from_text({
+                key_name : key_data
+                })
+    except binascii.Error, err:
+        raise exceptions.KeyringException("Error creating keyring. Verify correct key data for key: %s. Reason: %s" % (key_name, err))
     return keyring

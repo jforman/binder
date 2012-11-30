@@ -23,3 +23,11 @@ class RecordException(Exception):
     """
 
     pass
+
+class KeyringException(Exception):
+    """
+    Thrown when there is a problem creating the keyring.
+      * When the length/padding of the TSIG data is incorrect.
+    """
+
+    pass
