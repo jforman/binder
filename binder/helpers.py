@@ -84,10 +84,10 @@ def delete_record(dns_server, rr_list, key_name):
     """Delete a list of DNS records passed as strings in rr_items."""
 
     try:
-        keyring = create_keyring(key_name)
-    except exceptions.KeyringException, err:
-        return([{ "description" : "Error in deletion process",
-                  "output" : err }])
+        transfer_key = models.Key.objects.get(name=key_name)
+        keyring = transfer_key.create_keyring()
+    except models.Key.DoesNotExist:
+        keyring = None
 
     delete_response = []
     for current_rr in rr_list:
@@ -107,9 +107,10 @@ def create_update(dns_server, zone_name, record_name, record_type, record_data, 
     """ Update/Create DNS record of name and type with passed data and ttl. """
 
     try:
-        keyring = create_keyring(key_name)
-    except exceptions.KeyringException, err:
-        return(err)
+        transfer_key = models.Key.objects.get(name=key_name)
+        keyring = transfer_key.create_keyring()
+    except models.Key.DoesNotExist:
+        keyring = None
 
     dns_update = dns.update.Update(zone_name, keyring = keyring)
     dns_update.replace(record_name, ttl, record_type, record_data)
@@ -159,34 +160,3 @@ def send_dns_update(dns_message, dns_server, key_name):
                   "for correctness." % (dns_server, key_name))
 
     return output
-
-def create_keyring(key_name):
-
-    """Return a tsigkeyring object from key name and key data.
-
-    Args:
-      key_name: String representation of Key name object
-
-    Return:
-      None if key_name is none.
-      keyring object with the key name and TSIG secret.
-
-    Raises:
-      KeyringException: For incorrect key data.
-    """
-
-    if key_name is None:
-        return None
-
-    # TODO: Unittest here for key_name that does not exist
-    # Stick this in a try/except and catch models.Key.DoesNotExist
-    this_key = models.Key.objects.get(name=key_name)
-
-    try:
-        keyring = dns.tsigkeyring.from_text({
-                this_key.name : this_key.data
-                })
-    except binascii.Error, err:
-        raise exceptions.KeyringException("Incorrect key data. Verify key: %s. Reason: %s" % (key_name, err))
-
-    return keyring

@@ -14,7 +14,6 @@ import dns.zone
 # App Imports
 from binder import exceptions
 from django.db import models
-import keyutils
 
 TSIG_ALGORITHMS = (('hmac-md5', 'MD5'),
                    ('hmac-sha1', 'SHA1'),
@@ -33,6 +32,19 @@ class Key(models.Model):
 
     def __unicode__(self):
         return self.name
+
+    def create_keyring(self):
+        if self.name is None:
+            return None
+
+        try:
+            keyring = dns.tsigkeyring.from_text({
+                    self.name : self.data
+                    })
+        except binascii.Error, err:
+            raise exceptions.KeyringException("Incorrect key data. Verify key: %s. Reason: %s" % (key_name, err))
+
+        return keyring
 
 
 class BindServer(models.Model):
@@ -93,10 +105,10 @@ class BindServer(models.Model):
           List of Dicts { String rr_name, String rr_ttl, String rr_class, String rr_type, String rr_data }
         """
 
-        if self.default_transfer_key:
-            keyring = keyutils.create_keyring(self.default_transfer_key.name,
-                                              self.default_transfer_key.data)
-        else:
+        try:
+            transfer_key = Key.objects.get(name=self.default_transfer_key)
+            keyring = transfer_key.create_keyring()
+        except Key.DoesNotExist:
             keyring = None
 
         try:
@@ -107,10 +119,10 @@ class BindServer(models.Model):
         except socket.error, err:
             # Thrown when the DNS server does not respond for a zone transfer (XFR).
             raise exceptions.TransferException("DNS server did not respond for transfer. Reason: %s" % err)
-        # except exception.FormError, err:
-        #     # TODO: What throws this?
-        #     raise exceptions.TransferException("There was an error attempting to list zone records.")
-
+        except dns.exception.FormError:
+            # When the DNS message is malformed.
+            # * Can happen if a TSIG key is required but a default_transfer_key is not specified.
+            raise exceptions.TransferException("There was an error attempting to list zone records. Did you forget to specify a default transfer key?")
 
         names = zone.nodes.keys()
         names.sort()
