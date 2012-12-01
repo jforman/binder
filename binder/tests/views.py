@@ -2,7 +2,6 @@ from django.test import TestCase
 from django.test.client import Client
 
 from binder import models, helpers
-from collections import OrderedDict
 
 
 class GetTests(TestCase):
@@ -31,23 +30,13 @@ class GetTests(TestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_GetInvalidServer(self):
-        """ Attempt to get a zone list for a server
-        not configured in the database. 
-        """
+        """ Attempt to get a zone list for a server not in the database."""
         response = self.client.get("/info/unconfigured.server.net/")
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, ('<div class="alert alert-error">Errors were encountered: <br>'
                                        'There is no configured server by that name: unconfigured.server.net </div>'),
                             html=True)
 
-
-class ModelTests(TestCase):
-    def test_EmptyBindServerModel(self):
-        self.assertEqual(models.BindServer.objects.count(), 0)
-        bindserver_1 = models.BindServer(hostname="test1",
-                                        statistics_port = 1234)
-        bindserver_1.save()
-        self.assertEqual(models.BindServer.objects.count(), 1)
 
 
 class PostTests(TestCase):
