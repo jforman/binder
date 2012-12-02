@@ -27,7 +27,7 @@ class FormAddRecord(forms.Form):
     """ Form used to add a DNS record. """
     dns_server = forms.CharField(max_length=100)
     record_name = forms.RegexField(max_length=100, regex="^[a-zA-Z0-9-_]+$", required=False)
-    record_type = forms.CharField(max_length=10)
+    record_type = forms.ChoiceField(choices=local_settings.RECORD_TYPE_CHOICES)
     zone_name = forms.CharField(max_length=100)
     record_data = forms.GenericIPAddressField()
     ttl = forms.ChoiceField(choices=local_settings.TTL_CHOICES)

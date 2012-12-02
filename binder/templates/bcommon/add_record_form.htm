@@ -36,8 +36,11 @@ Add record in {{ zone_name }}
     <label class="control-label">Record Type: </label>
     <div class="controls">
       <select name="record_type">
-	    <option value="A" selected="selected">A</option>
-	    <option value="AAAA">AAAA</option>
+        {% for type, name in record_type_choices %}
+	    <option value="{{name}}">
+        {{name}}
+      </option>
+        {% endfor %}
       </select>
     </div>
   </div>

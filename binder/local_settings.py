@@ -7,5 +7,4 @@ TTL_CHOICES = ((300, "5 minutes"),
                (86400, "1 day"))
 
 RECORD_TYPE_CHOICES = (("A", "A"),
-                       ("AAAA", "AAAA"),
-                       ("CNAME", "CNAME"))
+                       ("AAAA", "AAAA"))

@@ -66,6 +66,7 @@ def view_add_record(request, dns_server, zone_name):
                     "zone_name" : zone_name,
                     "tsig_keys" : models.Key.objects.all(),
                     "ttl_choices" : local_settings.TTL_CHOICES,
+                    "record_type_choices" : local_settings.RECORD_TYPE_CHOICES,
                     })
 
 def view_add_record_result(request):
