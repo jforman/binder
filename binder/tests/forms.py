@@ -42,6 +42,7 @@ class FormTests(TestCase):
 
         expected_form_errors = {"record_data": [u"Enter a valid IPv4 or IPv6 address."],
                                 "record_name": [u"Enter a valid value."],
+                                "record_type": [u"Select a valid choice. 123 is not one of the available choices."],
                                 "ttl": [u'Select a valid choice. A is not one of the available choices.']}
         testform_2 = forms.FormAddRecord(form_data)
         testform_2.is_valid()
