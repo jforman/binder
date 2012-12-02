@@ -42,7 +42,11 @@ Add CNAME record for {{ originating_record }}
     <label class="control-label">TTL: </label>
     <div class="controls">
       <select name="ttl">
-	      <option value="86400">86400 (1 day)</option>
+        {% for ttl, description in ttl_choices %}
+	    <option value="{{ttl}}">
+        {{ttl}} ({{description}})
+      </option>
+        {% endfor %}
       </select>
     </div>
   </div>

@@ -5,6 +5,7 @@ from django.shortcuts import redirect, render
 
 # App Imports
 from binder import exceptions, forms, helpers, models
+import local_settings
 
 def home_index(request):
     """ List the main index page for Binder. """
@@ -63,7 +64,9 @@ def view_add_record(request, dns_server, zone_name):
     return render(request, "bcommon/add_record_form.htm",
                   { "dns_server" : dns_server,
                     "zone_name" : zone_name,
-                    "tsig_keys" : models.Key.objects.all() })
+                    "tsig_keys" : models.Key.objects.all(),
+                    "ttl_choices" : local_settings.TTL_CHOICES,
+                    })
 
 def view_add_record_result(request):
     """ Process the input given to add a DNS record. """
@@ -104,6 +107,7 @@ def view_add_cname_record(request, dns_server, zone_name, record_name):
                   { "dns_server" : dns_server,
                     "originating_record" : "%s.%s" % (record_name, zone_name),
                     "zone_name" : zone_name,
+                    "ttl_choices" : local_settings.TTL_CHOICES,
                     "tsig_keys" : models.Key.objects.all() })
 
 def view_add_cname_result(request):
