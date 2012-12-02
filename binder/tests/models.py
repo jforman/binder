@@ -1,13 +1,14 @@
 from django.test import TestCase
 from django.db import IntegrityError
+
 from binder import models
 
-class ModelTests(TestCase):
-    def test_EmptyBindServerModel(self):
+class Model_BindServer_Tests(TestCase):
+    def test_BindServerModel(self):
         """Test that adding a well-formed BindServer works."""
         self.assertEqual(models.BindServer.objects.count(), 0)
         bindserver_1 = models.BindServer(hostname="test1",
-                                        statistics_port=1234)
+                                         statistics_port=1234)
         bindserver_1.save()
         self.assertEqual(models.BindServer.objects.count(), 1)
 
@@ -23,3 +24,18 @@ class ModelTests(TestCase):
                                          statistics_port="bar1")
         with self.assertRaisesMessage(ValueError, "invalid literal for int() with base 10: 'bar1'"):
             bindserver_1.save()
+
+
+class Model_Key_Tests(TestCase):
+    def test_KeyModel(self):
+        """ Test that adding a well-formed Key works."""
+        self.assertEqual(models.Key.objects.count(), 0)
+        key_1 = models.Key(name="testkey1",
+                           data="abc123",
+                           algorithm="MD5")
+        key_1.save()
+        self.assertEqual(models.Key.objects.count(), 1)
+
+    def test_NonExistantKey(self):
+        with self.assertRaisesMessage(models.Key.DoesNotExist, "Key matching query does not exist"):
+            this_key = models.Key.objects.get(name="does_not_exist")

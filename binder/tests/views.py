@@ -18,7 +18,7 @@ class GetTests(TestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_GetResultRedirects(self):
-        """ Expected Output: Redirect to / """
+        """ GETing a /result/ URL should always redirect to /. """
         response = self.client.get("/add_record/result/", follow=True)
         self.assertRedirects(response, "/")
         self.assertEqual(response.status_code, 200)
@@ -30,7 +30,7 @@ class GetTests(TestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_GetInvalidServer(self):
-        """ Attempt to get a zone list for a server not in the database."""
+        """ Get a zone list for a server not in the database."""
         response = self.client.get("/info/unconfigured.server.net/")
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, ('<div class="alert alert-error">Errors were encountered: <br>'
