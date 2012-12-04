@@ -17,7 +17,7 @@ class CustomUnicodeListField(forms.CharField):
             first_parse = eval(value)
             string_list = [current_item for current_item in first_parse]
         except:
-            raise ValidationError
+            raise ValidationError("Error in converting Unicode list to list of Strings: %r" % value)
 
         return string_list
 
