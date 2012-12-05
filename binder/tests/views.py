@@ -38,7 +38,6 @@ class GetTests(TestCase):
                             html=True)
 
 
-
 class PostTests(TestCase):
     """ Unit Tests that exercise HTTP POST. """
     def setUp(self):
@@ -90,4 +89,3 @@ class HelperTests(TestCase):
         response = helpers.ip_info("ds.test-ipv6.com")
         self.assertEqual([['IPv4 (1)', u'216.218.228.114'], ['IPv6 (1)', u'2001:470:1:18::2']],
                          response)
-

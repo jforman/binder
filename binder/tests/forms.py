@@ -2,9 +2,9 @@ from django.test import TestCase
 
 from binder import forms
 
-class FormTests(TestCase):
+class Form_Tests(TestCase):
     def test_Valid_FormAddRecord(self):
-        """Test FOrmAddRecord with valid data, with/without create_reverse."""
+        """Test FormAddRecord with valid data, with/without create_reverse."""
         form_data = {"dns_server":"server1",
                      "record_name":"record1",
                      "record_type":"A",
@@ -48,3 +48,17 @@ class FormTests(TestCase):
         testform_2.is_valid()
         self.assertFalse(testform_2.is_valid())
         self.assertEquals(expected_form_errors, testform_2.errors)
+
+    def test_Validation_FormDeleteRecord(self):
+        """Validate good data in the FormDeleteRecord form."""
+        delete_dict = { "dns_server" : "foo.net",
+                        "zone_name" : "domain1.local",
+                        "rr_list" : '[u"record1.domain1.local", u"record2.domain1.local"]',
+                        }
+        testform_1 = forms.FormDeleteRecord(delete_dict)
+        testform_1.is_valid
+        self.assertFalse(testform_1.errors)
+        delete_dict["rr_list"] = '[record1.domain1.local", u"record2.domain1.local"]'
+        testform_1 = forms.FormDeleteRecord(delete_dict)
+        testform_1.is_valid
+        self.assertTrue(testform_1.errors)
