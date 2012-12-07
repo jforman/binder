@@ -77,14 +77,16 @@ class Integration_Tests(TestCase):
             self.assertRegexpMatches(dns_update_output, "rcode NOERROR")
                        
 
-    def test_Integration_ZoneList_ConnectionRefused(self):
+    def test_Integration_ServerZoneList_ConnectionRefused(self):
         """Confirm connection refused on a server zone list."""
         dns_server = models.BindServer.objects.get(hostname="testserver1")
         original_statistics_port = dns_server.statistics_port
         dns_server.statistics_port = 1234
+        dns_server.save()
         response = self.client.get("/info/testserver1/")
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context["dns_server"], "testserver1")
         self.assertEqual(response.context["zone_array"], {})
         self.assertEqual(response.context["errors"], "Unable to list server zones. Error: <urlopen error [Errno 111] Connection refused>")
         dns_server.statistics_port = original_statistics_port
+        dns_server.save()
