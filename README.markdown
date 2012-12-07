@@ -50,11 +50,6 @@ Where /etc/bind/test.key:
 
 Deploy the Django application as you see fit, and create the database via `manage.py syncdb`.
 
-Using the Admin UI, add each DNS Server to the 'Bind Servers' model under the bcommon app.
+Using the Admin UI, add each DNS Server to the 'Bind Servers' model.
 
 Once you have completed this, surf over to the URL where the binder Django app is installed and enjoy. 
-
-## Todo ##
-
-* Associate Keys with DNS Servers
- * Should we auto-populate the DB with a DNS Server's zones upon add?
