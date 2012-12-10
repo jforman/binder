@@ -90,3 +90,14 @@ class Integration_Tests(TestCase):
         self.assertEqual(response.context["errors"], "Unable to list server zones. Error: <urlopen error [Errno 111] Connection refused>")
         dns_server.statistics_port = original_statistics_port
         dns_server.save()
+
+    def test_Integration_ZoneList_MissingTransferKey(self):
+        """Attempt to list a zone's records with missing TSIG key.
+        domain3.local should be configured to require a TSIG key
+        for transfers."""
+        dns_server = models.BindServer.objects.get(hostname="testserver1")
+        response = self.client.get("/info/testserver1/domain3.local/")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context["zone_name"], "domain3.local")
+        self.assertEqual(response.context["dns_server"], "testserver1")
+        self.assertRegexpMatches(str(response.context["errors"]), "Unable to perform AXFR to list zone records. Did you forget to specify a default transfer key?")

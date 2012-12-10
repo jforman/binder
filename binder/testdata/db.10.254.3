@@ -1,0 +1,10 @@
+$TTL 86400	; 1 day
+@	IN SOA	ns1.example.com. mymail.example.com. (
+				2          ; serial
+				10800      ; refresh (3 hours)
+				15         ; retry (15 seconds)
+				604800     ; expire (1 week)
+				10800      ; minimum (3 hours)
+				)
+			NS	localhost.
+$ORIGIN 3.254.10.in-addr.arpa.

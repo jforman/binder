@@ -122,7 +122,7 @@ class BindServer(models.Model):
         except dns.exception.FormError:
             # When the DNS message is malformed.
             # * Can happen if a TSIG key is required but a default_transfer_key is not specified.
-            raise exceptions.TransferException("There was an error attempting to list zone records. Did you forget to specify a default transfer key?")
+            raise exceptions.TransferException("Unable to perform AXFR to list zone records. Did you forget to specify a default transfer key?")
 
         names = zone.nodes.keys()
         names.sort()
