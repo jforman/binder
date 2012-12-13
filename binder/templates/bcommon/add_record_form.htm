@@ -6,7 +6,7 @@ Add record in {{ zone_name }}
 
 {% block body %}
 <form class="form-horizontal" action="/add_record/result/" method="post">{% csrf_token %}
-  <legend>Create Foward Record</legend>
+  <legend>Create Record</legend>
 	<input type="hidden" name="zone_name" value="{{zone_name}}"/>
 
   <div class="control-group">
@@ -36,11 +36,13 @@ Add record in {{ zone_name }}
     <label class="control-label">Record Type: </label>
     <div class="controls">
       <select name="record_type">
-        {% for type, name in record_type_choices %}
-	    <option value="{{name}}">
-        {{name}}
-      </option>
-        {% endfor %}
+      {% if "in-addr.arpa" not in zone_name and "ip.arpa" not in zone_name %}
+          {% for type, name in record_type_choices %}
+              <option value="{{name}}">{{name}}</option>
+          {% endfor %}
+      {% else %}
+        <option value="PTR">PTR</option>
+      {% endif %}
       </select>
     </div>
   </div>
@@ -72,13 +74,15 @@ Add record in {{ zone_name }}
     </div>
   </div>
 
+  {% if "in-addr.arpa" not in zone_name and "ip.arpa" not in zone_name %}
   <div class="control-group">
     <div class="controls">
       <label class="checkbox">
-        <input type="checkbox" name="create_reverse" value="True">Create Reverse Record
+        <input type="checkbox" name="create_reverse" value="True">Create Reverse Record (PTR)
       </label>
     </div>
   </div>
+  {% endif %}
 
   <div class="control-group">
     <label class="control-label">TSIG Key: </label>

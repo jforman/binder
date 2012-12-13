@@ -24,7 +24,10 @@ class CustomUnicodeListField(forms.CharField):
 ### Form Models
 
 class FormAddRecord(forms.Form):
-    """ Form used to add a DNS record. """
+    """ Form used to add a DNS record.
+    TODO: Right now this form only supports forward zone creation.
+    It wont accept values if you try to manually add a PTR.
+    """
     dns_server = forms.CharField(max_length=100)
     record_name = forms.RegexField(max_length=100, regex="^[a-zA-Z0-9-_]+$", required=False)
     record_type = forms.ChoiceField(choices=local_settings.RECORD_TYPE_CHOICES)
@@ -33,7 +36,6 @@ class FormAddRecord(forms.Form):
     ttl = forms.ChoiceField(choices=local_settings.TTL_CHOICES)
     create_reverse = forms.BooleanField(required=False)
     key_name = forms.ModelChoiceField(queryset=Key.objects.all(), required=False)
-
 
 class FormAddCnameRecord(forms.Form):
     """ Form used to add a CNAME record. """
