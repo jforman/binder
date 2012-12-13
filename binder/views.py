@@ -143,6 +143,7 @@ def view_add_cname_result(request):
                     "originating_record" : request.POST["originating_record"],
                     "form_data" : request.POST,
                     "form_errors" : form.errors,
+                    "ttl_choices" : local_settings.TTL_CHOICES,
                     "tsig_keys" : models.Key.objects.all() })
 
 

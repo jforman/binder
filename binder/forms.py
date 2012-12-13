@@ -32,7 +32,7 @@ class FormAddRecord(forms.Form):
     record_name = forms.RegexField(max_length=100, regex="^[a-zA-Z0-9-_]+$", required=False)
     record_type = forms.ChoiceField(choices=local_settings.RECORD_TYPE_CHOICES)
     zone_name = forms.CharField(max_length=100)
-    record_data = forms.GenericIPAddressField()
+    record_data = forms.GenericIPAddressField() # TODO: Change to this a non-empty valid-data regex field.
     ttl = forms.ChoiceField(choices=local_settings.TTL_CHOICES)
     create_reverse = forms.BooleanField(required=False)
     key_name = forms.ModelChoiceField(queryset=Key.objects.all(), required=False)
