@@ -1,3 +1,4 @@
+from django.core.urlresolvers import reverse
 from django.test import TestCase
 from django.test.client import Client
 
@@ -19,7 +20,7 @@ class Integration_Tests(TestCase):
                      "record_data" : "10.254.1.101",
                      "ttl" : 86400,
                      "create_reverse" : True}
-        response = self.client.post("/add_record/result/", add_dict)
+        response = self.client.post(reverse("add_record_result"), add_dict)
         self.assertEqual(response.status_code, 200)
         # Make sure that we get two responses (fwd/rev) back from the server.
         self.assertEqual(len(response.context["response"]), 2)
@@ -35,7 +36,7 @@ class Integration_Tests(TestCase):
                         "zone_name" : "domain1.local",
                         "rr_list" : '[u"record1.domain1.local", u"record2.domain1.local"]',
                      }
-        response = self.client.post("/delete_record/result/", delete_dict)
+        response = self.client.post(reverse("delete_record_result"), delete_dict)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.context["response"]), 2)
         for current_response in response.context["response"]:
@@ -53,7 +54,7 @@ class Integration_Tests(TestCase):
                      "record_data" : "10.254.1.101",
                      "ttl" : 86400,
                      "create_reverse" : False}
-        response = self.client.post("/add_record/result/", add_dict)
+        response = self.client.post(reverse("add_record_result"), add_dict)
         self.assertEqual(response.status_code, 200)
         # Make sure that we get two responses (fwd/rev) back from the server.
         self.assertEqual(len(response.context["response"]), 1)
@@ -69,7 +70,7 @@ class Integration_Tests(TestCase):
                        "zone_name" : "domain1.local",
                        "ttl" : 86400,
                        }
-        response = self.client.post("/add_cname_record/result/", cname_dict)
+        response = self.client.post(reverse("add_cname_result"), cname_dict)
         self.assertEqual(response.status_code, 200)
         for current_response in response.context["response"]:
             dns_update_output = str(current_response["output"])
@@ -83,7 +84,7 @@ class Integration_Tests(TestCase):
         original_statistics_port = dns_server.statistics_port
         dns_server.statistics_port = 1234
         dns_server.save()
-        response = self.client.get("/info/testserver1/")
+        response = self.client.get(reverse("server_zone_list", args=("testserver1",)))
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context["dns_server"], "testserver1")
         self.assertEqual(response.context["zone_array"], {})
@@ -96,7 +97,7 @@ class Integration_Tests(TestCase):
         domain3.local should be configured to require a TSIG key
         for transfers."""
         dns_server = models.BindServer.objects.get(hostname="testserver1")
-        response = self.client.get("/info/testserver1/domain3.local/")
+        response = self.client.get(reverse("zone_list", args=("testserver1", "domain3.local")))
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context["zone_name"], "domain3.local")
         self.assertEqual(response.context["dns_server"], "testserver1")
