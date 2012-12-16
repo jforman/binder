@@ -13,7 +13,7 @@ Server List
   </tr>
 {% for current_server in server_info %}
   <tr>
-    <td><a href="/info/{{ current_server.host_name }}/"> {{ current_server.host_name }}</td>
+    <td><a href="{% url server_zone_list dns_server=current_server.host_name %}"> {{ current_server.host_name }}</td>
     <td>{% for type, data in current_server.ip_address %}
       {{type}}: {{data}}<br>
       {% endfor %}

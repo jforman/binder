@@ -16,7 +16,7 @@ Server Zone List for {{ dns_server }}
 {% for current_zone in zone_array %}
   <tr>
     <td>
-      <a href="/info/{{ dns_server }}/{{ current_zone.zone_name }}/"> {{ current_zone.zone_name }}</a>
+      <a href="{% url zone_list dns_server=dns_server zone_name=current_zone.zone_name %}"> {{ current_zone.zone_name }}</a>
     </td>
     <td>{{ current_zone.view_name }}</td>
     <td>{{ current_zone.zone_class }}</td>
