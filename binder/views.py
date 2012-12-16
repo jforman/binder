@@ -173,8 +173,9 @@ def view_delete_result(request):
     if form.is_valid():
         clean_form = form.cleaned_data
     else:
-        # TODO: Add unit test here.
-        pass
+        # TODO: What situations would cause this form
+        # not to validate?
+        print "in view_delete_result, form errors: %r" % form.errors
 
     delete_result = helpers.delete_record(clean_form["dns_server"],
                                           clean_form["rr_list"],
