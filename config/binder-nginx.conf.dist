@@ -1,0 +1,29 @@
+#
+# binder$ ./manage.py runfcgi -v3 host=0.0.0.0 port=<fcgi port> daemonize=FALSE debug=TRUE
+#
+
+server {
+  listen 80; # This might be different depending on your Nginx setup
+  server_name <your server name here>;
+  access_log /var/log/nginx/binder.access.log;
+  error_log /var/log/nginx/binder.error.log;
+
+  location /static/ {
+    alias <binder dir>/binder/static/;
+  }
+	
+  location /static/admin/ {
+    alias /usr/share/pyshared/django/contrib/admin/static/admin/;
+  }
+
+  location / {
+    fastcgi_pass 127.0.0.1:<fcgi port>;
+    fastcgi_param REQUEST_METHOD $request_method;
+    fastcgi_param SERVER_NAME $server_name;
+    fastcgi_param SERVER_PORT $server_port;
+    fastcgi_param SERVER_PROTOCOL $server_protocol;
+    fastcgi_param PATH_INFO $fastcgi_script_name;
+    fastcgi_param CONTENT_TYPE $content_type;
+    fastcgi_param CONTENT_LENGTH $content_length;
+  }
+}
