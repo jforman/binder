@@ -34,7 +34,7 @@ Zone listing for {{ zone_name }} on {{ dns_server }}
       <div class="btn-group">
 	<button class="btn dropdown-toggle" data-toggle="dropdown">Record Actions  <span class="caret"></span></button>
 	<ul class="dropdown-menu">
-	  <li><a href="#">Edit Record</a></li>
+	  <li><a href="#">Edit Record (Coming Soon)</a></li>
 	  {% if current_record.rr_type == "A" %}
 	  <li><a href="{% url add_cname dns_server=dns_server zone_name=zone_name record_name=current_record.rr_name %}">Add CNAME Pointer</a></li>
 	  {% endif %}

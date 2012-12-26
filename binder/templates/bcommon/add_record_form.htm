@@ -36,7 +36,7 @@ Add record in {{ zone_name }}
     <label class="control-label">Record Type: </label>
     <div class="controls">
       <select name="record_type">
-      {% if "in-addr.arpa" not in zone_name and "ip.arpa" not in zone_name %}
+      {% if "in-addr.arpa" not in zone_name and "ip6.arpa" not in zone_name %}
           {% for type, name in record_type_choices %}
               <option value="{{name}}">{{name}}</option>
           {% endfor %}

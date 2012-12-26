@@ -14,7 +14,7 @@ class Form_Tests(TestCase):
                      "key_name": None,
                      "create_reverse" : False}
 
-        testform_1 = forms.FormAddRecord(form_data)
+        testform_1 = forms.FormAddForwardRecord(form_data)
         self.assertTrue(testform_1.is_valid())
 
         form_data = {"dns_server":"server1",
@@ -26,8 +26,20 @@ class Form_Tests(TestCase):
                      "key_name":None,
                      "create_reverse":True}
 
-        testform_2 = forms.FormAddRecord(form_data)
+        testform_2 = forms.FormAddForwardRecord(form_data)
         self.assertTrue(testform_2.is_valid())
+
+        form_data = { "dns_server" : "server1",
+                      "record_name" : 41,
+                      "record_type" : "PTR",
+                      "zone_name" : "1.254.10.in-addr.arpa",
+                      "record_data" : "reverse41.domain1.local",
+                      "ttl" : 3600,
+                      "key_name" : None }
+        reverseform_1 = forms.FormAddReverseRecord(form_data)
+        reverseform_1.is_valid()
+        self.assertTrue(reverseform_1.is_valid())
+
 
 
     def test_MissingData_FormAddRecord(self):
@@ -42,7 +54,7 @@ class Form_Tests(TestCase):
                      "create_reverse":True}
 
         expected_form_errors = {"record_data": [u"This field is required."]}
-        testform = forms.FormAddRecord(form_data)
+        testform = forms.FormAddForwardRecord(form_data)
         testform.is_valid()
         self.assertFalse(testform.is_valid())
         self.assertEquals(expected_form_errors, testform.errors)
@@ -62,7 +74,7 @@ class Form_Tests(TestCase):
                                 "record_name": [u"Enter a valid value."],
                                 "record_type": [u"Select a valid choice. 123 is not one of the available choices."],
                                 "ttl": [u'Select a valid choice. A is not one of the available choices.']}
-        testform_2 = forms.FormAddRecord(form_data)
+        testform_2 = forms.FormAddForwardRecord(form_data)
         testform_2.is_valid()
         self.assertFalse(testform_2.is_valid())
         self.assertEquals(expected_form_errors, testform_2.errors)

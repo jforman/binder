@@ -75,7 +75,15 @@ def view_add_record_result(request):
     if request.method == "GET":
         return redirect("/")
 
-    form = forms.FormAddRecord(request.POST)
+    if "HTTP_REFERER" in request.META:
+        incoming_zone = request.META["HTTP_REFERER"].split("/")[-2]
+        if ("in-addr.arpa" in incoming_zone) or ("ip6.arpa" in incoming_zone):
+            form = forms.FormAddReverseRecord(request.POST)
+        else:
+            form = forms.FormAddForwardRecord(request.POST)
+    else:
+        form = forms.FormAddForwardRecord(request.POST)
+
     if form.is_valid():
         form_cleaned = form.cleaned_data
         try:
