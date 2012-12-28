@@ -1,0 +1,8 @@
+description "django binder app"
+
+start on started network-services
+stop on runlevel [016]
+
+setuid www-data
+
+exec /opt/binder/manage.py runfcgi host=127.0.0.1 port=<fcgi port> daemonize=false
