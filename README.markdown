@@ -47,13 +47,11 @@ Keys should also be created, if needed. The name of the key should match the con
 
 Once these two pieces of configuration are done, open up [http://yourserver:port/](http://yourserver:port) to access Binder and begin DNS zone management.
 
-### BIND Name Servers ###
+### BIND DNS Server ###
 
 When Binder accesses your BIND DNS server, it first queries the statistics port to gather various zone information. This data includes zone name, view, and serial number. This is all configured by some of the following configuration examples.
 
-#### Key Configuration ####
-
-##### named.conf #####
+#### named.conf ####
 
 We must provide server statistics from the BIND process itself. This allows Binder to query BIND itself and get a list of zones, views, and other statistics.
 
@@ -75,7 +73,7 @@ Moving on to zone declaration, determine how locked down you want zone updates a
         allow-update { key dynzone-key; };
     };
 
-##### /etc/bind/dynzone.key #####
+#### /etc/bind/dynzone.key ####
 
 Below are the entire contents of the dynzone.key file. This specifies the name, algorith and TSIG secret.
 
@@ -85,3 +83,21 @@ Below are the entire contents of the dynzone.key file. This specifies the name, 
     };
 
 referenced as 'dynzone-key' in named.conf
+
+### Related Configuration ###
+
+#### Apache HTTPD ####
+
+If you are using Apache to front-end your Binder Django app, the following two configuration files can be used as starting points.
+
+[binder-apache.conf.dist](https://github.com/jforman/binder/blob/master/config/binder-apache.conf.dist): Apache virtual host configuration file to be inclued in your apache.conf. Values provide for Binder to run on its own virtual host, separate logs, etc
+
+[django.wsgi](https://github.com/jforman/binder/blob/master/config/django.wsgi): WSGI configuration file used by Apache to run the actual Django app.
+
+#### Nginx ####
+
+[binder-nginx.conf.dist](https://github.com/jforman/binder/blob/master/config/binder-nginx.conf.dist): Nginx virtual host configuraiton. This configuration expects Django to be running in fcgi mode on port 4001 on 127.0.0.1.
+
+#### Ubuntu Upstart ####
+
+To have Binder start upon system boot, if you are running Ubuntu, I have provided an [example Upstart configurarton](https://github.com/jforman/binder/blob/master/config/binder-upstart.conf.dist) to be installed in /etc/init/.
