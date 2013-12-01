@@ -7,7 +7,7 @@ Zone listing for {{ zone_name }} on {{ dns_server }}
 {% block body %}
 
 {% if not errors %}
-<form action="{% url delete_record %}" method="post">{% csrf_token %}
+<form action="{% url "delete_record" %}" method="post">{% csrf_token %}
 <table class="table table-hover sortable">
 <tr>
   <th>Select</th>
@@ -36,7 +36,7 @@ Zone listing for {{ zone_name }} on {{ dns_server }}
 	<ul class="dropdown-menu">
 	  <li><a href="#">Edit Record (Coming Soon)</a></li>
 	  {% if current_record.rr_type == "A" %}
-	  <li><a href="{% url add_cname dns_server=dns_server zone_name=zone_name record_name=current_record.rr_name %}">Add CNAME Pointer</a></li>
+	  <li><a href="{% url "add_cname" dns_server=dns_server zone_name=zone_name record_name=current_record.rr_name %}">Add CNAME Pointer</a></li>
 	  {% endif %}
 	</ul>
       </div>
@@ -47,7 +47,7 @@ Zone listing for {{ zone_name }} on {{ dns_server }}
 
 </table>
 
-<a href="{% url add_record dns_server=dns_server zone_name=zone_name %}">Add Record</a>
+<a href="{% url "add_record" dns_server=dns_server zone_name=zone_name %}">Add Record</a>
 <input type="submit" value="Delete Selected"/>
 </form>
 {% endif %}
