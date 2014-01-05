@@ -10,6 +10,7 @@ Packages:
 
 * [Django](http://www.djangoproject.com)
 * Python Modules
+  * [pybindxml](https://pypi.python.org/pypi?name=pybindxml&:action=display): This is a shared library I wrote to scrape and stick into Python dict objects various server/zone data from a BIND DNS server.
   * [python-beautifulsoup](http://www.crummy.com/software/BeautifulSoup/)
   * [python-dnspython](http://www.dnspython.org/)
   * [python-sqlite](http://docs.python.org/2/library/sqlite3.html) (If you will be using Sqlite for server and key storage)

@@ -10,18 +10,18 @@ Server Zone List for {{ dns_server }}
   <tr>
     <th>Zone</th>
     <th>View</th>
-    <th>Class</th>
     <th>Serial Number</th>
   </tr>
-{% for current_zone in zone_array %}
-  <tr>
-    <td>
-      <a href="{% url "zone_list" dns_server=dns_server zone_name=current_zone.zone_name %}"> {{ current_zone.zone_name }}</a>
-    </td>
-    <td>{{ current_zone.view_name }}</td>
-    <td>{{ current_zone.zone_class }}</td>
-    <td>{{ current_zone.zone_serial }}</td>
-  </tr>
+{% for current_zone, cz_data in zone_array.stats.zone_stats.iteritems %}
+  {% for current_view, cv_data in cz_data.iteritems %}
+    <tr>
+      <td>
+        <a href="{% url "zone_list" dns_server=dns_server zone_name=current_zone %}"> {{ current_zone }}</a>
+      </td>
+      <td>{{ current_view }}</td>
+      <td>{{ cv_data.serial }}</td>
+    </tr>
+  {% endfor %}
 {% endfor %}
 </table>
 

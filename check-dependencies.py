@@ -24,6 +24,12 @@ except ImportError:
     errors += 1
 
 try:
+    import pybindxml
+except ImportError:
+    print "Could not import pybindxml. This is a required module for Binder.\n"
+    errors += 1
+
+try:
     import flup
 except ImportError:
     print "Could not import flup. This is an optional module if you intend to run Binder under fastcgi."

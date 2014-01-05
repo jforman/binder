@@ -6,6 +6,7 @@ import urllib2
 
 # 3rd Party
 from BeautifulSoup import BeautifulStoneSoup as BS
+from pybindxml import reader as bindreader
 import dns.exception
 import dns.query
 import dns.tsig
@@ -70,28 +71,9 @@ class BindServer(models.Model):
                           String zone_class,
                           String zone_serial }
         """
-        zone_req  = urllib2.Request("http://%s:%s" % (self.hostname, self.statistics_port))
-        try:
-            http_request = urllib2.urlopen(zone_req)
-        except urllib2.URLError, err:
-            raise exceptions.ZoneException(err)
-
-        return_array = []
-        xmloutput = http_request.read()
-        mysoup = BS(xmloutput)
-        views = mysoup.findAll("view")
-        for view in views:
-            view_name = view.find("name").string
-            for zone in view.findAll("zone"):
-                zone_name, zone_class = zone.find("name").string.split("/")
-                zone_serial = zone.find("serial").string
-                if zone_class == "IN":
-                    return_array.append({"view_name" : view_name,
-                                         "zone_name" : zone_name,
-                                         "zone_class" : zone_class,
-                                         "zone_serial" : zone_serial })
-
-        return return_array
+        zone_data = bindreader.BindXmlReader(host=self.hostname, port=self.statistics_port)
+        zone_data.get_stats()
+        return zone_data
 
     def list_zone_records(self, zone_name):
         """ List all records in a specific zone.
