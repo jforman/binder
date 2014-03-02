@@ -1,0 +1,6 @@
+include README.markdown
+recursive-include binder/db *
+recursive-include binder/static *
+recursive-include binder/templates *
+recursive-include binder/tests *
+recursive-include binder/testdata *
