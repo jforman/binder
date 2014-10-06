@@ -5,7 +5,6 @@ import socket
 import urllib2
 
 # 3rd Party
-from BeautifulSoup import BeautifulStoneSoup as BS
 from pybindxml import reader as bindreader
 import dns.exception
 import dns.query
