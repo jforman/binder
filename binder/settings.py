@@ -61,7 +61,7 @@ MIDDLEWARE_CLASSES = (
 ROOT_URLCONF = 'binder.urls'
 
 TEMPLATE_DIRS = (
-    os.path.join(SITE_ROOT, "templates")
+    os.path.join(SITE_ROOT, "templates"),
 )
 
 INSTALLED_APPS = (
