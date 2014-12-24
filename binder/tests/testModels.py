@@ -15,7 +15,7 @@ class Model_BindServer_Tests(TestCase):
     def test_BindServerMissingStatisticsPort(self):
         """Attempt to add a BindServer without a statistics port."""
         bindserver_1 = models.BindServer(hostname="badtest1")
-        with self.assertRaisesMessage(IntegrityError, "binder_bindserver.statistics_port may not be NULL"):
+        with self.assertRaisesMessage(IntegrityError, "NOT NULL constraint failed: binder_bindserver.statistics_port"):
             bindserver_1.save()
 
     def test_BindServerNonIntStatisticsPort(self):
