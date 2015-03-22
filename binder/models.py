@@ -88,12 +88,15 @@ class BindServer(models.Model):
 
         try:
             transfer_key = Key.objects.get(name=self.default_transfer_key)
-            keyring = transfer_key.create_keyring()
         except Key.DoesNotExist:
             keyring = None
+            algorithm = None
+        else:
+            keyring = transfer_key.create_keyring()
+            algorithm = transfer_key.algorithm
 
         try:
-            zone = dns.zone.from_xfr(dns.query.xfr(self.hostname, zone_name, keyring=keyring))
+            zone = dns.zone.from_xfr(dns.query.xfr(self.hostname, zone_name, keyring=keyring, keyalgorithm=algorithm))
         except dns.tsig.PeerBadKey:
             # The incorrect TSIG key was selected for transfers.
             raise exceptions.TransferException("Unable to list zone records because of a TSIG key mismatch.")
