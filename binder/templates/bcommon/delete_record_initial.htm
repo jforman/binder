@@ -1,15 +1,12 @@
 {% extends "base.htm" %}
 
-{% block pageheader %}
-Delete record(s) in {{ zone_name }}
-{% endblock pageheader %}
+{% block pageheader %}Delete record(s) in {{ zone_name }}{% endblock pageheader %}
 
 {% block body %}
-
 <table class="table">
 <form action="/delete_record/result/" method="POST">
   {% csrf_token %}
-  <input type="hidden" name="dns_server" value="{{ dns_server }}" />
+  <input type="hidden" name="dns_server" value="{{ dns_server.hostname }}" />
   <input type="hidden" name="zone_name" value="{{ zone_name }}" />
   <input type="hidden" name="rr_list" value="{{ rr_list }}" />
   <tr>
@@ -17,7 +14,7 @@ Delete record(s) in {{ zone_name }}
   </tr>
   <tr>
     <td>Server</td>
-    <td>{{ dns_server }}</td>
+    <td>{{ dns_server.hostname }}</td>
   </tr>
   <tr>
     <td>Zone</td>
@@ -31,9 +28,10 @@ Delete record(s) in {{ zone_name }}
     <td>Key</td>
     <td>
       <select name="key_name">
-        <option selected="selected" value=""/>
         {% for current_key in tsig_keys %}
-        <option value="{{current_key.id}}">{{current_key}}</option>
+        <option value="{{current_key.id}}"{% if current_key == dns_server.default_transfer_key %} selected="selected"{% endif %}>{{current_key}}</option>
+        {% empty %}
+        <option selected="selected" value=""/>
         {% endfor %}
       </select>
     </td>
@@ -45,5 +43,4 @@ Delete record(s) in {{ zone_name }}
   </tr>
   </form>
 </table>
-
 {% endblock body %}
