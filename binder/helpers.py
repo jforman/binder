@@ -85,16 +85,19 @@ def delete_record(dns_server, rr_list, key_name):
 
     try:
         transfer_key = models.Key.objects.get(name=key_name)
-        keyring = transfer_key.create_keyring()
     except models.Key.DoesNotExist:
         keyring = None
+        algorithm = None
+    else:
+        keyring = transfer_key.create_keyring()
+        algorithm = transfer_key.algorithm
 
     delete_response = []
     for current_rr in rr_list:
         record_list = current_rr.split(".")
         record = record_list[0]
         domain = ".".join(record_list[1:])
-        dns_update = dns.update.Update(domain, keyring = keyring)
+        dns_update = dns.update.Update(domain, keyring=keyring, keyalgorithm=algorithm)
         dns_update.delete(record)
         output = send_dns_update(dns_update, dns_server, key_name)
 
@@ -108,11 +111,14 @@ def create_update(dns_server, zone_name, record_name, record_type, record_data, 
 
     try:
         transfer_key = models.Key.objects.get(name=key_name)
-        keyring = transfer_key.create_keyring()
     except models.Key.DoesNotExist:
         keyring = None
+        algorithm = None
+    else:
+        keyring = transfer_key.create_keyring()
+        algorithm = transfer_key.algorithm
 
-    dns_update = dns.update.Update(zone_name, keyring = keyring)
+    dns_update = dns.update.Update(zone_name, keyring=keyring, keyalgorithm=algorithm)
     dns_update.replace(record_name, ttl, record_type, record_data)
     output = send_dns_update(dns_update, dns_server, key_name)
 
