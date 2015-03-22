@@ -56,6 +56,10 @@ When Binder accesses your BIND DNS server, it first queries the statistics port 
 
 We must provide server statistics from the BIND process itself. This allows Binder to query BIND itself and get a list of zones, views, and other statistics.
 
+    options {
+      zone-statistics yes;
+    }
+
     statistics-channels {
         inet * port 8053 allow { 10.10.0.0/24; };
     };
