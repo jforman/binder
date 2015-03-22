@@ -5,9 +5,9 @@ import sys
 errors = 0
 
 try:
-    import BeautifulSoup
+    from bs4 import BeautifulSoup
 except ImportError:
-    print "Could not import BeautifulSoup. This is a required module for Binder.\n"
+    print "Could not import BeautifulSoup. This is a required module for Binder. It is automatically installed with pybindxml.\n"
     errors += 1
 
 try:
@@ -27,6 +27,7 @@ try:
     import pybindxml
 except ImportError:
     print "Could not import pybindxml. This is a required module for Binder.\n"
+    print "Pybindxml: https://pypi.python.org/pypi/pybindxml"
     errors += 1
 
 try:
