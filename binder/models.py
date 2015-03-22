@@ -16,7 +16,7 @@ import dns.zone
 from binder import exceptions
 from django.db import models
 
-TSIG_ALGORITHMS = (('hmac-md5', 'MD5'),
+TSIG_ALGORITHMS = (('HMAC-MD5.SIG-ALG.REG.INT', 'MD5'),
                    ('hmac-sha1', 'SHA1'),
                    ('hmac-sha256', 'SHA256'),
                    ('hmac-sha384', 'SHA384'),
