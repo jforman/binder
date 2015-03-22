@@ -26,12 +26,21 @@ class Key(models.Model):
 
     TODO: Should/Can we encrypt these DNS keys in the DB?
     """
-    name = models.CharField(max_length=255)
-    data = models.CharField(max_length=255)
-    algorithm = models.CharField(max_length=255, choices=TSIG_ALGORITHMS)
+    name = models.CharField(max_length=255,
+                            unique=True,
+                            help_text="A human readable name for the key to store, used for "
+                            "further references to the key.")
+    data = models.CharField(max_length=255,
+                            help_text="The private part of the TSIG key.")
+    algorithm = models.CharField(max_length=255,
+                                 choices=TSIG_ALGORITHMS,
+                                 help_text="The algorithm which has been used for the key.")
 
     def __unicode__(self):
         return self.name
+
+    class Meta:
+        ordering = ["name"]
 
     def create_keyring(self):
         if self.name is None:
@@ -52,12 +61,23 @@ class BindServer(models.Model):
         statistics ports. Also reference FK for TSIG transfer keys,
         if required.
     """
-    hostname = models.CharField(max_length=255)
-    statistics_port = models.IntegerField()
-    default_transfer_key = models.ForeignKey(Key, null=True, blank=True)
+    hostname = models.CharField(max_length=255,
+                                unique=True,
+                                help_text="Host name or IP address of the BIND server.")
+    statistics_port = models.IntegerField(help_text="Port where the BIND server is serving "
+                                          "statistics on.")
+    default_transfer_key = models.ForeignKey(Key,
+                                             null=True,
+                                             blank=True,
+                                             help_text="The default key to use for all actions "
+                                             "with this DNS server as long as no other key is "
+                                             "specified explicitly.")
 
     def __unicode__(self):
         return self.hostname
+
+    class Meta:
+        ordering = ["hostname"]
 
     def list_zones(self):
         """ List the DNS zones and attributes.
