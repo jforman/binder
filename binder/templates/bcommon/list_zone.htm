@@ -48,7 +48,7 @@ Zone listing for {{ zone_name }} on {{ dns_server }}
 </table>
 
 <a href="{% url "add_record" dns_server=dns_server zone_name=zone_name %}">Add Record</a>
-<input type="submit" value="Delete Selected"/>
+<button type="submit" class="btn">Delete Selected</button>
 </form>
 {% endif %}
 {% endblock body %}
