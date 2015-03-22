@@ -1,6 +1,7 @@
 ### Binder Models
 
 # Standard Imports
+import binascii
 import socket
 import urllib2
 
@@ -47,11 +48,9 @@ class Key(models.Model):
             return None
 
         try:
-            keyring = dns.tsigkeyring.from_text({
-                    self.name : self.data
-                    })
+            keyring = dns.tsigkeyring.from_text({self.name: self.data})
         except binascii.Error, err:
-            raise exceptions.KeyringException("Incorrect key data. Verify key: %s. Reason: %s" % (key_name, err))
+            raise exceptions.KeyringException("Incorrect key data. Verify key: %s. Reason: %s" % (self.name, err))
 
         return keyring
 
