@@ -54,7 +54,7 @@
     <div class="controls">
       <select name="key_name">
     {% for key in tsig_keys %}
-        <option value="{{key.id}}"{% if current_key == dns_server.default_transfer_key %} selected="selected"{% endif %}>{{key}}</option>
+        <option value="{{key.id}}"{% if key == dns_server.default_transfer_key %} selected="selected"{% endif %}>{{key}}</option>
     {% empty %}
         <option selected="selected" value=""></option>
     {% endfor %}
