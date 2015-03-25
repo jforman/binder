@@ -9,6 +9,8 @@ Zone listing for {{ zone_name }} on {{ dns_server }}
 {% if not errors %}
 <form action="{% url "delete_record" %}" method="post">{% csrf_token %}
 <table class="table table-hover sortable">
+<button class="btn btn-default"><a href="{% url "add_record" dns_server=dns_server zone_name=zone_name %}">Add Record</a></button>
+
 <tr>
   <th>Select</th>
   <th>Name</th>
@@ -47,8 +49,7 @@ Zone listing for {{ zone_name }} on {{ dns_server }}
 
 </table>
 
-<a href="{% url "add_record" dns_server=dns_server zone_name=zone_name %}">Add Record</a>
-<button type="submit" class="btn">Delete Selected</button>
+<button class="btn btn-danger" type="submit">Delete Selected</button>
 </form>
 {% endif %}
 {% endblock body %}

@@ -41,7 +41,7 @@ Delete record(s) in {{ zone_name }}
   <tr>
     <td colspan="2">
       <button type="submit" class="btn">Yes, I really want to delete them.</button>
-      <a href="{% url "zone_list" dns_server=dns_server zone_name=zone_name %}">Cancel</a>
+      <button class="btn btn-warning"><a href="{% url "zone_list" dns_server=dns_server zone_name=zone_name %}">Cancel</a></button>
     </td>
   </tr>
   </form>
