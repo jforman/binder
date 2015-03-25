@@ -95,6 +95,6 @@
   </div>
 
   <button type="submit" class="btn">Save Changes</button>
-  <button class="btn btn-warning"><a href="{% url "zone_list" dns_server=dns_server zone_name=zone_name %}">Cancel</a></buton>
+  <a href="{% url "zone_list" dns_server=dns_server zone_name=zone_name %}" class="btn btn-warning">Cancel</a>
 </form>
 {% endblock body %}

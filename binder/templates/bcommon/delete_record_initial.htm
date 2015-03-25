@@ -39,7 +39,7 @@
   <tr>
     <td colspan="2">
       <button type="submit" class="btn">Yes, I really want to delete them.</button>
-      <button class="btn btn-warning"><a href="{% url "zone_list" dns_server=dns_server zone_name=zone_name %}">Cancel</a></button>
+      <a href="{% url "zone_list" dns_server=dns_server zone_name=zone_name %}" class="btn btn-warning">Cancel</a>
     </td>
   </tr>
   </form>
