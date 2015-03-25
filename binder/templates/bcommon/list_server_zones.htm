@@ -1,9 +1,6 @@
 {% extends "base.htm" %}
 
-{% block pageheader %}
-Server Zone List for {{ dns_server }}
-{% endblock pageheader %}
-
+{% block pageheader %}Server Zone List for {{ dns_server.hostname }}{% endblock pageheader %}
 
 {% block body %}
 <table class="table sortable">
@@ -16,7 +13,7 @@ Server Zone List for {{ dns_server }}
   {% for current_view, cv_data in cz_data.iteritems %}
     <tr>
       <td>
-        <a href="{% url "zone_list" dns_server=dns_server zone_name=current_zone %}"> {{ current_zone }}</a>
+        <a href="{% url "zone_list" dns_server=dns_server.hostname zone_name=current_zone %}"> {{ current_zone }}</a>
       </td>
       <td>{{ current_view }}</td>
       <td>{{ cv_data.serial }}</td>
@@ -24,5 +21,4 @@ Server Zone List for {{ dns_server }}
   {% endfor %}
 {% endfor %}
 </table>
-
 {% endblock body %}
