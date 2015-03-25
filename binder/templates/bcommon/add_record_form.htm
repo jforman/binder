@@ -1,28 +1,25 @@
 {% extends "base.htm" %}
 
-{% block pageheader %}
-Add record in {{ zone_name }}
-{% endblock pageheader %}
+{% block pageheader %}Add record in {{ zone_name }}{% endblock pageheader %}
 
 {% block body %}
 <form class="form-horizontal" action="/add_record/result/" method="post">{% csrf_token %}
   <legend>Create Record</legend>
-	<input type="hidden" name="zone_name" value="{{zone_name}}"/>
+    <input type="hidden" name="zone_name" value="{{zone_name}}"/>
 
   <div class="control-group">
     <label class="control-label">DNS Server: </label>
     <div class="controls">
-      <span class="input-xlarge uneditable-input">{{dns_server}}</span>
-      <input type="hidden" name="dns_server" value="{{dns_server}}"/>
+      <span class="input-xlarge uneditable-input">{{dns_server.hostname}}</span>
+      <input type="hidden" name="dns_server" value="{{dns_server.hostname}}"/>
     </div>
   </div>
-
 
   <div class="control-group">
     <label class="control-label">Record Name: </label>
     <div class="controls">
       <div class="input-append">
-	    <input class="span2" size="100" name="record_name" type="text"/><span class="add-on">.{{zone_name}}</span>
+        <input class="span2" size="100" name="record_name" type="text"/><span class="add-on">.{{zone_name}}</span>
       </div>
       {% if form_errors.record_name %}
       <div class="alert alert-error">
@@ -51,7 +48,7 @@ Add record in {{ zone_name }}
     <label class="control-label">Record Data: </label>
     <div class="controls">
       <div class="input-append">
-	    <input class="input-large" size="100" name="record_data" type="text"/>
+        <input class="input-large" size="100" name="record_data" type="text"/>
       </div>
       {% if form_errors.record_data %}
       <div class="alert alert-error">
@@ -66,7 +63,7 @@ Add record in {{ zone_name }}
     <div class="controls">
       <select name="ttl">
         {% for ttl, description in ttl_choices %}
-	    <option value="{{ttl}}">
+        <option value="{{ttl}}">
         {{ttl}} ({{description}})
       </option>
         {% endfor %}
@@ -88,9 +85,10 @@ Add record in {{ zone_name }}
     <label class="control-label">TSIG Key: </label>
     <div class="controls">
       <select name="key_name">
-        <option selected="selected" value=""/>
         {% for key in tsig_keys %}
-          <option value="{{key.id}}">{{key}}</option>
+          <option value="{{key.id}}"{% if key == dns_server.default_transfer_key %} selected="selected"{% endif %}>{{key}}</option>
+        {% empty %}
+          <option selected="selected" value=""/>
         {% endfor %}
       </select>
     </div>
@@ -99,5 +97,4 @@ Add record in {{ zone_name }}
   <button type="submit" class="btn">Save Changes</button>
   <button class="btn btn-warning"><a href="{% url "zone_list" dns_server=dns_server zone_name=zone_name %}">Cancel</a></buton>
 </form>
-
 {% endblock body %}
