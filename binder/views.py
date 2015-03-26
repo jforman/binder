@@ -9,7 +9,7 @@ import local_settings
 
 def home_index(request):
     """ List the main index page for Binder. """
-    return render(request, "index.htm")
+    return render(request, "index.html")
 
 
 def view_server_list(request):
@@ -19,7 +19,7 @@ def view_server_list(request):
     for current in server_list:
         server_info.append({"host_name" : current, "ip_address" : helpers.ip_info(current.hostname)})
 
-    return render(request, "bcommon/list_servers.htm",
+    return render(request, "bcommon/list_servers.html",
                   { "server_info" : server_info})
 
 
@@ -37,7 +37,7 @@ def view_server_zones(request, dns_server):
         except exceptions.ZoneException, err:
             errors = "Unable to list server zones. Error: %s" % err
 
-    return render(request, "bcommon/list_server_zones.htm",
+    return render(request, "bcommon/list_server_zones.html",
                   { "errors" : errors,
                     "dns_server" : this_server,
                     "zone_array" : zone_array})
@@ -51,14 +51,14 @@ def view_zone_records(request, dns_server, zone_name):
     try:
         zone_array = this_server.list_zone_records(zone_name)
     except exceptions.TransferException, err:
-        return render(request, "bcommon/list_zone.htm",
+        return render(request, "bcommon/list_zone.html",
                       { "errors" : err,
                         "zone_name" : zone_name,
                         "dns_server" : this_server})
     except models.BindServer.DoesNotExist:
         errors = "Requesting a zone listing for a Bind server that is not configured: %s" % dns_server
 
-    return render(request, "bcommon/list_zone.htm",
+    return render(request, "bcommon/list_zone.html",
                   { "zone_array" : zone_array,
                     "dns_server" : this_server,
                     "zone_name" : zone_name,
@@ -69,7 +69,7 @@ def view_add_record(request, dns_server, zone_name):
     """ View to provide form to add a DNS record. """
     this_server = models.BindServer.objects.get(hostname=dns_server)
 
-    return render(request, "bcommon/add_record_form.htm",
+    return render(request, "bcommon/add_record_form.html",
                   { "dns_server" : this_server,
                     "zone_name" : zone_name,
                     "tsig_keys" : models.Key.objects.all(),
@@ -109,13 +109,13 @@ def view_add_record_result(request):
             # What would cause this?
             errors = err
 
-        return render(request, "bcommon/response_result.htm",
+        return render(request, "bcommon/response_result.html",
                       { "errors" : errors,
                         "response" : response })
 
     dns_server = models.BindServer.objects.get(hostname=request.POST["dns_server"])
 
-    return render(request, "bcommon/add_record_form.htm",
+    return render(request, "bcommon/add_record_form.html",
                   { "dns_server" : dns_server,
                     "zone_name" : request.POST["zone_name"],
                     "tsig_keys" : models.Key.objects.all(),
@@ -130,7 +130,7 @@ def view_add_cname_record(request, dns_server, zone_name, record_name):
 
     this_server = models.BindServer.objects.get(hostname=dns_server)
 
-    return render(request, "bcommon/add_cname_record_form.htm",
+    return render(request, "bcommon/add_cname_record_form.html",
                   { "dns_server" : this_server,
                     "originating_record" : "%s.%s" % (record_name, zone_name),
                     "zone_name" : zone_name,
@@ -159,13 +159,13 @@ def view_add_cname_result(request):
         except exceptions.RecordException, err:
             errors = err
 
-        return render(request, "bcommon/response_result.htm",
+        return render(request, "bcommon/response_result.html",
                       {"response" : add_cname_response,
                        "errors" : errors })
 
     dns_server = models.BindServer.objects.get(hostname=request.POST["dns_server"])
 
-    return render(request, "bcommon/add_cname_record_form.htm",
+    return render(request, "bcommon/add_cname_record_form.html",
                   { "dns_server" : dns_server,
                     "zone_name" : request.POST["zone_name"],
                     "record_name" : request.POST["cname"],
@@ -185,7 +185,7 @@ def view_delete_record(request):
     zone_name = request.POST["zone_name"]
     rr_list = request.POST.getlist("rr_list")
 
-    return render(request, "bcommon/delete_record_initial.htm",
+    return render(request, "bcommon/delete_record_initial.html",
                   { "dns_server" : dns_server,
                     "zone_name" : zone_name,
                     "rr_list" :  rr_list,
@@ -210,5 +210,5 @@ def view_delete_result(request):
                                           clean_form["rr_list"],
                                           clean_form["key_name"])
 
-    return render(request, "bcommon/response_result.htm",
+    return render(request, "bcommon/response_result.html",
                   { "response" : delete_result })
