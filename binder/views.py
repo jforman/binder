@@ -118,6 +118,9 @@ def view_add_record_result(request):
     return render(request, "bcommon/add_record_form.htm",
                   { "dns_server" : dns_server,
                     "zone_name" : request.POST["zone_name"],
+                    "tsig_keys" : models.Key.objects.all(),
+                    "ttl_choices" : local_settings.TTL_CHOICES,
+                    "record_type_choices" : local_settings.RECORD_TYPE_CHOICES,
                     "form_errors" : form.errors,
                     "form_data" : request.POST })
 
