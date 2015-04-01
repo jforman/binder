@@ -2,7 +2,7 @@
 
 # 3rd Party
 from django import forms
-from django.core.exceptions import ValidationError
+from django.forms import ValidationError
 
 # App Imports
 from models import Key
@@ -14,11 +14,9 @@ class CustomUnicodeListField(forms.CharField):
     """ Convert unicode item list to list of strings. """
     def clean(self, value):
         try:
-            first_parse = eval(value)
-            string_list = [current_item for current_item in first_parse]
+            string_list = [str(cur_rr) for cur_rr in eval(value)]
         except:
             raise ValidationError("Error in converting Unicode list to list of Strings: %r" % value)
-
         return string_list
 
 class CustomStringPeriodSuffix(forms.CharField):
@@ -73,5 +71,5 @@ class FormDeleteRecord(forms.Form):
     """ Final form to delete DNS record(s). """
     dns_server = forms.CharField(max_length=100)
     zone_name = forms.CharField(max_length=256)
-    rr_list = CustomUnicodeListField(required=False)
+    rr_list = CustomUnicodeListField()
     key_name = forms.ModelChoiceField(queryset=Key.objects.all(), required=False)

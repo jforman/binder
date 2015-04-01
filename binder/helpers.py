@@ -94,9 +94,9 @@ def delete_record(dns_server, rr_list, key_name):
 
     delete_response = []
     for current_rr in rr_list:
-        record_list = current_rr.split(".")
+        record_list = current_rr.split(".", 1)
         record = record_list[0]
-        domain = ".".join(record_list[1:])
+        domain = record_list[1]
         dns_update = dns.update.Update(domain, keyring=keyring, keyalgorithm=algorithm)
         dns_update.delete(record)
         output = send_dns_update(dns_update, dns_server, key_name)
