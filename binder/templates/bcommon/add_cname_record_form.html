@@ -45,8 +45,8 @@
     <label for="id_ttl" class="control-label col-md-2">TTL</label>
     <div class="controls col-md-10">
       {% for ttl, description in ttl_choices %}
-      <label class="radio-inline">
-        <input type="radio" id="id_ttl" name="ttl" id="ttl_{{ttl}}" value="{{ttl}}">{{ttl}} ({{description}})
+      <label for="id_ttl_{{ttl}}" class="radio-inline">
+        <input type="radio" id="id_ttl_{{ ttl }}" name="ttl" value="{{ttl}}">{{ttl}} ({{description}})
       </label>
       {% endfor %}
     </div>

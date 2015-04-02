@@ -41,7 +41,7 @@
       {% if "in-addr.arpa" not in zone_name and "ip6.arpa" not in zone_name %}
         {% for type, name in record_type_choices %}
           <label for="id_record_type_{{ name }}" class="radio-inline">
-            <input type="radio" id="id_record_type_{{ name }}" name="record_type" id="record_type_{{name}}" value="{{name}}">{{name}}
+            <input type="radio" id="id_record_type_{{ name }}" name="record_type" value="{{name}}">{{name}}
           </label>
         {% endfor %}
       {% else %}
@@ -76,7 +76,7 @@
     <div class="controls col-md-10">
       {% for ttl, description in ttl_choices %}
         <label for="id_ttl_{{ ttl }}" class="radio-inline">
-          <input type="radio" id="id_ttl_{{ ttl }}" name="ttl" id="ttl_{{ttl}}" value="{{ttl}}">{{ttl}} ({{description}})
+          <input type="radio" id="id_ttl_{{ ttl }}" name="ttl" value="{{ttl}}">{{ttl}} ({{description}})
         </label>
       {% endfor %}
     </div>
