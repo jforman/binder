@@ -66,6 +66,7 @@
   </div>
 
   <button type="submit" class="btn">Save Changes</button>
+  <a href="{% url "zone_list" dns_server=dns_server zone_name=zone_name %}" class="btn btn-warning">Cancel</a>
 </form>
 
 {% endblock body %}
