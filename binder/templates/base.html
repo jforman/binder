@@ -3,7 +3,9 @@
 {% block header %}
 <head>
   <title>Binder DNS Admin</title>
-  <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}bootstrap/css/bootstrap.css" />
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}bootstrap/css/bootstrap.min.css" />
   <script src="{{ STATIC_URL }}sorttable.js"></script>
 </head>
 {% endblock header %}
@@ -27,7 +29,7 @@
   <div class="col-md-10">
     <div class="panel panel-default">
       <div class="panel-heading">
-	{% block pageheader %}{% endblock pageheader %}
+        {% block pageheader %}{% endblock pageheader %}
       </div>
     </div>
 

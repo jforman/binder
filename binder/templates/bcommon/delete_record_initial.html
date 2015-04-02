@@ -22,72 +22,29 @@
     </td>
 </tr>
 <tr>
-  <td>TSIG Key</td>
+  <td><label for="id_key_name">TSIG Key</label></td>
   <td>
     <div class="form-group">
       <div class="controls">
-	<select class="form-control" name="key_name">
+        <select id="id_key_name" class="form-control" name="key_name">
           {% for key in tsig_keys %}
           <option value="{{key.id}}"{% if key == dns_server.default_transfer_key %} selected="selected"{% endif %}>{{key}}</option>
           {% empty %}
           <option selected="selected" value=""/>
           {% endfor %}
-	</select>
+        </select>
       </div>
     </div>
   </td>
 </tr>
 <tr>
   <td>
-    <button type="submit" class="btn">Yes, really delete.</button>
+    <button type="submit" class="btn btn-default">Yes, really delete.</button>
   </td>
   <td></td>
 </tr>
 </table>
 
-<!-- <form class="form-horizontal" action="/delete_record/result/" method="POST"> -->
-<!--   {% csrf_token %} -->
-<!--   <legend>Delete Record(s)</legend> -->
-<!--   <div class="form-group"> -->
-<!--    <label class="control-label col-md-2">DNS Server</label> -->
-<!--    <div class="controls col-md-10"> -->
-<!--      <input type="text" class="form-control" name="dns_server" value="{{ dns_server.hostname }}" readonly /> -->
-<!--    </div> -->
-<!--   </div> -->
-
-<!--   <div class="form-group"> -->
-<!--    <label class="control-label col-md-2">Zone Name</label> -->
-<!--    <div class="controls col-md-10"> -->
-<!--      <input type="text" class="form-control" name="zone_name" value="{{ zone_name }}" readonly /> -->
-<!--    </div> -->
-<!--   </div> -->
-
-<!--   <div class="form-group"> -->
-<!--     <label class="control-label col-md-2">Record List</label> -->
-<!--     <div class="controls col-md-10"> -->
-<!--       <select multiple class="form-control" name="rr_list"> -->
-<!-- 	{% for current_rr in rr_list %} -->
-<!-- 	  <option selected value="{{current_rr}}" selected>{{current_rr}}</option> -->
-<!-- 	{% endfor %} -->
-<!--        </select> -->
-<!--     </div> -->
-<!--   </div> -->
-
-<!--   <div class="form-group"> -->
-<!--     <label class="control-label col-md-2">TSIG Key</label> -->
-<!--     <div class="controls col-md-10"> -->
-<!--       <select class="form-control" name="key_name"> -->
-<!--         {% for key in tsig_keys %} -->
-<!--           <option value="{{key.id}}"{% if key == dns_server.default_transfer_key %} selected="selected"{% endif %}>{{key}}</option> -->
-<!--         {% empty %} -->
-<!--           <option selected="selected" value=""/> -->
-<!--         {% endfor %} -->
-<!--       </select> -->
-<!--     </div> -->
-<!--   </div> -->
-
-
-<!--   <button type="submit" class="btn">Yes, really delete.</button> -->
 <input type="text" class="form-control hidden" name="dns_server" value="{{ dns_server.hostname }}"/>
 <input type="text" class="form-control hidden" name="zone_name" value="{{ zone_name }}"/>
 <input type="text" class="form-control hidden" name="rr_list" value="{{ rr_list }}"/>

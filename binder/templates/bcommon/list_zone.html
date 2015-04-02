@@ -4,10 +4,14 @@
 
 {% block body %}
 {% if not errors %}
-<form action="{% url "delete_record" %}" method="post">{% csrf_token %}
-<table class="table table-condensed table-hover sortable">
-<a href="{% url "add_record" dns_server=dns_server zone_name=zone_name %}" class="btn btn-default">Add Record</a></button>
+<a href="{% url "add_record" dns_server=dns_server zone_name=zone_name %}" class="btn btn-default">Add Record</a>
 
+<form action="{% url "delete_record" %}" method="post">{% csrf_token %}
+
+<input type="hidden" name="dns_server" value="{{ dns_server.hostname }}">
+<input type="hidden" name="zone_name" value="{{ zone_name }}">
+
+<table class="table table-condensed table-hover sortable">
 <tr>
   <th>Select</th>
   <th>Name</th>
@@ -18,17 +22,9 @@
   <th></th>
 </tr>
 
-<input type="hidden" name="dns_server" value="{{ dns_server.hostname }}">
-<input type="hidden" name="zone_name" value="{{ zone_name }}">
 {% for current_record in zone_array %}
 <tr>
-  <td>
-    <div class="checkbox">
-      <label>
-	<input type="checkbox" id="rr_{{current_record.rr_name}}" name="rr_list" value="{{ current_record.rr_name }}.{{ zone_name }}"/>
-     </label>
-  </div>
-  </td>
+  <td><input type="checkbox" id="rr_{{current_record.rr_name}}" name="rr_list" value="{{ current_record.rr_name }}.{{ zone_name }}" /></td>
   <td>{{ current_record.rr_name }}</td>
   <td>{{ current_record.rr_ttl }}</td>
   <td>{{ current_record.rr_class }}</td>
@@ -37,7 +33,7 @@
   <td>
     <div class="btn-toolbar" style="margin: 0;">
       <div class="btn-group">
-        <button class="btn dropdown-toggle" data-toggle="dropdown">Record Actions  <span class="caret"></span></button>
+        <button class="btn btn-default dropdown-toggle" data-toggle="dropdown">Record Actions <span class="caret"></span></button>
         <ul class="dropdown-menu">
           <li><a href="#">Edit Record (Coming Soon)</a></li>
           {% if current_record.rr_type == "A" %}
