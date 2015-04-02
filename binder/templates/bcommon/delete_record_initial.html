@@ -3,45 +3,93 @@
 {% block pageheader %}Delete record(s) in {{ zone_name }}{% endblock pageheader %}
 
 {% block body %}
-<table class="table">
 <form action="/delete_record/result/" method="POST">
   {% csrf_token %}
-  <input type="hidden" name="dns_server" value="{{ dns_server.hostname }}" />
-  <input type="hidden" name="zone_name" value="{{ zone_name }}" />
-  <input type="hidden" name="rr_list" value="{{ rr_list }}" />
-  <tr>
-    <th colspan="2">Do you really want to delete the following records?</th>
-  </tr>
-  <tr>
-    <td>Server</td>
-    <td>{{ dns_server.hostname }}</td>
-  </tr>
-  <tr>
-    <td>Zone</td>
-    <td>{{ zone_name }}</td>
-  </tr>
-  <tr>
-    <td>Records</td>
-    <td>{% for current_rr in rr_list %}{{ current_rr }}<br> {% endfor %}</td>
-  </tr>
-  <tr>
-    <td>Key</td>
-    <td>
-      <select name="key_name">
-        {% for current_key in tsig_keys %}
-        <option value="{{current_key.id}}"{% if current_key == dns_server.default_transfer_key %} selected="selected"{% endif %}>{{current_key}}</option>
-        {% empty %}
-        <option selected="selected" value=""/>
-        {% endfor %}
-      </select>
+<table class="sortable table table-hover">
+<tr>
+  <td>DNS Server</td>
+  <td>{{dns_server.hostname}}</td>
+</tr>
+<tr>
+  <td>Zone</td>
+  <td>{{zone_name}}</td>
+</tr>
+<tr>
+  <td>Records</td>
+  <td>{% for current_rr in rr_list %}
+    {{ current_rr }}<br>
+    {% endfor %}
     </td>
-  </tr>
-  <tr>
-    <td colspan="2">
-      <button type="submit" class="btn">Yes, I really want to delete them.</button>
-      <a href="{% url "zone_list" dns_server=dns_server zone_name=zone_name %}" class="btn btn-warning">Cancel</a>
-    </td>
-  </tr>
-  </form>
+</tr>
+<tr>
+  <td>TSIG Key</td>
+  <td>
+    <div class="form-group">
+      <div class="controls">
+	<select class="form-control" name="key_name">
+          {% for key in tsig_keys %}
+          <option value="{{key.id}}"{% if key == dns_server.default_transfer_key %} selected="selected"{% endif %}>{{key}}</option>
+          {% empty %}
+          <option selected="selected" value=""/>
+          {% endfor %}
+	</select>
+      </div>
+    </div>
+  </td>
+</tr>
+<tr>
+  <td>
+    <button type="submit" class="btn">Yes, really delete.</button>
+  </td>
+  <td></td>
+</tr>
 </table>
+
+<!-- <form class="form-horizontal" action="/delete_record/result/" method="POST"> -->
+<!--   {% csrf_token %} -->
+<!--   <legend>Delete Record(s)</legend> -->
+<!--   <div class="form-group"> -->
+<!--    <label class="control-label col-md-2">DNS Server</label> -->
+<!--    <div class="controls col-md-10"> -->
+<!--      <input type="text" class="form-control" name="dns_server" value="{{ dns_server.hostname }}" readonly /> -->
+<!--    </div> -->
+<!--   </div> -->
+
+<!--   <div class="form-group"> -->
+<!--    <label class="control-label col-md-2">Zone Name</label> -->
+<!--    <div class="controls col-md-10"> -->
+<!--      <input type="text" class="form-control" name="zone_name" value="{{ zone_name }}" readonly /> -->
+<!--    </div> -->
+<!--   </div> -->
+
+<!--   <div class="form-group"> -->
+<!--     <label class="control-label col-md-2">Record List</label> -->
+<!--     <div class="controls col-md-10"> -->
+<!--       <select multiple class="form-control" name="rr_list"> -->
+<!-- 	{% for current_rr in rr_list %} -->
+<!-- 	  <option selected value="{{current_rr}}" selected>{{current_rr}}</option> -->
+<!-- 	{% endfor %} -->
+<!--        </select> -->
+<!--     </div> -->
+<!--   </div> -->
+
+<!--   <div class="form-group"> -->
+<!--     <label class="control-label col-md-2">TSIG Key</label> -->
+<!--     <div class="controls col-md-10"> -->
+<!--       <select class="form-control" name="key_name"> -->
+<!--         {% for key in tsig_keys %} -->
+<!--           <option value="{{key.id}}"{% if key == dns_server.default_transfer_key %} selected="selected"{% endif %}>{{key}}</option> -->
+<!--         {% empty %} -->
+<!--           <option selected="selected" value=""/> -->
+<!--         {% endfor %} -->
+<!--       </select> -->
+<!--     </div> -->
+<!--   </div> -->
+
+
+<!--   <button type="submit" class="btn">Yes, really delete.</button> -->
+<input type="text" class="form-control hidden" name="dns_server" value="{{ dns_server.hostname }}"/>
+<input type="text" class="form-control hidden" name="zone_name" value="{{ zone_name }}"/>
+<input type="text" class="form-control hidden" name="rr_list" value="{{ rr_list }}"/>
+</form>
 {% endblock body %}

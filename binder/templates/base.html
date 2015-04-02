@@ -13,25 +13,23 @@
   <script src="{{ STATIC_URL }}bootstrap/js/bootstrap.min.js"></script>
 
 <div class="container-fluid">
-<div class="row-fluid">
-  <div class="span2">
+  <div class="row">
+  <div class="col-md-2">
     {% block navigation %}
-    <ul class="nav nav-list">
-      <li class="nav-header">Actions</li>
-      <li><a href="/">Home</a></li>
-      <li><a href="{% url "server_list" %}">Server List</a></li>
+    <ul class="nav nav-pills nav-stacked">
+      <li role="presentation" class="active">Actions</li>
+      <li role="presentation"><a href="/">Home</a></li>
+      <li role="presentation"><a href="{% url "server_list" %}">Server List</a></li>
     </ul>
     {% endblock navigation %}
   </div>
 
-  <div class="span10">
-      <div class="navbar">
-        <div class="navbar-inner">
-          <a class="brand" href="#">
-            {% block pageheader %}{% endblock pageheader %}
-          </a>
-        </div>
+  <div class="col-md-10">
+    <div class="panel panel-default">
+      <div class="panel-heading">
+	{% block pageheader %}{% endblock pageheader %}
       </div>
+    </div>
 
      {% block errors %}
        {% if errors %}
@@ -43,6 +41,7 @@
       {% endif %}
     {% endblock errors %}
 
+   <div class="panel-body">
     {% block body %}
     {% endblock body %}
   </div>
