@@ -63,6 +63,12 @@ class BindServer(models.Model):
     hostname = models.CharField(max_length=255,
                                 unique=True,
                                 help_text="Host name or IP address of the BIND server.")
+    dns_port = models.IntegerField(default=53,
+                                   verbose_name="DNS port",
+                                   help_text="The port where the BIND server is listening for DNS "
+                                   "requests. binder especially uses that port for the dynamic "
+                                   "zone updates. In most cases you should always leave it at the "
+                                   "default port 53.")
     statistics_port = models.IntegerField(help_text="Port where the BIND server is serving "
                                           "statistics on.")
     default_transfer_key = models.ForeignKey(Key,
@@ -115,7 +121,11 @@ class BindServer(models.Model):
             algorithm = transfer_key.algorithm
 
         try:
-            zone = dns.zone.from_xfr(dns.query.xfr(self.hostname, zone_name, keyring=keyring, keyalgorithm=algorithm))
+            zone = dns.zone.from_xfr(dns.query.xfr(self.hostname,
+                                                   zone_name,
+                                                   port=self.dns_port,
+                                                   keyring=keyring,
+                                                   keyalgorithm=algorithm))
         except dns.tsig.PeerBadKey:
             # The incorrect TSIG key was selected for transfers.
             raise exceptions.TransferException("Unable to list zone records because of a TSIG key mismatch.")

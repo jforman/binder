@@ -83,6 +83,8 @@ def add_cname_record(dns_server, zone_name, cname, originating_record, ttl, key_
 def delete_record(dns_server, rr_list, key_name):
     """Delete a list of DNS records passed as strings in rr_items."""
 
+    server = models.BindServer.objects.get(hostname=dns_server)
+
     try:
         transfer_key = models.Key.objects.get(name=key_name)
     except models.Key.DoesNotExist:
@@ -99,7 +101,7 @@ def delete_record(dns_server, rr_list, key_name):
         domain = record_list[1]
         dns_update = dns.update.Update(domain, keyring=keyring, keyalgorithm=algorithm)
         dns_update.delete(record)
-        output = send_dns_update(dns_update, dns_server, key_name)
+        output = send_dns_update(dns_update, dns_server, server.dns_port, key_name)
 
         delete_response.append({ "description" : "Delete Record: %s" % current_rr,
                                  "output" : output })
@@ -108,6 +110,8 @@ def delete_record(dns_server, rr_list, key_name):
 
 def create_update(dns_server, zone_name, record_name, record_type, record_data, ttl, key_name):
     """ Update/Create DNS record of name and type with passed data and ttl. """
+
+    server = models.BindServer.objects.get(hostname=dns_server)
 
     try:
         transfer_key = models.Key.objects.get(name=key_name)
@@ -120,7 +124,7 @@ def create_update(dns_server, zone_name, record_name, record_type, record_data, 
 
     dns_update = dns.update.Update(zone_name, keyring=keyring, keyalgorithm=algorithm)
     dns_update.replace(record_name, ttl, record_type, record_data)
-    output = send_dns_update(dns_update, dns_server, key_name)
+    output = send_dns_update(dns_update, dns_server, server.dns_port, key_name)
 
     return output
 
@@ -144,7 +148,7 @@ def ip_info(host_name):
 
     return info
 
-def send_dns_update(dns_message, dns_server, key_name):
+def send_dns_update(dns_message, dns_server, port, key_name):
     """ Send DNS message to server and return response.
 
     Args:
@@ -157,7 +161,7 @@ def send_dns_update(dns_message, dns_server, key_name):
     """
 
     try:
-        output = dns.query.tcp(dns_message, dns_server)
+        output = dns.query.tcp(dns_message, dns_server, port=port)
     except dns.tsig.PeerBadKey:
         output = ("DNS server %s is not configured for TSIG key: %s." %
                   (dns_server, key_name))
