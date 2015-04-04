@@ -34,10 +34,7 @@ class GetTests(TestCase):
         """ Get a zone list for a server not in the database."""
         server_name = "unconfigured.server.net"
         response = self.client.get(reverse("server_zone_list", args=(server_name, )))
-        self.assertEqual(response.status_code, 200)
-        self.assertContains(response, ('<div class="alert alert-error">Errors were encountered: <br>'
-                                       'There is no configured server by that name: unconfigured.server.net </div>'),
-                            html=True)
+        self.assertEqual(response.status_code, 404)
 
 
 class PostTests(TestCase):

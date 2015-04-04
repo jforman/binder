@@ -1,7 +1,7 @@
 ### Binder VIews
 
 # 3rd Party
-from django.shortcuts import redirect, render
+from django.shortcuts import get_object_or_404, redirect, render
 
 # App Imports
 from binder import exceptions, forms, helpers, models
@@ -27,15 +27,13 @@ def view_server_zones(request, dns_server):
     """ Display the list of DNS zones a particular DNS host provides. """
     errors = ""
     zone_array = {}
+
+    this_server = get_object_or_404(models.BindServer, hostname=dns_server)
+
     try:
-        this_server = models.BindServer.objects.get(hostname=dns_server)
-    except models.BindServer.DoesNotExist, err:
-        errors = "There is no configured server by that name: %s" % dns_server
-    else:
-        try:
-            zone_array = this_server.list_zones()
-        except exceptions.ZoneException, err:
-            errors = "Unable to list server zones. Error: %s" % err
+        zone_array = this_server.list_zones()
+    except exceptions.ZoneException, err:
+        errors = "Unable to list server zones. Error: %s" % err
 
     return render(request, "bcommon/list_server_zones.html",
                   { "errors" : errors,
@@ -47,7 +45,9 @@ def view_zone_records(request, dns_server, zone_name):
     """ Display the list of records for a particular zone. """
     errors = ""
     zone_array = {}
-    this_server = models.BindServer.objects.get(hostname=dns_server)
+
+    this_server = get_object_or_404(models.BindServer, hostname=dns_server)
+
     try:
         zone_array = this_server.list_zone_records(zone_name)
     except exceptions.TransferException, err:
@@ -55,8 +55,6 @@ def view_zone_records(request, dns_server, zone_name):
                       { "errors" : err,
                         "zone_name" : zone_name,
                         "dns_server" : this_server})
-    except models.BindServer.DoesNotExist:
-        errors = "Requesting a zone listing for a Bind server that is not configured: %s" % dns_server
 
     return render(request, "bcommon/list_zone.html",
                   { "zone_array" : zone_array,
@@ -67,7 +65,7 @@ def view_zone_records(request, dns_server, zone_name):
 
 def view_add_record(request, dns_server, zone_name):
     """ View to provide form to add a DNS record. """
-    this_server = models.BindServer.objects.get(hostname=dns_server)
+    this_server = get_object_or_404(models.BindServer, hostname=dns_server)
 
     return render(request, "bcommon/add_record_form.html",
                   { "dns_server" : this_server,
@@ -128,7 +126,7 @@ def view_add_record_result(request):
 def view_add_cname_record(request, dns_server, zone_name, record_name):
     """ Process given input to add a CNAME pointer."""
 
-    this_server = models.BindServer.objects.get(hostname=dns_server)
+    this_server = get_object_or_404(models.BindServer, hostname=dns_server)
 
     return render(request, "bcommon/add_cname_record_form.html",
                   { "dns_server" : this_server,
