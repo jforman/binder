@@ -1,5 +1,6 @@
 from django.test import TestCase
 from django.test.client import Client
+from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 
 from binder import models, helpers
@@ -9,6 +10,12 @@ class GetTests(TestCase):
     """ Unit Tests that exercise HTTP GET. """
     def setUp(self):
         self.client = Client()
+        user = User.objects.create_user('testuser',
+                                        'testuser@example.com',
+                                        'testpassword')
+        response = self.client.login(username='testuser',
+                                     password='testpassword')
+
 
     def test_GetIndex(self):
         response = self.client.get(reverse("index"))
@@ -44,6 +51,11 @@ class PostTests(TestCase):
         models.BindServer(hostname="testserver.test.net",
                           statistics_port=1234).save()
 
+        user = User.objects.create_user('testuser',
+                                        'testuser@example.com',
+                                        'testpassword')
+        response = self.client.login(username='testuser',
+                                     password='testpassword')
 
     def test_DeleteRecordInitial_Empty(self):
         """ Ensure the initial deletion form works as expected with no RR list. """

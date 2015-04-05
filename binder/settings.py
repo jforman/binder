@@ -67,6 +67,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
+    'binder.middlewares.LoginRequiredMiddleware',
 )
 
 ROOT_URLCONF = 'binder.urls'
@@ -86,3 +87,5 @@ INSTALLED_APPS = (
 )
 
 TEST_RUNNER = 'django.test.runner.DiscoverRunner'
+
+LOGIN_REDIRECT_URL = '/'
