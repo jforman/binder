@@ -34,16 +34,16 @@ class GetTests(TestCase):
         """ Get a zone list for a server not in the database."""
         server_name = "unconfigured.server.net"
         response = self.client.get(reverse("server_zone_list", args=(server_name, )))
-        self.assertEqual(response.status_code, 200)
-        self.assertContains(response, ('<div class="alert alert-error">Errors were encountered: <br>'
-                                       'There is no configured server by that name: unconfigured.server.net </div>'),
-                            html=True)
+        self.assertEqual(response.status_code, 404)
 
 
 class PostTests(TestCase):
     """ Unit Tests that exercise HTTP POST. """
     def setUp(self):
         self.client = Client()
+        models.BindServer(hostname="testserver.test.net",
+                          statistics_port=1234).save()
+
 
     def test_DeleteRecordInitial_Empty(self):
         """ Ensure the initial deletion form works as expected with no RR list. """
@@ -52,13 +52,13 @@ class PostTests(TestCase):
                                                                 "rr_list" : [] })
 
         self.assertContains(response,
-                            '<input type="hidden" name="zone_name" value="testzone1.test.net">',
+                            '<input type="text" class="form-control hidden" name="zone_name" value="testzone1.test.net"/>',
                             html=True)
         self.assertContains(response,
-                            '<input type="hidden" name="rr_list" value="[]">',
+                            '<input type="text" class="form-control hidden" name="rr_list" value="[]"/>',
                             html=True)
         self.assertContains(response,
-                            '<input type="hidden" name="dns_server" value="testserver.test.net" />',
+                            '<input type="text" class="form-control hidden" name="dns_server" value="testserver.test.net"/>',
                             html=True)
 
 
@@ -68,13 +68,11 @@ class PostTests(TestCase):
                                                                "zone_name" : "testzone1.test.net",
                                                                "rr_list" : ["testrecord1.testzone1.test.net",
                                                                             "testrecord2.testzone1.test.net"] })
-
         self.assertContains(response,
-                            '<input type="hidden" name="zone_name" value="testzone1.test.net">',
+                            '<input type="text" class="form-control hidden" name="zone_name" value="testzone1.test.net"/>', html=True)
+        self.assertContains(response,
+                            '<input type="text" class="form-control hidden" name="rr_list" value="[u&#39;testrecord1.testzone1.test.net&#39;, u&#39;testrecord2.testzone1.test.net&#39;]"/>',
                             html=True)
         self.assertContains(response,
-                            '<input type="hidden" name="rr_list" value="[u\'testrecord1.testzone1.test.net\', u\'testrecord2.testzone1.test.net\']">',
-                            html=True)
-        self.assertContains(response,
-                            '<input type="hidden" name="dns_server" value="testserver.test.net" />',
+                            '<input type="text" class="form-control hidden" name="dns_server" value="testserver.test.net"/>',
                             html=True)
