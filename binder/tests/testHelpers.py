@@ -8,5 +8,5 @@ class HelperTests(TestCase):
         self.assertEqual([['Error', u'Unable to resolve foobar.doesnotexist.local: [Errno -2] Name or service not known']],
                          response)
         response = helpers.ip_info("localhost")
-        self.assertEqual([['IPv4 (1)', u'127.0.0.1'], ['IPv6 (1)', u'::1']],
+        self.assertEqual([['IPv4 (1)', u'127.0.0.1']],
                          sorted(response))
