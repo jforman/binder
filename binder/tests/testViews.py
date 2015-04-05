@@ -41,6 +41,9 @@ class PostTests(TestCase):
     """ Unit Tests that exercise HTTP POST. """
     def setUp(self):
         self.client = Client()
+        models.BindServer(hostname="testserver.test.net",
+                          statistics_port=1234).save()
+
 
     def test_DeleteRecordInitial_Empty(self):
         """ Ensure the initial deletion form works as expected with no RR list. """
