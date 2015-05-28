@@ -1,11 +1,11 @@
 ### Binder VIews
 
 # 3rd Party
+from django.conf import settings
 from django.shortcuts import get_object_or_404, redirect, render
 
 # App Imports
 from binder import exceptions, forms, helpers, models
-import local_settings
 
 def home_index(request):
     """ List the main index page for Binder. """
@@ -71,8 +71,8 @@ def view_add_record(request, dns_server, zone_name):
                   { "dns_server" : this_server,
                     "zone_name" : zone_name,
                     "tsig_keys" : models.Key.objects.all(),
-                    "ttl_choices" : local_settings.TTL_CHOICES,
-                    "record_type_choices" : local_settings.RECORD_TYPE_CHOICES,
+                    "ttl_choices": settings.TTL_CHOICES,
+                    "record_type_choices": settings.RECORD_TYPE_CHOICES,
                     })
 
 
@@ -117,8 +117,8 @@ def view_add_record_result(request):
                   { "dns_server" : dns_server,
                     "zone_name" : request.POST["zone_name"],
                     "tsig_keys" : models.Key.objects.all(),
-                    "ttl_choices" : local_settings.TTL_CHOICES,
-                    "record_type_choices" : local_settings.RECORD_TYPE_CHOICES,
+                    "ttl_choices": settings.TTL_CHOICES,
+                    "record_type_choices": settings.RECORD_TYPE_CHOICES,
                     "form_errors" : form.errors,
                     "form_data" : request.POST })
 
@@ -132,7 +132,7 @@ def view_add_cname_record(request, dns_server, zone_name, record_name):
                   { "dns_server" : this_server,
                     "originating_record" : "%s.%s" % (record_name, zone_name),
                     "zone_name" : zone_name,
-                    "ttl_choices" : local_settings.TTL_CHOICES,
+                    "ttl_choices": settings.TTL_CHOICES,
                     "tsig_keys" : models.Key.objects.all() })
 
 
@@ -170,7 +170,7 @@ def view_add_cname_result(request):
                     "originating_record" : request.POST["originating_record"],
                     "form_data" : request.POST,
                     "form_errors" : form.errors,
-                    "ttl_choices" : local_settings.TTL_CHOICES,
+                    "ttl_choices": settings.TTL_CHOICES,
                     "tsig_keys" : models.Key.objects.all() })
 
 

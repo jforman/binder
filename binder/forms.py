@@ -2,11 +2,11 @@
 
 # 3rd Party
 from django import forms
+from django.conf import settings
 from django.forms import ValidationError
 
 # App Imports
 from models import Key
-import local_settings
 
 ### Custom Form Fields
 
@@ -40,10 +40,10 @@ class FormAddForwardRecord(forms.Form):
     """ Form used to add a Forward DNS record. """
     dns_server = forms.CharField(max_length=100)
     record_name = forms.RegexField(max_length=100, regex="^[a-zA-Z0-9-_]+$", required=False)
-    record_type = forms.ChoiceField(choices=local_settings.RECORD_TYPE_CHOICES)
+    record_type = forms.ChoiceField(choices=settings.RECORD_TYPE_CHOICES)
     zone_name = forms.CharField(max_length=100)
     record_data = forms.GenericIPAddressField()
-    ttl = forms.ChoiceField(choices=local_settings.TTL_CHOICES)
+    ttl = forms.ChoiceField(choices=settings.TTL_CHOICES)
     create_reverse = forms.BooleanField(required=False)
     key_name = forms.ModelChoiceField(queryset=Key.objects.all(), required=False)
 
@@ -54,7 +54,7 @@ class FormAddReverseRecord(forms.Form):
     record_type = forms.RegexField(regex=r"^PTR$",error_messages={"invalid" : "The only valid choice here is PTR."})
     zone_name = forms.CharField(max_length=100)
     record_data = CustomStringPeriodSuffix(required=True)
-    ttl = forms.ChoiceField(choices=local_settings.TTL_CHOICES)
+    ttl = forms.ChoiceField(choices=settings.TTL_CHOICES)
     key_name = forms.ModelChoiceField(queryset=Key.objects.all(), required=False)
     create_reverse = forms.BooleanField(required=False)
 
@@ -64,7 +64,7 @@ class FormAddCnameRecord(forms.Form):
     originating_record = forms.CharField(max_length=100)
     cname = forms.RegexField(max_length=100, regex="^[a-zA-Z0-9-_]+$")
     zone_name = forms.CharField(max_length=256)
-    ttl = forms.ChoiceField(choices=local_settings.TTL_CHOICES)
+    ttl = forms.ChoiceField(choices=settings.TTL_CHOICES)
     key_name = forms.ModelChoiceField(queryset=Key.objects.all(), required=False)
 
 class FormDeleteRecord(forms.Form):
