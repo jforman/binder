@@ -22,24 +22,24 @@
     </td>
 </tr>
 <tr>
-  <td>TSIG Key</td>
+  <td><label for="id_key_name">TSIG Key</label></td>
   <td>
     <div class="form-group">
       <div class="controls">
-	<select class="form-control" name="key_name">
+        <select id="id_key_name" class="form-control" name="key_name">
           {% for key in tsig_keys %}
           <option value="{{key.id}}"{% if key == dns_server.default_transfer_key %} selected="selected"{% endif %}>{{key}}</option>
           {% empty %}
           <option selected="selected" value=""/>
           {% endfor %}
-	</select>
+        </select>
       </div>
     </div>
   </td>
 </tr>
 <tr>
   <td>
-    <button type="submit" class="btn">Yes, really delete.</button>
+    <button type="submit" class="btn btn-default">Yes, really delete.</button>
     <a href="{% url "zone_list" dns_server=dns_server zone_name=zone_name %}" class="btn btn-warning">Cancel</a>
   </td>
   <td></td>
