@@ -1,5 +1,7 @@
 # Binder #
 
+[![Build Status](https://travis-ci.org/jforman/binder.svg?branch=master)](https://travis-ci.org/jforman/binder)
+
 A Django web application for viewing and editing BIND DNS zone records.
 
 Binder supports adding and deleting DNS records (and eventually editing in place). TSIG-authenticated transfers and updates are supported.

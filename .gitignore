@@ -5,3 +5,4 @@
 *.conf
 *~
 /binder/secret.txt
+/binder/local_settings.py
