@@ -3,7 +3,7 @@
 {% block pageheader %}Add record in {{ zone_name }}{% endblock pageheader %}
 
 {% block body %}
-<form class="form-horizontal" action="/add_record/result/" method="POST">{% csrf_token %}
+<form class="form-horizontal" action="{% url "add_record_result" %}" method="POST">{% csrf_token %}
   <legend>Create Record</legend>
   <div class="form-group">
     <label for="id_dns_server" class="control-label col-md-2">DNS Server</label>
