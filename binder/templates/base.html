@@ -20,7 +20,7 @@
     {% block navigation %}
     <ul class="nav nav-pills nav-stacked">
       <li role="presentation" class="active">Actions</li>
-      <li role="presentation"><a href="/">Home</a></li>
+      <li role="presentation"><a href="{% url "index" %}">Home</a></li>
       <li role="presentation"><a href="{% url "server_list" %}">Server List</a></li>
     </ul>
     {% endblock navigation %}

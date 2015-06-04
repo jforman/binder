@@ -3,7 +3,7 @@
 {% block pageheader %}Delete record(s) in {{ zone_name }}{% endblock pageheader %}
 
 {% block body %}
-<form action="/delete_record/result/" method="POST">
+<form action="{% url "delete_record_result" %}" method="POST">
   {% csrf_token %}
 <table class="sortable table table-hover">
 <tr>
