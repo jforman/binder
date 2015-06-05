@@ -15,40 +15,51 @@
   <script src="{% static "jquery-2.1.3.min.js" %}"></script>
   <script src="{% static "bootstrap/js/bootstrap.min.js" %}"></script>
 
-<div class="container-fluid">
+<div class="container">
   <div class="row">
-  <div class="col-md-2">
-    {% block navigation %}
-    <ul class="nav nav-pills nav-stacked">
-      <li role="presentation" class="active">Actions</li>
-      <li role="presentation"><a href="{% url "index" %}">Home</a></li>
-      <li role="presentation"><a href="{% url "server_list" %}">Server List</a></li>
-    </ul>
-    {% endblock navigation %}
-  </div>
-
-  <div class="col-md-10">
-    <div class="panel panel-default">
-      <div class="panel-heading">
-        {% block pageheader %}{% endblock pageheader %}
+    <div class="col-md-12">
+      <div class="navbar navbar-default">
+        <div class="container">
+          <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-navbar-collapse-1">
+              <span class="sr-only">Toggle navigation</span>
+              <span class="icon-bar" aria-hidden="true"></span>
+              <span class="icon-bar" aria-hidden="true"></span>
+              <span class="icon-bar" aria-hidden="true"></span>
+            </button>
+            <a class="navbar-brand" href="{% url "index" %}">Binder</a>
+          </div>
+          <div class="collapse navbar-collapse" id="bs-navbar-collapse-1">
+            <ul class="nav navbar-nav">
+              <li><a href="{% url "server_list" %}">Server List</a></li>
+            </ul>
+          </div>
+        </div>
       </div>
     </div>
-
-     {% block errors %}
-       {% if errors %}
-         <div class="alert alert-error">
-           Errors were encountered:
-           <br>
-          {{ errors }}
-        </div>
-      {% endif %}
-    {% endblock errors %}
-
-   <div class="panel-body">
-    {% block body %}
-    {% endblock body %}
   </div>
-</div>
+  <div class="row">
+    <div class="col-md-12">
+        <h2>{% block pageheader %}{% endblock pageheader %}</h2>
+        <br />
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-12">
+      {% block errors %}
+        {% if errors %}
+          <div class="alert alert-error">
+            Errors were encountered:
+            <br />
+            {{ errors }}
+          </div>
+        {% endif %}
+      {% endblock errors %}
+
+      {% block body %}
+      {% endblock body %}
+    </div>
+  </div>
 </div>
 </body>
 
