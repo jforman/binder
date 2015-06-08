@@ -52,13 +52,13 @@ class PostTests(TestCase):
                                                                 "rr_list" : [] })
 
         self.assertContains(response,
-                            '<input type="text" class="form-control hidden" name="zone_name" value="testzone1.test.net"/>',
+                            '<input type="hidden" id="zone_name" name="zone_name" value="testzone1.test.net" />',
                             html=True)
         self.assertContains(response,
-                            '<input type="text" class="form-control hidden" name="rr_list" value="[]"/>',
+                            '<input type="hidden" id="rr_list" name="rr_list" value="[]" />',
                             html=True)
         self.assertContains(response,
-                            '<input type="text" class="form-control hidden" name="dns_server" value="testserver.test.net"/>',
+                            '<input type="hidden" id="dns_server" name="dns_server" value="testserver.test.net" />',
                             html=True)
 
 
@@ -69,10 +69,10 @@ class PostTests(TestCase):
                                                                "rr_list" : ["testrecord1.testzone1.test.net",
                                                                             "testrecord2.testzone1.test.net"] })
         self.assertContains(response,
-                            '<input type="text" class="form-control hidden" name="zone_name" value="testzone1.test.net"/>', html=True)
+                            '<input type="hidden" id="zone_name" name="zone_name" value="testzone1.test.net" />', html=True)
         self.assertContains(response,
-                            '<input type="text" class="form-control hidden" name="rr_list" value="[u&#39;testrecord1.testzone1.test.net&#39;, u&#39;testrecord2.testzone1.test.net&#39;]"/>',
+                            '<input type="hidden" id="rr_list" name="rr_list" value="[u&#39;testrecord1.testzone1.test.net&#39;, u&#39;testrecord2.testzone1.test.net&#39;]"/>',
                             html=True)
         self.assertContains(response,
-                            '<input type="text" class="form-control hidden" name="dns_server" value="testserver.test.net"/>',
+                            '<input type="hidden" id="dns_server" name="dns_server" value="testserver.test.net" />',
                             html=True)
