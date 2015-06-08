@@ -3,7 +3,7 @@
 {% block pageheader %}Add CNAME record for {{ originating_record }}{% endblock pageheader %}
 
 {% block body %}
-<form class="form-horizontal" action="/add_cname_record/result/" method="post">{% csrf_token %}
+<form class="form-horizontal" action="{% url "add_cname_result" %}" method="post">{% csrf_token %}
   <legend>Create CNAME record</legend>
   <div class="form-group">
     <label for="id_dns_server" class="control-label col-md-2">DNS Server</label>
