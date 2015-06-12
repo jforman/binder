@@ -1,6 +1,7 @@
 # Binder #
 
 [![Build Status](https://travis-ci.org/jforman/binder.svg?branch=master)](https://travis-ci.org/jforman/binder)
+[![Code Health](https://landscape.io/github/jforman/binder/master/landscape.svg?style=flat)](https://landscape.io/github/jforman/binder/master)
 
 A Django web application for viewing and editing BIND DNS zone records.
 
