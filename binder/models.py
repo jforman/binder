@@ -3,7 +3,6 @@
 # Standard Imports
 import binascii
 import socket
-import urllib2
 
 # 3rd Party
 from pybindxml import reader as bindreader
@@ -22,20 +21,24 @@ TSIG_ALGORITHMS = (('HMAC-MD5.SIG-ALG.REG.INT', 'MD5'),
                    ('hmac-sha384', 'SHA384'),
                    ('hmac-sha512', 'SHA512'))
 
+
 class Key(models.Model):
-    """ Store and reference TSIG keys.
+
+    """Store and reference TSIG keys.
 
     TODO: Should/Can we encrypt these DNS keys in the DB?
     """
+
     name = models.CharField(max_length=255,
                             unique=True,
-                            help_text="A human readable name for the key to store, used for "
-                            "further references to the key.")
+                            help_text="A human readable name for the key to "
+                            "store, used for further references to the key.")
     data = models.CharField(max_length=255,
                             help_text="The private part of the TSIG key.")
     algorithm = models.CharField(max_length=255,
                                  choices=TSIG_ALGORITHMS,
-                                 help_text="The algorithm which has been used for the key.")
+                                 help_text="The algorithm which has been used "
+                                 "for the key.")
 
     def __unicode__(self):
         return self.name
@@ -56,10 +59,12 @@ class Key(models.Model):
 
 
 class BindServer(models.Model):
-    """ Store DNS servers and attributes for referencing their
-        statistics ports. Also reference FK for TSIG transfer keys,
-        if required.
+
+    """Store DNS servers and attributes for referencing their statistics ports.
+
+    Also reference FK for TSIG transfer keys, if required.
     """
+
     hostname = models.CharField(max_length=255,
                                 unique=True,
                                 help_text="Host name or IP address of the BIND server.")
@@ -85,7 +90,7 @@ class BindServer(models.Model):
         ordering = ["hostname"]
 
     def list_zones(self):
-        """ List the DNS zones and attributes.
+        """List the DNS zones and attributes.
 
         TODO: Parse these XML more intelligently. Grab the view name. Any other data available?
 
@@ -100,7 +105,7 @@ class BindServer(models.Model):
         return zone_data
 
     def list_zone_records(self, zone_name):
-        """ List all records in a specific zone.
+        """List all records in a specific zone.
 
         TODO: Print out current_record in the loop and see if we can parse this more programatically,
               rather than just splitting on space. What is the difference between class and type?
@@ -110,7 +115,6 @@ class BindServer(models.Model):
         Returns:
           List of Dicts { String rr_name, String rr_ttl, String rr_class, String rr_type, String rr_data }
         """
-
         try:
             transfer_key = Key.objects.get(name=self.default_transfer_key)
         except Key.DoesNotExist:
@@ -154,4 +158,3 @@ class BindServer(models.Model):
                 record_array.append(rr_dict)
 
         return record_array
-

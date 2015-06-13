@@ -3,6 +3,7 @@ from django.db import IntegrityError
 
 from binder import models
 
+
 class Model_BindServer_Tests(TestCase):
     def test_BindServerModel(self):
         """Test that adding a well-formed BindServer works."""
@@ -28,7 +29,7 @@ class Model_BindServer_Tests(TestCase):
 
 class Model_Key_Tests(TestCase):
     def test_KeyModel(self):
-        """ Test that adding a well-formed Key works."""
+        """Test that adding a well-formed Key works."""
         self.assertEqual(models.Key.objects.count(), 0)
         key_1 = models.Key(name="testkey1",
                            data="abc123",
@@ -38,4 +39,4 @@ class Model_Key_Tests(TestCase):
 
     def test_NonExistantKey(self):
         with self.assertRaisesMessage(models.Key.DoesNotExist, "Key matching query does not exist"):
-            this_key = models.Key.objects.get(name="does_not_exist")
+            models.Key.objects.get(name="does_not_exist")
