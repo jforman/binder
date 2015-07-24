@@ -4,6 +4,7 @@ from models import BindServer, Key
 from django.contrib import admin
 from django.forms import ModelForm, ValidationError
 
+
 class BindServerAdminForm(ModelForm):
     def clean_statistics_port(self):
         port = self.cleaned_data["statistics_port"]
@@ -12,7 +13,6 @@ class BindServerAdminForm(ModelForm):
                                   "a valid one between 1 and 65535.",
                                   params={'port': port})
         return self.cleaned_data["statistics_port"]
-
 
     def clean_dns_port(self):
         port = self.cleaned_data["dns_port"]
@@ -31,7 +31,7 @@ class BindServerAdmin(admin.ModelAdmin):
 class KeyAdminForm(ModelForm):
     def clean_data(self):
         try:
-            keyring = dns.tsigkeyring.from_text({'': self.cleaned_data["data"]})
+            dns.tsigkeyring.from_text({'': self.cleaned_data["data"]})
         except binascii.Error as err:
             raise ValidationError("Invalid key data: %(error)s",
                                   params={'error': err})
