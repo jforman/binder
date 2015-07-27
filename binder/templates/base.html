@@ -23,6 +23,9 @@
       <li role="presentation" class="active">Actions</li>
       <li role="presentation"><a href="{% url "index" %}">Home</a></li>
       <li role="presentation"><a href="{% url "server_list" %}">Server List</a></li>
+      {% if user.is_authenticated %}
+      <li role="presentation"><a href="{% url "logout" %}">Logout</a></li>
+      {% endif %}
     </ul>
     {% endblock navigation %}
   </div>

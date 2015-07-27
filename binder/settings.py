@@ -67,6 +67,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
+    'binder.middlewares.LoginRequiredMiddleware',
 )
 
 ROOT_URLCONF = 'binder.urls'
@@ -95,6 +96,8 @@ TTL_CHOICES = ((300, "5 minutes"),
 
 RECORD_TYPE_CHOICES = (("A", "A"),
                        ("AAAA", "AAAA"))
+
+LOGIN_REDIRECT_URL = '/'
 
 try:
     from local_settings import *

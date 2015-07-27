@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>Binder DNS Admin – Login</title>
+<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}bootstrap/css/bootstrap.css" />
+</head>
+<body>
+<div class="container">
+  <div class="page-header text-center">
+    <h1>Binder DNS Admin</h1>
+  </div>
+
+  {% if form.errors %}
+  <div class="row">
+    <div class="col-md-4"></div>
+    <div class="col-md-4 alert alert-danger text-center" role="alert">Wrong username or password! Please try again.</div>
+  </div>
+  {% endif %}
+
+  <form method="post" action="{% url 'django.contrib.auth.views.login' %}{% if next %}?next={{ next }}{% endif %}" class="form-horizontal" >
+    {% csrf_token %}
+    <div class="form-group">
+      <label for="{{ form.username.id_for_label }}" class="control-label col-md-5">Username</label>
+      <div class="controls col-md-3">
+        <input type="text" id="{{ form.username.id_for_label }}" name="username" class="form-control" value="{{ form.username.value|default_if_none:"" }}">
+      </div>
+    </div>
+    <div class="form-group">
+      <label for="{{ form.password.id_for_label }}" class="control-label col-md-5">Password</label>
+      <div class="controls col-md-3">
+        <input type="password" id="{{ form.password.id_for_label }}" name="password" class="form-control">
+      </div>
+    </div>
+
+    <div class="form-group">
+      <div class="col-md-5"></div>
+      <div class="col-md-3">
+        <button type="submit" class="btn btn-default">Login</button>
+      </div>
+    </div>
+  </form>
+</div>
+</body>
+</html>
