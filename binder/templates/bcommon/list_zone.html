@@ -11,7 +11,7 @@
 <input type="hidden" name="dns_server" value="{{ dns_server.hostname }}">
 <input type="hidden" name="zone_name" value="{{ zone_name }}">
 
-<table class="table table-condensed table-hover sortable">
+<table class="sortable table table-condensed table-hover">
 <tr>
   <th>Select</th>
   <th>Name</th>
@@ -19,12 +19,11 @@
   <th>Class</th>
   <th>Type</th>
   <th>Data</th>
-  <th></th>
+  <th>Actions</th>
 </tr>
-
 {% for current_record in zone_array %}
 <tr>
-  <td><input type="checkbox" id="rr_{{current_record.rr_name}}" name="rr_list" value="{{ current_record.rr_name }}.{{ zone_name }}" /></td>
+  <td><input type="checkbox" name="rr_list" value="{{ current_record.rr_name }}.{{ zone_name }}" /></td>
   <td>{{ current_record.rr_name }}</td>
   <td>{{ current_record.rr_ttl }}</td>
   <td>{{ current_record.rr_class }}</td>
@@ -33,7 +32,9 @@
   <td>
     <div class="btn-toolbar" style="margin: 0;">
       <div class="btn-group">
-        <button class="btn btn-default dropdown-toggle" data-toggle="dropdown">Record Actions <span class="caret"></span></button>
+        <button class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+          Record Actions <span class="caret"></span>
+        </button>
         <ul class="dropdown-menu">
           <li><a href="#">Edit Record (Coming Soon)</a></li>
           {% if current_record.rr_type == "A" %}
@@ -45,7 +46,6 @@
   </td>
 </tr>
 {% endfor %}
-
 </table>
 
 <button class="btn btn-danger" type="submit">Delete Selected</button>
