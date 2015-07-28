@@ -3,51 +3,65 @@
 {% block pageheader %}Delete record(s) in {{ zone_name }}{% endblock pageheader %}
 
 {% block body %}
-<form action="{% url "delete_record_result" %}" method="POST">
-  {% csrf_token %}
-<table class="sortable table table-hover">
-<tr>
-  <td>DNS Server</td>
-  <td>{{dns_server.hostname}}</td>
-</tr>
-<tr>
-  <td>Zone</td>
-  <td>{{zone_name}}</td>
-</tr>
-<tr>
-  <td>Records</td>
-  <td>{% for current_rr in rr_list %}
-    {{ current_rr }}<br>
-    {% endfor %}
-    </td>
-</tr>
-<tr>
-  <td><label for="id_key_name">TSIG Key</label></td>
-  <td>
-    <div class="form-group">
-      <div class="controls">
-        <select id="id_key_name" class="form-control" name="key_name">
-          {% for key in tsig_keys %}
+<form class="form-horizontal" action="{% url "delete_record_result" %}" method="POST">{% csrf_token %}
+  <legend>Delete Record</legend>
+
+  <div class="row">
+    <div class="col-sm-3"></div>
+    <p class="col-sm-5 col-md-4 bg-danger" style="padding: 1em; border-radius: 4px;">Do you really want to delete the following records?</p>
+  </div>
+
+  <div class="form-group">
+    <label for="dns_server" class="col-sm-3 control-label">Server:</label>
+    <input type="hidden" id="dns_server" name="dns_server" value="{{ dns_server.hostname }}" />
+    <div class="col-sm-5 col-md-4">
+      <p class="form-control-static">{{ dns_server.hostname }}</p>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label for="zone_name" class="col-sm-3 control-label">Zone:</label>
+    <input type="hidden" id="zone_name" name="zone_name" value="{{ zone_name }}" />
+    <div class="col-sm-5 col-md-4">
+      <p class="form-control-static">{{ zone_name }}</p>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label for="rr_list" class="col-sm-3 control-label">Records:</label>
+    <input type="hidden" id="rr_list" name="rr_list" value="{{ rr_list }}" />
+    <div class="col-sm-5 col-md-4">
+      <p class="form-control-static">{% for current_rr in rr_list %}{{ current_rr }}<br /> {% endfor %}</p>
+    </div>
+  </div>
+
+  <div class="form-group{% if form_errors.key_name %} has-error{% endif %}">
+    <label for="key_name" class="col-sm-3 control-label">TSIG Key:</label>
+    <div class="col-sm-5 col-md-4">
+      <select id="key_name" name="key_name" class="form-control">
+        {% for key in tsig_keys %}
           <option value="{{key.id}}"{% if key == dns_server.default_transfer_key %} selected="selected"{% endif %}>{{key}}</option>
-          {% empty %}
+        {% empty %}
           <option selected="selected" value=""/>
-          {% endfor %}
-        </select>
+        {% endfor %}
+      </select>
+    </div>
+    {% if form_errors.key_name %}
+    <div class="col-sm-4 col-md-5">
+      <div class="alert alert-danger">
+        {{ form_errors.key_name|stringformat:"s"|striptags }}
+        {% if form_data.key_name %} Previous Value: {{ form_data.key_name }}{% endif %}
       </div>
     </div>
-  </td>
-</tr>
-<tr>
-  <td>
-    <button type="submit" class="btn btn-default">Yes, really delete.</button>
-    <a href="{% url "zone_list" dns_server=dns_server zone_name=zone_name %}" class="btn btn-warning">Cancel</a>
-  </td>
-  <td></td>
-</tr>
-</table>
+    {% endif %}
+  </div>
 
-<input type="text" class="form-control hidden" name="dns_server" value="{{ dns_server.hostname }}"/>
-<input type="text" class="form-control hidden" name="zone_name" value="{{ zone_name }}"/>
-<input type="text" class="form-control hidden" name="rr_list" value="{{ rr_list }}"/>
+  <div class="form-group">
+    <div class="col-sm-3"></div>
+    <div class="col-sm-5 col-md-4">
+      <button type="submit" class="btn btn-default">Yes, I really want to delete them.</button>
+      <a href="{% url "zone_list" dns_server=dns_server zone_name=zone_name %}" class="btn btn-warning">Cancel</a>
+    </div>
+  </div>
 </form>
 {% endblock body %}

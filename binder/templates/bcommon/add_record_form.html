@@ -5,98 +5,113 @@
 {% block body %}
 <form class="form-horizontal" action="{% url "add_record_result" %}" method="POST">{% csrf_token %}
   <legend>Create Record</legend>
-  <div class="form-group">
-    <label for="id_dns_server" class="control-label col-md-2">DNS Server</label>
-    <div class="controls col-md-10">
-      <input type="text" id="id_dns_server" class="form-control" name="dns_server" value="{{dns_server.hostname}}" readonly />
+
+  <div class="form-group{% if form_errors.dns_server %} has-error{% endif %}">
+    <label for="dns_server" class="col-sm-3 control-label">DNS Server:</label>
+    <div class="col-sm-5 col-md-4">
+      <input id="dns_server" name="dns_server" type="text" class="form-control" value="{{dns_server.hostname}}" readonly="readonly" />
     </div>
-  </div>
-
-  <div class="form-group">
-    <label for="id_zone_name" class="control-label col-md-2">Zone</label>
-    <div class="controls col-md-10">
-      <input type="text" id="id_zone_name" class="form-control" name="zone_name" value="{{zone_name}}" readonly>
-    </div>
-  </div>
-
-
-  <div class="form-group">
-    <label for="id_record_name" class="control-label col-md-2">Record Name</label>
-    <div class="controls col-md-10">
-      {% if form_errors.record_name %}
-      <div class="alert alert-danger" role="alert">
-        Record Name: {{ form_errors.record_name|stringformat:"s"|striptags }} Previous Value: {{ form_data.record_name }}
+    {% if form_errors.dns_server %}
+    <div class="col-sm-4 col-md-5">
+      <div class="alert alert-danger">
+        {{ form_errors.dns_server|stringformat:"s"|striptags }}
+        {% if form_data.dns_server %}Previous Value: {{ form_data.dns_server }}{% endif %}
       </div>
-      {% endif %}
+    </div>
+    {% endif %}
+  </div>
+
+  <div class="form-group{% if form_errors.record_name %} has-error{% endif %}">
+    <label for="record_name" class="col-sm-3 control-label">Record Name:</label>
+    <div class="col-sm-5 col-md-4">
       <div class="input-group">
-        <input type="text" id="id_record_name" class="form-control" name="record_name"/>
-        <div class="input-group-addon">.{{zone_name}}</div>
+        <input id="record_name" name="record_name" type="text" class="form-control" />
+        <span class="input-group-addon">.{{zone_name}}</span>
+        <input type="hidden" name="zone_name" value="{{zone_name}}" />
       </div>
     </div>
+    {% if form_errors.record_name %}
+    <div class="col-sm-4 col-md-5">
+      <div class="alert alert-danger form-control-static">
+        {{ form_errors.record_name|stringformat:"s"|striptags }}
+        {% if form_data.record_name %} Previous Value: {{ form_data.record_name }}{% endif %}
+      </div>
+    </div>
+    {% endif %}
   </div>
 
-  <div class="form-group">
-    <label class="control-label col-md-2">Record Type</label>
-    <div class="controls col-md-10">
+  <div class="form-group{% if form_errors.record_type %} has-error{% endif %}">
+    <label for="record_type" class="col-sm-3 control-label">Record Type:</label>
+    <div class="col-sm-5 col-md-4">
+      <select id="record_type" name="record_type" class="form-control">
       {% if "in-addr.arpa" not in zone_name and "ip6.arpa" not in zone_name %}
-        {% for type, name in record_type_choices %}
-          <label for="id_record_type_{{ name }}" class="radio-inline">
-            <input type="radio" id="id_record_type_{{ name }}" name="record_type" value="{{name}}">{{name}}
-          </label>
-        {% endfor %}
+          {% for type, name in record_type_choices %}
+              <option value="{{name}}">{{name}}</option>
+          {% endfor %}
       {% else %}
-          <label for="id_record_type" class="radio-inline">
-            <input type="radio" id="id_record_type" name="record_type" id="record_type_PTR" value="PTR" checked="checked">PTR
-          </label>
+        <option value="PTR">PTR</option>
       {% endif %}
+      </select>
     </div>
+    {% if form_errors.record_type %}
+    <div class="col-sm-4 col-md-5">
+      <div class="alert alert-danger">
+        {{ form_errors.record_type|stringformat:"s"|striptags }}
+        {% if form_data.record_type %} Previous Value: {{ form_data.record_type }}{% endif %}
+      </div>
+    </div>
+    {% endif %}
   </div>
 
-  <div class="form-group">
-    <label for="id_record_data" class="control-label col-md-2">Record Data</label>
-    <div class="controls col-md-10">
-      {% if form_errors.record_data %}
-      <div class="alert alert-danger" role="alert">
-            Record Data: {{ form_errors.record_data|stringformat:"s"|striptags }} Previous Value: {{ form_data.record_data }}
-      </div>
-      {% endif %}
-      <div class="input-group">
-        <input type="text" id="id_record_data" class="form-control" name="record_data"/>
-        {% if "in-addr.arpa" not in zone_name and "ip6.arpa" not in zone_name %}
-        <div class="input-group-addon">IP Address</div>
-        {% else %}
-        <div class="input-group-addon">FQDN</div>
-        {% endif %}
+  <div class="form-group{% if form_errors.record_data %} has-error{% endif %}">
+    <label for="record_data" class="col-sm-3 control-label">Record Data:</label>
+    <div class="col-sm-5 col-md-4">
+      <input id="record_data" name="record_data" type="text" class="form-control" />
+    </div>
+    {% if form_errors.record_data %}
+    <div class="col-sm-4 col-md-5">
+      <div class="alert alert-danger">
+        {{ form_errors.record_data|stringformat:"s"|striptags }}
+        {% if form_data.record_data %} Previous Value: {{ form_data.record_data }}{% endif %}
       </div>
     </div>
+    {% endif %}
   </div>
-  
-  <div class="form-group">
-    <label class="control-label col-md-2">TTL</label>
-    <div class="controls col-md-10">
-      {% for ttl, description in ttl_choices %}
-        <label for="id_ttl_{{ ttl }}" class="radio-inline">
-          <input type="radio" id="id_ttl_{{ ttl }}" name="ttl" value="{{ttl}}">{{ttl}} ({{description}})
-        </label>
-      {% endfor %}
+
+  <div class="form-group{% if form_errors.ttl %} has-error{% endif %}">
+    <label for="ttl" class="col-sm-3 control-label">TTL: </label>
+    <div class="col-sm-5 col-md-4">
+      <select id="ttl" name="ttl" class="form-control">
+        {% for ttl, description in ttl_choices %}
+        <option value="{{ttl}}">
+        {{ttl}} ({{description}})
+      </option>
+        {% endfor %}
+      </select>
     </div>
+    {% if form_errors.ttl %}
+    <div class="col-sm-4 col-md-5">
+      <div class="alert alert-danger">
+        {{ form_errors.ttl|stringformat:"s"|striptags }}
+        {% if form_data.ttl %} Previous Value: {{ form_data.ttl }}{% endif %}
+      </div>
+    </div>
+    {% endif %}
   </div>
 
   {% if "in-addr.arpa" not in zone_name and "ip.arpa" not in zone_name %}
   <div class="form-group">
-    <label for="id_create_reverse" class="control-label col-md-2">Create PTR?</label>
-    <div class="checkbox controls col-md-10">
-      <label>
-        <input type="checkbox" id="id_create_reverse" name="create_reverse" id="create_reverse" value="True" aria-label="create ptr record?">Yes
-      <label>
+    <label for="create_reverse" class="col-sm-3 control-label checkbox">Create Reverse Record (PTR):</label>
+    <div class="col-sm-5 col-md-4">
+      <input type="checkbox" id="create_reverse" name="create_reverse" value="True" />
     </div>
   </div>
   {% endif %}
 
-  <div class="form-group">
-    <label for="id_key_name" class="control-label col-md-2">TSIG Key</label>
-    <div class="controls col-md-10">
-      <select id="id_key_name" class="form-control" name="key_name">
+  <div class="form-group{% if form_errors.key_name %} has-error{% endif %}">
+    <label for="key_name" class="col-sm-3 control-label">TSIG Key:</label>
+    <div class="col-sm-5 col-md-4">
+      <select id="key_name" name="key_name" class="form-control">
         {% for key in tsig_keys %}
           <option value="{{key.id}}"{% if key == dns_server.default_transfer_key %} selected="selected"{% endif %}>{{key}}</option>
         {% empty %}
@@ -104,9 +119,22 @@
         {% endfor %}
       </select>
     </div>
+    {% if form_errors.key_name %}
+    <div class="col-sm-4 col-md-5">
+      <div class="alert alert-danger">
+        {{ form_errors.key_name|stringformat:"s"|striptags }}
+        {% if form_data.key_name %} Previous Value: {{ form_data.key_name }}{% endif %}
+      </div>
+    </div>
+    {% endif %}
   </div>
 
-  <button type="submit" class="btn btn-default">Save Changes</button>
-  <a href="{% url "zone_list" dns_server=dns_server zone_name=zone_name %}" class="btn btn-warning">Cancel</a>
+  <div class="form-group">
+    <div class="col-sm-3"></div>
+    <div class="col-sm-5 col-md-4">
+      <button type="submit" class="btn btn-default">Save Changes</button>
+      <a href="{% url "zone_list" dns_server=dns_server zone_name=zone_name %}" class="btn btn-warning">Cancel</a>
+    </div>
+  </div>
 </form>
 {% endblock body %}
