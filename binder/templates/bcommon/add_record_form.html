@@ -6,41 +6,40 @@
 <form class="form-horizontal" action="{% url "add_record_result" %}" method="POST">{% csrf_token %}
   <legend>Create Record</legend>
 
-  <div class="form-group{% if form_errors.dns_server %} has-error{% endif %}">
+  <div class="form-group{% if form.dns_server.errors %} has-error{% endif %}">
     <label for="dns_server" class="col-sm-3 control-label">DNS Server:</label>
     <div class="col-sm-5 col-md-4">
       <input id="dns_server" name="dns_server" type="text" class="form-control" value="{{dns_server.hostname}}" readonly="readonly" />
     </div>
-    {% if form_errors.dns_server %}
+    {% if form.dns_server.errors %}
     <div class="col-sm-4 col-md-5">
       <div class="alert alert-danger">
-        {{ form_errors.dns_server|stringformat:"s"|striptags }}
-        {% if form_data.dns_server %}Previous Value: {{ form_data.dns_server }}{% endif %}
+        {{ form.dns_server.errors|stringformat:"s"|striptags }}
+        {% if form.dns_server.value %}Previous Value: {{ form.dns_server.value }}{% endif %}
       </div>
     </div>
     {% endif %}
   </div>
 
-  <div class="form-group{% if form_errors.record_name %} has-error{% endif %}">
+  <div class="form-group{% if form.record_name.errors %} has-error{% endif %}">
     <label for="record_name" class="col-sm-3 control-label">Record Name:</label>
     <div class="col-sm-5 col-md-4">
       <div class="input-group">
-        <input id="record_name" name="record_name" type="text" class="form-control" />
+        <input id="record_name" name="record_name" type="text" class="form-control"{% if form.record_name.value %} value="{{ form.record_name.value }}"{% endif %} />
         <span class="input-group-addon">.{{zone_name}}</span>
         <input type="hidden" name="zone_name" value="{{zone_name}}" />
       </div>
     </div>
-    {% if form_errors.record_name %}
+    {% if form.record_name.errors %}
     <div class="col-sm-4 col-md-5">
       <div class="alert alert-danger form-control-static">
-        {{ form_errors.record_name|stringformat:"s"|striptags }}
-        {% if form_data.record_name %} Previous Value: {{ form_data.record_name }}{% endif %}
+        {{ form.record_name.errors|stringformat:"s"|striptags }}
       </div>
     </div>
     {% endif %}
   </div>
 
-  <div class="form-group{% if form_errors.record_type %} has-error{% endif %}">
+  <div class="form-group{% if form.record_type.errors %} has-error{% endif %}">
     <label for="record_type" class="col-sm-3 control-label">Record Type:</label>
     <div class="col-sm-5 col-md-4">
       <select id="record_type" name="record_type" class="form-control">
@@ -53,32 +52,31 @@
       {% endif %}
       </select>
     </div>
-    {% if form_errors.record_type %}
+    {% if form.record_type.errors %}
     <div class="col-sm-4 col-md-5">
       <div class="alert alert-danger">
-        {{ form_errors.record_type|stringformat:"s"|striptags }}
-        {% if form_data.record_type %} Previous Value: {{ form_data.record_type }}{% endif %}
+        {{ form.record_type.errors|stringformat:"s"|striptags }}
+        {% if form.record_type.value %} Previous Value: {{ form.record_type.value }}{% endif %}
       </div>
     </div>
     {% endif %}
   </div>
 
-  <div class="form-group{% if form_errors.record_data %} has-error{% endif %}">
+  <div class="form-group{% if form.record_data.errors %} has-error{% endif %}">
     <label for="record_data" class="col-sm-3 control-label">Record Data:</label>
     <div class="col-sm-5 col-md-4">
-      <input id="record_data" name="record_data" type="text" class="form-control" />
+      <input id="record_data" name="record_data" type="text" class="form-control"{% if form.record_data.value %} value="{{ form.record_data.value }}"{% endif %} />
     </div>
-    {% if form_errors.record_data %}
+    {% if form.record_data.errors %}
     <div class="col-sm-4 col-md-5">
       <div class="alert alert-danger">
-        {{ form_errors.record_data|stringformat:"s"|striptags }}
-        {% if form_data.record_data %} Previous Value: {{ form_data.record_data }}{% endif %}
+        {{ form.record_data.errors|stringformat:"s"|striptags }}
       </div>
     </div>
     {% endif %}
   </div>
 
-  <div class="form-group{% if form_errors.ttl %} has-error{% endif %}">
+  <div class="form-group{% if form.ttl.errors %} has-error{% endif %}">
     <label for="ttl" class="col-sm-3 control-label">TTL: </label>
     <div class="col-sm-5 col-md-4">
       <select id="ttl" name="ttl" class="form-control">
@@ -89,11 +87,11 @@
         {% endfor %}
       </select>
     </div>
-    {% if form_errors.ttl %}
+    {% if form.ttl.errors %}
     <div class="col-sm-4 col-md-5">
       <div class="alert alert-danger">
-        {{ form_errors.ttl|stringformat:"s"|striptags }}
-        {% if form_data.ttl %} Previous Value: {{ form_data.ttl }}{% endif %}
+        {{ form.ttl.errors|stringformat:"s"|striptags }}
+        {% if form.ttl.value %} Previous choice: {{ form.ttl.value }}{% endif %}
       </div>
     </div>
     {% endif %}
@@ -108,7 +106,7 @@
   </div>
   {% endif %}
 
-  <div class="form-group{% if form_errors.key_name %} has-error{% endif %}">
+  <div class="form-group{% if form.key_name.errors %} has-error{% endif %}">
     <label for="key_name" class="col-sm-3 control-label">TSIG Key:</label>
     <div class="col-sm-5 col-md-4">
       <select id="key_name" name="key_name" class="form-control">
@@ -119,11 +117,11 @@
         {% endfor %}
       </select>
     </div>
-    {% if form_errors.key_name %}
+    {% if form.key_name.errors %}
     <div class="col-sm-4 col-md-5">
       <div class="alert alert-danger">
-        {{ form_errors.key_name|stringformat:"s"|striptags }}
-        {% if form_data.key_name %} Previous Value: {{ form_data.key_name }}{% endif %}
+        {{ form.key_name.errors|stringformat:"s"|striptags }}
+        {% if form.key_name.value %} Previous choice: {{ form.key_name.value }}{% endif %}
       </div>
     </div>
     {% endif %}

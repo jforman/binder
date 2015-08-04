@@ -6,56 +6,55 @@
 <form class="form-horizontal" action="{% url "add_cname_result" %}" method="post">{% csrf_token %}
   <legend>Create CNAME record</legend>
 
-  <div class="form-group{% if form_errors.dns_server %} has-error{% endif %}">
+  <div class="form-group{% if form.dns_server.errors %} has-error{% endif %}">
     <label for="dns_server" class="col-sm-3 control-label">DNS Server:</label>
     <div class="col-sm-5 col-md-4">
       <input id="dns_server" name="dns_server" type="text" class="form-control" value="{{dns_server.hostname}}" readonly="readonly" />
     </div>
-    {% if form_errors.dns_server %}
+    {% if form.dns_server.errors %}
     <div class="col-sm-4 col-md-5">
       <div class="alert alert-danger">
-        {{ form_errors.dns_server|stringformat:"s"|striptags }}
-        {% if form_data.dns_server %} Previous Value: {{ form_data.dns_server }}{% endif %}
+        {{ form.dns_server.errors|stringformat:"s"|striptags }}
+        {% if form.dns_server.value %} Previous Value: {{ form.dns_server.value }}{% endif %}
       </div>
     </div>
     {% endif %}
   </div>
 
-  <div class="form-group{% if form_errors.originating_record %} has-error{% endif %}">
+  <div class="form-group{% if form.originating_record.errors %} has-error{% endif %}">
     <label for="originating_record" class="col-sm-3 control-label">Originating Record: </label>
     <div class="col-sm-5 col-md-4">
       <input type="text" id="originating_record" name="originating_record" class="form-control" value="{{originating_record}}" readonly="readonly"/>
     </div>
-    {% if form_errors.originating_record %}
+    {% if form.originating_record.errors %}
     <div class="col-sm-4 col-md-5">
       <div class="alert alert-danger">
-        {{ form_errors.originating_record|stringformat:"s"|striptags }}
-        {% if form_data.originating_record %} Previous Value: {{ form_data.originating_record }}{% endif %}
+        {{ form.originating_record.errors|stringformat:"s"|striptags }}
+        {% if form.originating_record.value %} Previous Value: {{ form.originating_record.value }}{% endif %}
       </div>
     </div>
     {% endif %}
   </div>
 
-  <div class="form-group{% if form_errors.cname %} has-error{% endif %}">
+  <div class="form-group{% if form.cname.errors %} has-error{% endif %}">
     <label for="cname" class="col-sm-3 control-label">CNAME: </label>
     <div class="col-sm-5 col-md-4">
       <div class="input-group">
-        <input id="cname" name="cname" type="text" class="form-control" />
+        <input id="cname" name="cname" type="text" class="form-control"{% if form.cname.value %} value="{{ form.cname.value }}"{% endif %}/>
         <span class="input-group-addon">.{{zone_name}}</span>
         <input type="hidden" name="zone_name" value="{{zone_name}}"/>
       </div>
     </div>
-    {% if form_errors.cname  %}
+    {% if form.cname.errors  %}
     <div class="col-sm-4 col-md-5">
       <div class="alert alert-danger">
-        CNAME: {{ form_errors.cname|stringformat:"s"|striptags }}
-        {% if form_data.cnamr %} Previous Value: {{ form_data.cname }}{% endif %}
+        {{ form.cname.errors|stringformat:"s"|striptags }}
       </div>
     </div>
     {% endif %}
   </div>
 
-  <div class="form-group{% if form_errors.ttl %} has-error{% endif %}">
+  <div class="form-group{% if form.ttl.errors %} has-error{% endif %}">
     <label for="ttl" class="col-sm-3 control-label">TTL: </label>
     <div class="col-sm-5 col-md-4">
       <select id="ttl" name="ttl" class="form-control">
@@ -66,17 +65,17 @@
         {% endfor %}
       </select>
     </div>
-    {% if form_errors.ttl %}
+    {% if form.ttl.errors %}
     <div class="col-sm-4 col-md-5">
       <div class="alert alert-danger">
-        {{ form_errors.ttl|stringformat:"s"|striptags }}
-        {% if form_data.ttl %} Previous Value: {{ form_data.ttl }}{% endif %}
+        {{ form.ttl.errors|stringformat:"s"|striptags }}
+        {% if form.ttl.value %} Previous choice: {{ form.ttl.value }}{% endif %}
       </div>
     </div>
     {% endif %}
   </div>
 
-  <div class="form-group{% if form_errors.key_name %} has-error{% endif %}">
+  <div class="form-group{% if form.key_name.errors %} has-error{% endif %}">
     <label for="key_name" class="col-sm-3 control-label">TSIG Key:</label>
     <div class="col-sm-5 col-md-4">
       <select id="key_name" name="key_name" class="form-control">
@@ -87,11 +86,11 @@
         {% endfor %}
       </select>
     </div>
-    {% if form_errors.key_name %}
+    {% if form.key_name.errors %}
     <div class="col-sm-4 col-md-5">
       <div class="alert alert-danger">
-        {{ form_errors.key_name|stringformat:"s"|striptags }}
-        {% if form_data.key_name %} Previous Value: {{ form_data.key_name }}{% endif %}
+        {{ form.key_name.errors|stringformat:"s"|striptags }}
+        {% if form.key_name.value %} Previous choice: {{ form.key_name.value }}{% endif %}
       </div>
     </div>
     {% endif %}

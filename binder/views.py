@@ -120,8 +120,7 @@ def view_add_record_result(request):
                    "tsig_keys": models.Key.objects.all(),
                    "ttl_choices": settings.TTL_CHOICES,
                    "record_type_choices": settings.RECORD_TYPE_CHOICES,
-                   "form_errors": form.errors,
-                   "form_data": request.POST})
+                   "form": form})
 
 
 def view_add_cname_record(request, dns_server, zone_name, record_name):
@@ -145,15 +144,15 @@ def view_add_cname_result(request):
     add_cname_response = ""
     form = forms.FormAddCnameRecord(request.POST)
     if form.is_valid():
-        cd = form.cleaned_data
+        form_cleaned = form.cleaned_data
         try:
             add_cname_response = helpers.add_cname_record(
-                cd["dns_server"],
-                cd["zone_name"],
-                cd["cname"],
-                str(cd["originating_record"]),
-                cd["ttl"],
-                cd["key_name"])
+                form_cleaned["dns_server"],
+                form_cleaned["zone_name"],
+                form_cleaned["cname"],
+                str(form_cleaned["originating_record"]),
+                form_cleaned["ttl"],
+                form_cleaned["key_name"])
         except exceptions.RecordException, err:
             errors = err
 
@@ -168,10 +167,9 @@ def view_add_cname_result(request):
                    "zone_name": request.POST["zone_name"],
                    "record_name": request.POST["cname"],
                    "originating_record": request.POST["originating_record"],
-                   "form_data": request.POST,
-                   "form_errors": form.errors,
                    "ttl_choices": settings.TTL_CHOICES,
-                   "tsig_keys": models.Key.objects.all()})
+                   "tsig_keys": models.Key.objects.all(),
+                   "form": form})
 
 
 def view_delete_record(request):
