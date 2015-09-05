@@ -17,7 +17,7 @@ class ZoneException(Exception):
 
 class RecordException(Exception):
 
-    """Thrown when there is an issue dealign with a Record.
+    """Thrown when there is an issue dealing with a Record.
 
     * Adding or deleting.
     """
