@@ -57,9 +57,7 @@ class PostTests(TestCase):
         response = self.client.post(reverse("delete_record",
                                             kwargs={'dns_server': dns_server,
                                                     'zone_name': zone_name}),
-                                    {"dns_server": dns_server,
-                                     "zone_name": zone_name,
-                                     "rr_list": []}, follow=True)
+                                    {"rr_list": []}, follow=True)
         self.assertRedirects(response,
                              reverse("zone_list",
                                      kwargs={'dns_server': dns_server,
@@ -75,9 +73,7 @@ class PostTests(TestCase):
         response = self.client.post(reverse("delete_record",
                                             kwargs={'dns_server': dns_server,
                                                     'zone_name': zone_name}),
-                                            {"dns_server": dns_server,
-                                             "zone_name": zone_name,
-                                             "rr_list": ["testrecord1.testzone1.test.net",
+                                            {"rr_list": ["testrecord1.testzone1.test.net",
                                                          "testrecord2.testzone1.test.net"]})
 
         self.assertEqual(response.status_code, 200)
