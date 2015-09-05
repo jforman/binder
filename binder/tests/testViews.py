@@ -54,7 +54,9 @@ class PostTests(TestCase):
         """Ensure the initial deletion form works as expected with no RR list."""
         dns_server = "testserver.test.net"
         zone_name = "testzone1.test.net"
-        response = self.client.post(reverse("delete_record"),
+        response = self.client.post(reverse("delete_record",
+                                            kwargs={'dns_server': dns_server,
+                                                    'zone_name': zone_name}),
                                     {"dns_server": dns_server,
                                      "zone_name": zone_name,
                                      "rr_list": []}, follow=True)
@@ -68,10 +70,15 @@ class PostTests(TestCase):
 
     def test_DeleteRecordInitial(self):
         """Ensure the initial deletion form works as expected with RRs mentioned."""
-        response = self.client.post(reverse("delete_record"), {"dns_server": "testserver.test.net",
-                                                               "zone_name": "testzone1.test.net",
-                                                               "rr_list": ["testrecord1.testzone1.test.net",
-                                                                           "testrecord2.testzone1.test.net"]})
+        dns_server = "testserver.test.net"
+        zone_name = "testzone1.test.net"
+        response = self.client.post(reverse("delete_record",
+                                            kwargs={'dns_server': dns_server,
+                                                    'zone_name': zone_name}),
+                                            {"dns_server": dns_server,
+                                             "zone_name": zone_name,
+                                             "rr_list": ["testrecord1.testzone1.test.net",
+                                                         "testrecord2.testzone1.test.net"]})
 
         self.assertEqual(response.status_code, 200)
         self.assertContains(response,
