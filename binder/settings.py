@@ -1,5 +1,6 @@
 # Django settings for binder project.
 import os
+from django.contrib.messages import constants as messages
 
 SITE_ROOT = os.path.dirname(os.path.realpath(__file__))
 DEBUG = True
@@ -87,6 +88,38 @@ INSTALLED_APPS = (
 )
 
 TEST_RUNNER = 'django.test.runner.DiscoverRunner'
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format' : "[%(asctime)s] %(levelname)s [%(name)s:%(lineno)s] %(message)s",
+            'datefmt' : "%d/%b/%Y %H:%M:%S"
+        }
+    },
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose'
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'propagate': True,
+            'level': 'INFO'
+        },
+        'binder': {
+            'handlers': ['console'],
+            'level': 'DEBUG'
+        }
+    }
+}
+
+MESSAGE_TAGS = {
+    messages.ERROR: 'danger'
+}
 
 TTL_CHOICES = ((300, "5 minutes"),
                (1800, "30 minutes"),
