@@ -65,7 +65,10 @@ def view_add_record(request, dns_server, zone_name):
     this_server = get_object_or_404(models.BindServer, hostname=dns_server)
 
     if request.method == 'POST':
-        form = forms.FormAddForwardRecord(request.POST)
+        if "in-addr.arpa" in zone_name or "ip6.arpa" in zone_name:
+            form = forms.FormAddReverseRecord(request.POST)
+        else:
+            form = forms.FormAddForwardRecord(request.POST)
         if form.is_valid():
             form_cleaned = form.cleaned_data
             try:

@@ -77,7 +77,8 @@ class FormAddReverseRecord(forms.Form):
                                                   "is PTR."})
     zone_name = forms.CharField(max_length=100)
     record_data = CustomStringPeriodSuffix(required=True)
-    ttl = forms.ChoiceField(choices=settings.TTL_CHOICES)
+    ttl = forms.ChoiceField(choices=settings.TTL_CHOICES,
+                            widget=forms.RadioSelect)
     key_name = forms.ModelChoiceField(queryset=Key.objects.all(),
                                       required=False,
                                       widget=forms.RadioSelect,
