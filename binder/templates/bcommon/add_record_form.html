@@ -1,9 +1,9 @@
 {% extends "base.html" %}
 
-{% block pageheader %}Add record in {{ zone_name }}{% endblock pageheader %}
+{% block pageheader %}Add record in {{ form.zone_name.value }}{% endblock pageheader %}
 
 {% block body %}
-<form class="form-horizontal" action="{% url "add_record_result" %}" method="POST">{% csrf_token %}
+<form class="form-horizontal" action="{% url "add_record" dns_server=dns_server zone_name=form.zone_name.value %}" method="POST">{% csrf_token %}
   <legend>Create Record</legend>
 
   <div class="form-group{% if form.dns_server.errors %} has-error{% endif %}">
@@ -26,8 +26,8 @@
     <div class="col-sm-5 col-md-4">
       <div class="input-group">
         <input id="record_name" name="record_name" type="text" class="form-control"{% if form.record_name.value %} value="{{ form.record_name.value }}"{% endif %} />
-        <span class="input-group-addon">.{{zone_name}}</span>
-        <input type="hidden" name="zone_name" value="{{zone_name}}" />
+        <span class="input-group-addon">.{{ form.zone_name.value }}</span>
+        <input type="hidden" name="zone_name" value="{{ form.zone_name.value }}" />
       </div>
     </div>
     {% if form.record_name.errors %}
@@ -43,9 +43,9 @@
     <label for="record_type" class="col-sm-3 control-label">Record Type:</label>
     <div class="col-sm-5 col-md-4">
       <select id="record_type" name="record_type" class="form-control">
-      {% if "in-addr.arpa" not in zone_name and "ip6.arpa" not in zone_name %}
-          {% for type, name in record_type_choices %}
-              <option value="{{name}}">{{name}}</option>
+      {% if "in-addr.arpa" not in form.zone_name.value and "ip6.arpa" not in form.zone_name.value %}
+          {% for choice in form.record_type %}
+              <option value="{{ choice.choice_value }}">{{ choice.choice_label }}</option>
           {% endfor %}
       {% else %}
         <option value="PTR">PTR</option>
@@ -80,10 +80,8 @@
     <label for="ttl" class="col-sm-3 control-label">TTL: </label>
     <div class="col-sm-5 col-md-4">
       <select id="ttl" name="ttl" class="form-control">
-        {% for ttl, description in ttl_choices %}
-        <option value="{{ttl}}">
-        {{ttl}} ({{description}})
-      </option>
+        {% for choice in form.ttl %}
+        <option value="{{ choice.choice_value }}">{{ choice.choice_value }} ({{ choice.choice_label }})</option>
         {% endfor %}
       </select>
     </div>
@@ -97,7 +95,7 @@
     {% endif %}
   </div>
 
-  {% if "in-addr.arpa" not in zone_name and "ip.arpa" not in zone_name %}
+  {% if "in-addr.arpa" not in form.zone_name.value and "ip.arpa" not in form.zone_name.value %}
   <div class="form-group">
     <label for="create_reverse" class="col-sm-3 control-label checkbox">Create Reverse Record (PTR):</label>
     <div class="col-sm-5 col-md-4">
@@ -110,10 +108,10 @@
     <label for="key_name" class="col-sm-3 control-label">TSIG Key:</label>
     <div class="col-sm-5 col-md-4">
       <select id="key_name" name="key_name" class="form-control">
-        {% for key in tsig_keys %}
-          <option value="{{key.id}}"{% if key == dns_server.default_transfer_key %} selected="selected"{% endif %}>{{key}}</option>
+        {% for key in form.key_name %}
+          <option value="{{ key.choice_value }}"{% if key.choice_value|add:0 == dns_server.default_transfer_key.id %} selected="selected"{% endif %}>{{ key.choice_label }}</option>
         {% empty %}
-          <option selected="selected" value=""/>
+          <option selected="selected" value="" />
         {% endfor %}
       </select>
     </div>
@@ -131,7 +129,7 @@
     <div class="col-sm-3"></div>
     <div class="col-sm-5 col-md-4">
       <button type="submit" class="btn btn-default">Save Changes</button>
-      <a href="{% url "zone_list" dns_server=dns_server zone_name=zone_name %}" class="btn btn-warning">Cancel</a>
+      <a href="{% url "zone_list" dns_server=dns_server zone_name=form.zone_name.value %}" class="btn btn-warning">Cancel</a>
     </div>
   </div>
 </form>

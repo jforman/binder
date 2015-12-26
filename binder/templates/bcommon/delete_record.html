@@ -3,7 +3,7 @@
 {% block pageheader %}Delete record(s) in {{ zone_name }}{% endblock pageheader %}
 
 {% block body %}
-<form class="form-horizontal" action="{% url "delete_record_result" %}" method="POST">{% csrf_token %}
+<form class="form-horizontal" action="{% url "delete_record" dns_server=dns_server zone_name=zone_name %}" method="POST">{% csrf_token %}
   <legend>Delete Record</legend>
 
   <div class="row">
@@ -39,10 +39,10 @@
     <label for="key_name" class="col-sm-3 control-label">TSIG Key:</label>
     <div class="col-sm-5 col-md-4">
       <select id="key_name" name="key_name" class="form-control">
-        {% for key in tsig_keys %}
-          <option value="{{key.id}}"{% if key == dns_server.default_transfer_key %} selected="selected"{% endif %}>{{key}}</option>
+        {% for key in form.key_name %}
+          <option value="{{ key.choice_value }}"{% if key.choice_value|add:0 == dns_server.default_transfer_key.id %} selected="selected"{% endif %}>{{ key.choice_label }}</option>
         {% empty %}
-          <option selected="selected" value=""/>
+          <option selected="selected" value="" />
         {% endfor %}
       </select>
     </div>

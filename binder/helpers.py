@@ -1,11 +1,13 @@
 # Binder Helpers
 
 # Standard Imports
+import logging
 import re
 import socket
 
 # 3rd Party
 import dns.query
+import dns.rcode
 import dns.reversename
 import dns.tsig
 import dns.tsigkeyring
@@ -13,6 +15,7 @@ import dns.update
 
 # App Imports
 from binder import models
+from binder.exceptions import KeyringException, RecordException
 
 
 def add_record(dns_server, zone_name, record_name, record_type, record_data,
@@ -89,11 +92,13 @@ def delete_record(dns_server, rr_list, key_name):
     """Delete a list of DNS records passed as strings in rr_items."""
     server = models.BindServer.objects.get(hostname=dns_server)
 
+    logger = logging.getLogger('binder.helpers')
     try:
         transfer_key = models.Key.objects.get(name=key_name)
-    except models.Key.DoesNotExist:
-        keyring = None
-        algorithm = None
+    except models.Key.DoesNotExist as exc:
+        logger.error(exc)
+        raise KeyringException("The specified TSIG key %s does not exist in "
+                               "binders configuration." % key_name)
     else:
         keyring = transfer_key.create_keyring()
         algorithm = transfer_key.algorithm
@@ -107,13 +112,19 @@ def delete_record(dns_server, rr_list, key_name):
                                        keyring=keyring,
                                        keyalgorithm=algorithm)
         dns_update.delete(record)
-        output = send_dns_update(dns_update,
-                                 dns_server,
-                                 server.dns_port,
-                                 key_name)
-
-        delete_response.append({"description": "Delete Record: %s" % current_rr,
-                                "output": output})
+        try:
+            output = send_dns_update(dns_update,
+                                    dns_server,
+                                    server.dns_port,
+                                    key_name)
+        except (KeyringException, RecordException) as exc:
+            delete_response.append({"description": exc,
+                                    "record": current_rr,
+                                    "success": False})
+        else:
+            delete_response.append({"description": output,
+                                    "record": current_rr,
+                                    "success": True})
 
     return delete_response
 
@@ -123,11 +134,13 @@ def create_update(dns_server, zone_name, record_name, record_type, record_data,
     """Update/Create DNS record of name and type with passed data and ttl."""
     server = models.BindServer.objects.get(hostname=dns_server)
 
+    logger = logging.getLogger('binder.helpers')
     try:
         transfer_key = models.Key.objects.get(name=key_name)
-    except models.Key.DoesNotExist:
-        keyring = None
-        algorithm = None
+    except models.Key.DoesNotExist as exc:
+        logger.error(exc)
+        raise KeyringException("The specified TSIG key %s does not exist in "
+                               "binders configuration." % key_name)
     else:
         keyring = transfer_key.create_keyring()
         algorithm = transfer_key.algorithm
@@ -174,13 +187,21 @@ def send_dns_update(dns_message, dns_server, port, key_name):
     Returns:
         String output
     """
+    logger = logging.getLogger('binder.helpers')
     try:
         output = dns.query.tcp(dns_message, dns_server, port=port)
-    except dns.tsig.PeerBadKey:
-        output = ("DNS server %s is not configured for TSIG key: %s." %
-                  (dns_server, key_name))
-    except dns.tsig.PeerBadSignature:
-        output = ("DNS server %s did like the TSIG signature we sent. Check "
-                  "key %s for correctness." % (dns_server, key_name))
-
+    except dns.tsig.PeerBadKey as exc:
+        logger.error(exc)
+        raise KeyringException("DNS server %s is not configured for TSIG key: %s." %
+                               (dns_server, key_name))
+    except dns.tsig.PeerBadSignature as exc:
+        logger.error(exc)
+        raise KeyringException("DNS server %s didn't like the TSIG signature "
+                               "we sent. Check key %s for correctness." %
+                               (dns_server, key_name))
+    logger.debug(output)
+    return_code = output.rcode()
+    if return_code != dns.rcode.NOERROR:
+        raise RecordException('Error when requesting DNS server %s: %s' %
+                                (dns_server, dns.rcode.to_text(return_code)))
     return output

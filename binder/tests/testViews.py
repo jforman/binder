@@ -27,18 +27,6 @@ class GetTests(TestCase):
         response = self.client.get(reverse("server_list"))
         self.assertEqual(response.status_code, 200)
 
-    def test_GetResultRedirects(self):
-        """GETing a /result/ URL should always redirect to /."""
-        response = self.client.get(reverse("add_record_result"), follow=True)
-        self.assertRedirects(response, reverse("index"))
-        self.assertEqual(response.status_code, 200)
-        response = self.client.get(reverse("delete_record_result"), follow=True)
-        self.assertRedirects(response, reverse("index"))
-        self.assertEqual(response.status_code, 200)
-        response = self.client.get(reverse("add_cname_result"), follow=True)
-        self.assertRedirects(response, reverse("index"))
-        self.assertEqual(response.status_code, 200)
-
     def test_GetInvalidServer(self):
         """Get a zone list for a server not in the database."""
         server_name = "unconfigured.server.net"
@@ -64,28 +52,31 @@ class PostTests(TestCase):
 
     def test_DeleteRecordInitial_Empty(self):
         """Ensure the initial deletion form works as expected with no RR list."""
-        response = self.client.post(reverse("delete_record"),
-                                    {"dns_server": "testserver.test.net",
-                                     "zone_name": "testzone1.test.net",
-                                     "rr_list": []})
-
-        self.assertContains(response,
-                            '<input type="hidden" id="zone_name" name="zone_name" value="testzone1.test.net" />',
-                            html=True)
-        self.assertContains(response,
-                            '<input type="hidden" id="rr_list" name="rr_list" value="[]" />',
-                            html=True)
-        self.assertContains(response,
-                            '<input type="hidden" id="dns_server" name="dns_server" value="testserver.test.net" />',
-                            html=True)
+        dns_server = "testserver.test.net"
+        zone_name = "testzone1.test.net"
+        response = self.client.post(reverse("delete_record",
+                                            kwargs={'dns_server': dns_server,
+                                                    'zone_name': zone_name}),
+                                    {"rr_list": []}, follow=True)
+        self.assertRedirects(response,
+                             reverse("zone_list",
+                                     kwargs={'dns_server': dns_server,
+                                             'zone_name': zone_name}))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Select at least one record for deletion.")
 
 
     def test_DeleteRecordInitial(self):
         """Ensure the initial deletion form works as expected with RRs mentioned."""
-        response = self.client.post(reverse("delete_record"), {"dns_server": "testserver.test.net",
-                                                               "zone_name": "testzone1.test.net",
-                                                               "rr_list": ["testrecord1.testzone1.test.net",
-                                                                           "testrecord2.testzone1.test.net"]})
+        dns_server = "testserver.test.net"
+        zone_name = "testzone1.test.net"
+        response = self.client.post(reverse("delete_record",
+                                            kwargs={'dns_server': dns_server,
+                                                    'zone_name': zone_name}),
+                                            {"rr_list": ["testrecord1.testzone1.test.net",
+                                                         "testrecord2.testzone1.test.net"]})
+
+        self.assertEqual(response.status_code, 200)
         self.assertContains(response,
                             '<input type="hidden" id="zone_name" name="zone_name" value="testzone1.test.net" />', html=True)
         self.assertContains(response,
