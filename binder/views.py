@@ -112,10 +112,10 @@ def view_add_cname_record(request, dns_server, zone_name, record_name):
                                          form_cleaned["key_name"])
             except (KeyringException, RecordException) as exc:
                 messages.error(request, "Adding %s.%s failed: %s" %
-                               (form_cleaned["record_name"], zone_name, exc))
+                               (form_cleaned["cname"], zone_name, exc))
             else:
                 messages.success(request, "%s.%s was added successfully." %
-                                 (form_cleaned["record_name"], zone_name))
+                                 (form_cleaned["cname"], zone_name))
                 return redirect('zone_list',
                                 dns_server=dns_server,
                                 zone_name=zone_name)
