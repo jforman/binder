@@ -11,7 +11,7 @@ Binder supports adding and deleting DNS records (and eventually editing in place
 
 Packages:
 
-* [Django](http://www.djangoproject.com)
+* [Django](http://www.djangoproject.com) >=1.8
 * Python Modules
   * [pybindxml](https://pypi.python.org/pypi?name=pybindxml&:action=display): This is a shared library I wrote to scrape and stick into Python dict objects various server/zone data from a BIND DNS server.
   * Beautifulsoup4: This library is included as a dependency of pybindmlx when you  when you install pybindxml.
@@ -42,7 +42,7 @@ binder/
 
 The development server is run as most Django dev servers are run.
 
-    /opt/binder/manage.py syncdb
+    /opt/binder/manage.py migrate
     /opt/binder/manage.py runserver
 
 Once you have the Django server up and running, you will want to configure at least one BIND server in the Django Admin app. This includes a hostname, TCP statistics port and a default TSIG transfer key to be used when doing AXFR actions (if necessary).

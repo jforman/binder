@@ -4,7 +4,6 @@ from django.contrib.messages import constants as messages
 
 SITE_ROOT = os.path.dirname(os.path.realpath(__file__))
 DEBUG = True
-TEMPLATE_DEBUG = DEBUG
 
 ADMINS = (
     # ('Your Name', 'your_email@domain.com'),
@@ -56,11 +55,25 @@ except IOError:
     except IOError:
         Exception('Please create a %s file with random characters to generate your secret key!' % SECRET_FILE)
 
-# List of callables that know how to import templates from various sources.
-TEMPLATE_LOADERS = (
-    'django.template.loaders.filesystem.Loader',
-    'django.template.loaders.app_directories.Loader',
-)
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'APP_DIRS': True,
+        'DIRS': os.path.join(SITE_ROOT, "templates"),
+        'OPTIONS': {
+            'context_processors': [
+                'django.contrib.auth.context_processors.auth',
+                'django.template.context_processors.debug',
+                'django.template.context_processors.i18n',
+                'django.template.context_processors.media',
+                'django.template.context_processors.static',
+                'django.template.context_processors.tz',
+                'django.contrib.messages.context_processors.messages'
+                ],
+            'debug': True
+            }
+    }
+]
 
 MIDDLEWARE_CLASSES = (
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -72,10 +85,6 @@ MIDDLEWARE_CLASSES = (
 )
 
 ROOT_URLCONF = 'binder.urls'
-
-TEMPLATE_DIRS = (
-    os.path.join(SITE_ROOT, "templates"),
-)
 
 INSTALLED_APPS = (
     'django.contrib.contenttypes',
