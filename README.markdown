@@ -27,7 +27,7 @@ Once the git repository has been cloned these can be installed with one command
 
 Packages installed:
 
-* [Django](http://www.djangoproject.com)
+* [Django](http://www.djangoproject.com) >=1.8
 * Python Modules
   * [pybindxml](https://pypi.python.org/pypi?name=pybindxml&:action=display): This is a shared library I wrote to scrape and stick into Python dict objects various server/zone data from a BIND DNS server.
   * Beautifulsoup4: This library is included as a dependency of pybindmlx when you  when you install pybindxml.

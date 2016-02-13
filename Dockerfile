@@ -4,29 +4,20 @@ MAINTAINER Jeffrey Forman <code@jeffreyforman.net>
 
 ENV DEBIAN_FRONTEND noninteractive
 
-RUN apt-get update && apt-get install -y \
+RUN apt-get update && apt-get install -y --no-install-recommends \
     git \
-    python-bs4 \
-    python-dev \
-    python-django \
-    python-dnspython \
-    python-lxml \
-    python-pip \
-    python-sqlite 
+    python-pip
 
-RUN pip install \
-    pybindxml
+RUN git clone https://github.com/jforman/binder.git /opt/binder/
 
-WORKDIR /opt
+RUN pip install -r /opt/binder/requirements.txt
 
-RUN git clone https://github.com/jforman/binder.git
+ENV	PYTHONPATH $PYTHONPATH:/opt/binder
+ENV	DJANGO_SETTINGS_MODULE binder.settings
 
-env	PYTHONPATH $PYTHONPATH:/opt/binder
-env	DJANGO_SETTINGS_MODULE binder.settings
+RUN ["/opt/binder/manage.py", "migrate"]
+RUN ["/opt/binder/manage.py", "loaddata", "/opt/binder/binder/fixtures/initial_data.json"]
 
-run ["/opt/binder/manage.py", "migrate"]
-run ["/opt/binder/manage.py", "loaddata", "/opt/binder/binder/fixtures/initial_data.json"]
-
-expose :8000
+EXPOSE :8000
 
 CMD ["/opt/binder/manage.py", "runserver", "0.0.0.0:8000"]
