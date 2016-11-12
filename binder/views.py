@@ -61,7 +61,7 @@ def view_zone_records(request, dns_server, zone_name):
 
 
 def view_add_record(request, dns_server, zone_name):
-    """View to allow to add A records."""
+    """View to add an RR record to DNS zone."""
     this_server = get_object_or_404(models.BindServer, hostname=dns_server)
 
     if request.method == 'POST':
@@ -89,6 +89,8 @@ def view_add_record(request, dns_server, zone_name):
                 return redirect('zone_list',
                                 dns_server=dns_server,
                                 zone_name=zone_name)
+        else:
+            messages.error(request, "Form data was invalid. Check all inputs.")
     else:
         form = forms.FormAddForwardRecord(initial={'zone_name': zone_name})
 

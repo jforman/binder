@@ -3,6 +3,8 @@
 # 3rd Party
 from django import forms
 from django.conf import settings
+from django.contrib import messages
+from django.core import validators
 from django.forms import ValidationError
 
 # App Imports
@@ -55,7 +57,7 @@ class FormAddForwardRecord(forms.Form):
     record_type = forms.ChoiceField(choices=settings.RECORD_TYPE_CHOICES,
                                     widget=forms.RadioSelect)
     zone_name = forms.CharField(max_length=100)
-    record_data = forms.GenericIPAddressField()
+    record_data = forms.CharField(max_length=100)
     ttl = forms.ChoiceField(choices=settings.TTL_CHOICES,
                             widget=forms.RadioSelect)
     create_reverse = forms.BooleanField(required=False)
@@ -64,6 +66,16 @@ class FormAddForwardRecord(forms.Form):
                                       widget=forms.RadioSelect,
                                       empty_label=None)
 
+
+    def clean(self):
+        cleaned_data = super(FormAddForwardRecord, self).clean()
+        record_type = cleaned_data.get("record_type")
+        record_data = cleaned_data.get("record_data")
+        if record_type in ("A", "AAAA"):
+            try:
+                validators.validate_ipv46_address(record_data)
+            except:
+                raise ValidationError("Invalid IP Address.")
 
 class FormAddReverseRecord(forms.Form):
 
