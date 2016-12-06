@@ -18,7 +18,7 @@
   </div>
   {% endif %}
 
-  <form method="post" action="{% url 'django.contrib.auth.views.login' %}{% if next %}?next={{ next }}{% endif %}" class="form-horizontal" >
+  <form method="post" action="{% url 'login' %}{% if next %}?next={{ next }}{% endif %}" class="form-horizontal" >
     {% csrf_token %}
     <div class="form-group">
       <label for="{{ form.username.id_for_label }}" class="control-label col-md-5">Username</label>
