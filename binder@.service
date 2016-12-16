@@ -1,0 +1,15 @@
+[Unit]
+Description=Docker BIND Admin
+After=docker.service
+Requires=docker.service
+
+[Service]
+TimeoutStartSec=20m
+ExecStartPre=-/usr/bin/docker kill binder-%i
+ExecStartPre=-/usr/bin/docker rm binder-%i
+ExecStartPre=/usr/bin/docker pull jforman/binder
+ExecStart=/usr/bin/docker run --rm --name binder-%i -p 8000:8000 jforman/binder
+ExecStop=/usr/bin/docker stop binder-%i
+
+[X-Fleet]
+Conflicts=binder@*.service
