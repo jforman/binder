@@ -1,3 +1,4 @@
 Django>=1.10
 dnspython>=1.11
-pybindxml>=0.4
+git+https://github.com/jforman/pybindxml@0.6.1
+lxml
