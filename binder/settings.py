@@ -4,7 +4,6 @@ from django.contrib.messages import constants as messages
 
 SITE_ROOT = os.path.dirname(os.path.realpath(__file__))
 DEBUG = True
-
 ADMINS = (
     # ('Your Name', 'your_email@domain.com'),
 )
@@ -63,6 +62,7 @@ TEMPLATES = [
         'OPTIONS': {
             'context_processors': [
                 'django.contrib.auth.context_processors.auth',
+                'django.core.context_processors.request',
                 'django.template.context_processors.debug',
                 'django.template.context_processors.i18n',
                 'django.template.context_processors.media',

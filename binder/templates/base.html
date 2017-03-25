@@ -53,6 +53,7 @@
       </ul>
       {% endif %}
       {% block body %}{% endblock body %}
+      Served by: {{ request.META.SERVER_NAME }}
     </div>
   </div>
 </div>
