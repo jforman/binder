@@ -3,6 +3,7 @@ FROM python:2.7
 MAINTAINER Jeffrey Forman <code@jeffreyforman.net>
 
 ENV DEBIAN_FRONTEND noninteractive
+ENV NODB 1
 
 RUN apt-get update \
      && rm -rf /var/lib/apt/lists/*
