@@ -9,16 +9,28 @@ ADMINS = (
 )
 
 MANAGERS = ADMINS
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3', # Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': os.path.join(SITE_ROOT, 'db') + '/binder.db', # Or path to database file if using sqlite3.
-        'USER': '',                      # Not used with sqlite3.
-        'PASSWORD': '',                  # Not used with sqlite3.
-        'HOST': '',                      # Set to empty string for localhost. Not used with sqlite3.
-        'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
+
+ALLOWED_HOSTS=['*']
+
+if os.getenv('NODB'):
+    print "Attempting to use Sqlite database at %s" % (os.path.join(SITE_ROOT, 'db') + '/binder.db')
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': os.path.join(SITE_ROOT, 'db') + '/binder.db',
+        }
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.mysql',
+            'NAME': os.environ.get('DJANGO_DB_NAME', 'binder'),
+            'USER': os.environ.get('DJANGO_DB_USER', ''),
+            'PASSWORD': os.environ.get('DJANGO_DB_PASSWORD', ''),
+            'HOST': os.environ.get('DJANGO_DB_HOST', ''),
+            'PORT': 3306,
+        }
+    }
 
 TIME_ZONE = 'America/New_York'
 

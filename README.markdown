@@ -5,81 +5,97 @@
 
 A Django web application for viewing and editing BIND DNS zone records.
 
-Binder supports adding and deleting DNS records (and eventually editing in place). TSIG-authenticated transfers and updates are supported.
+## Download ##
 
-The Binder repository is housed in a [Github](http://github.com/jforman/binder) repository. The repo containts all the Django code and example configuration data for running Binder both in development and production.
+```
+git clone https://github.com/jforman/binder.git
+```
 
-## Installation ##
+## Requirements ##
 
-There are some build dependencies for the Python mondules, on apt based systems these can be installed with
+The requirements.txt file has the necessary dependencies.
 
-    apt-get install python-dev libxml2-dev libxslt-dev git
-
-Initial checkout has to be performed with git
-
-    git clone https://github.com/jforman/binder.git
-
-### Requirements ###
-
-Once the git repository has been cloned these can be installed with one command
-
-    pip install -r requirements.txt
-
-Packages installed:
-
-* [Django](http://www.djangoproject.com) >=1.8
-* Python Modules
-  * [pybindxml](https://pypi.python.org/pypi?name=pybindxml&:action=display): This is a shared library I wrote to scrape and stick into Python dict objects various server/zone data from a BIND DNS server.
-  * Beautifulsoup4: This library is included as a dependency of pybindmlx when you  when you install pybindxml.
-  * [python-dnspython](http://www.dnspython.org/)
-  * [python-sqlite](http://docs.python.org/2/library/sqlite3.html) (If you will be using Sqlite for server and key storage)
-
-Elsewhere you will need a [Bind DNS Server](http://www.isc.org/software/bind) running (at least version 9.5.x, which provides instrumentation for gathering process and zone statistics remotely).
-
-To verify that required and optional dependencies are installed, execute [check-dependencies.py](https://github.com/jforman/binder/blob/master/check-dependencies.py). This script checks that various Python modules will import correctly.
-
-Binder is intended to be installed into the /opt directory in /opt/binder. Forthcoming deb packages will provide for this easy installation and upgrades.
-
-## Configuration ##
-
-### binder/ ###
-
-If you wish to override anything from settings.py it should be done in a new file
-
-* local_settings.py: Local settings called by Binder templates for TTL choices, record types handled, etc.
-
-### config/ ###
-
-Provided under the config directory are various example configurations for runing Binder:
-
-* binder-apache.conf.dist: Name-based virtual host configuration for running Binder under Apache.
-* django.wsgi: WSGI configuration file called by Apache to run Binder.
-* binder-nginx.conf.dist: Name-based virtual host configuration for running Binder under Nginx using fcgi.
-* binder-upstart.conf.dist: Ubuntu Upstart configuration file for starting Binder upon machine startup.
-
-These are not necesary for development but are useful once moving to production.
-
-### Admin user ###
-
-It is necesary to create an administrative user
-
-    python manage.py createsuperuser
+```
+pip install -r requirements.txt
+```
 
 ## Running Binder ##
-The development server is run as most Django dev servers are run.
 
-    /opt/binder/manage.py migrate
-    /opt/binder/manage.py runserver
+Over the course of developing Binder, it has come to the fore that using a container makes development and runnin Binder much easier.
 
-Once you have the Django server up and running, you will want to configure at least one BIND server in the Django Admin app. This includes a hostname, TCP statistics port and a default TSIG transfer key to be used when doing AXFR actions (if necessary).
+### Local Sqlite database ###
 
-Keys should also be created, if needed. The name of the key should match the contents of the below noted key file. Along side the name, key data and type should also be specified.
+```
+docker run -e NODB=1 jforman/binder:latest
+```
+### Admin user ###
 
-Once these two pieces of configuration are done, open up [http://yourserver:port/](http://yourserver:port) to access Binder and begin DNS zone management.
+Default admin user for Binder is 'admin', and password is 'admin' as well.
 
-## BIND DNS Server ##
+### MySQL database ###
 
-When Binder accesses your BIND DNS server, it first queries the statistics port to gather zone information. This includes zone name, view, and serial number. This is all configured by some of the following configuration examples.
+```
+docker run -e DJANGO_DB_HOST="XXXX",DJANGO_DB_PASSWORD="YYYY",DJANGO_DB_USER="binder" jforman/binder:latest
+```
+
+The Django settings.py is configured to accept the following environment
+variables when configuring a MySQL-based backend database.
+
+* DJANGO_DB_HOST: IP address or Hostname of the MySQL database host.
+* DJANGO_DB_NAME: Name of the MySQL database.
+* DJANGO_DB_USER: Username to access the above database.
+* DJANGO_DB_PASSWORD: Binder Database password
+
+### Manually ###
+
+Or you can run Binder directly on your host using the Django devserver.
+
+```
+export NODB=1
+python manage.py migrate
+python manage.py createsuperuser
+python manage.py runserver
+```
+
+## Develop Binder
+
+If you want to develop on Binder, I've tried to write down the steps I use.
+
+`develop.sh` is a shell script that will start a Docker container based off the
+same image as the one on Docker hub. Only this script will mount your
+Binder code directory into /code in the container.
+
+Before any development can commence, you will need to install the requirements.
+
+From inside the container:
+
+```
+pip install -r requirements.txt
+```
+
+### Generating a new initial_data.json
+
+Certain versions of Django cause changes in the schema of the admin table.
+In this case, I've found a (perhaps less than proper) workflow for creating
+a new initial_data.json file. This uses a local Sqlite database file for
+bootstrapping.
+
+```
+export NODB=1
+python manage.py migrate
+python manage.py createsuperuser
+...
+python manage.py dumpdata -o binder/fixtures/initial_data.json
+```
+
+## External configuration ##
+
+Aside from the Binder application itself, other infrastructure is required
+to make Binder useful.
+
+### BIND DNS Server ###
+
+When Binder accesses your BIND DNS server, it first queries the statistics port to gather zone information. This includes zone name, view, and serial number.
 
 #### named.conf ####
 
@@ -93,7 +109,9 @@ We must provide server statistics from the BIND process itself. This allows Bind
         inet * port 8053 allow { 10.10.0.0/24; };
     };
 
-This tells bind to start an HTTP server on port 8053 on all interfaces, allowing 10.10.0.0/24 to make requests on this interface, http://${bind_server}:8053/. You will most likely want to narrow down the subset of hosts or subnets that can query BIND for this data. This data can be viewed via your choice of Browser, or read by your favorite programming language and progamatically processed by your choice of XML library.
+This tells bind to start an HTTP server on port 8053 on all interfaces, allowing 10.10.0.0/24 to make requests on this interface, http://${bind_server}:8053/. You will most likely want to narrow down list of source hosts/IPs who can query BIND for this data.
+
+It is smart to include your TSIG key in a separate file. This way if you choose to have specific ACLs for your named.conf that are different from your TSIG key, this can be done.
 
     include "/etc/bind/dynzone.key";
 
@@ -120,9 +138,8 @@ referenced as 'dynzone-key' in named.conf
 
 For information on TSIG see http://www.cyberciti.biz/faq/unix-linux-bind-named-configuring-tsig/ .
 
-### Related Configuration ###
 
-#### Apache HTTPD ####
+### Apache HTTPD ###
 
 If you are using Apache to front-end your Binder Django app, the following two configuration files can be used as starting points.
 
@@ -130,10 +147,21 @@ If you are using Apache to front-end your Binder Django app, the following two c
 
 [django.wsgi](https://github.com/jforman/binder/blob/master/config/django.wsgi): WSGI configuration file used by Apache to run the actual Django app.
 
-#### Nginx ####
+### Nginx ###
 
 [binder-nginx.conf.dist](https://github.com/jforman/binder/blob/master/config/binder-nginx.conf.dist): Nginx virtual host configuraiton. This configuration expects Django to be running in fcgi mode on port 4001 on 127.0.0.1.
 
-#### Ubuntu Upstart ####
+#### MySQL ###
 
-To have Binder start upon system boot, if you are running Ubuntu, I have provided an [example Upstart configurarton](https://github.com/jforman/binder/blob/master/config/binder-upstart.conf.dist) to be installed in /etc/init/.
+If you choose to use MySQL as your backing datastore, the following commands
+will help you get up and running quickly.
+
+```
+create database binder;
+
+create user 'binder'@'%' identified by 'INSERTYOURPASSWORDHERE';
+
+grant all privileges on binder.* to 'binder'@'%';
+
+flush privileges;
+```
