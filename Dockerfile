@@ -4,10 +4,6 @@ MAINTAINER Jeffrey Forman <code@jeffreyforman.net>
 
 ENV DEBIAN_FRONTEND noninteractive
 
-# Uncomment the following line to not use a remote database,
-# and to use a local Sqlite database file.
-# ENV NODB 1
-
 RUN apt-get update \
      && rm -rf /var/lib/apt/lists/*
 
