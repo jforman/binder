@@ -26,7 +26,7 @@ Over the course of developing Binder, it has come to the fore that using a conta
 ### Local Sqlite database ###
 
 ```
-docker run -e NODB=1 jforman/binder:latest
+docker run jforman/binder:latest
 ```
 ### Admin user ###
 
@@ -34,8 +34,9 @@ Default admin user for Binder is 'admin', and password is 'admin' as well.
 
 ### MySQL database ###
 
+If you wish to use a MySQL database, the following structure works:
 ```
-docker run -e DJANGO_DB_HOST="XXXX",DJANGO_DB_PASSWORD="YYYY",DJANGO_DB_USER="binder" jforman/binder:latest
+docker run -e 'DJANGO_DB_HOST=XXXX' -e 'DJANGO_DB_PASSWORD=YYYY' -e 'DJANGO_DB_USER=binder' jforman/binder:latest
 ```
 
 The Django settings.py is configured to accept the following environment
@@ -51,7 +52,6 @@ variables when configuring a MySQL-based backend database.
 Or you can run Binder directly on your host using the Django devserver.
 
 ```
-export NODB=1
 python manage.py migrate
 python manage.py createsuperuser
 python manage.py runserver
@@ -81,7 +81,6 @@ a new initial_data.json file. This uses a local Sqlite database file for
 bootstrapping.
 
 ```
-export NODB=1
 python manage.py migrate
 python manage.py createsuperuser
 ...
