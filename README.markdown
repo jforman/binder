@@ -36,16 +36,19 @@ Default admin user for Binder is 'admin', and password is 'admin' as well.
 
 If you wish to use a MySQL database, the following structure works:
 ```
-docker run -e 'DJANGO_DB_HOST=XXXX' -e 'DJANGO_DB_PASSWORD=YYYY' -e 'DJANGO_DB_USER=binder' jforman/binder:latest
+docker run -e 'DJANGO_DB_HOST=XXXX' -e 'DJANGO_DB_PASSWORD=YYYY' -e 'DJANGO_DB_NAME=ZZZZ' -e 'DJANGO_DB_USER=binder' jforman/binder:latest
 ```
 
 The Django settings.py is configured to accept the following environment
 variables when configuring a MySQL-based backend database.
 
-* DJANGO_DB_HOST: IP address or Hostname of the MySQL database host.
-* DJANGO_DB_NAME: Name of the MySQL database.
-* DJANGO_DB_USER: Username to access the above database.
-* DJANGO_DB_PASSWORD: Binder Database password
+* DJANGO_DB_HOST: IP address or Hostname of the MySQL database host. (Required)
+* DJANGO_DB_NAME: Name of the MySQL database. (Required)
+* DJANGO_DB_USER: Username to access the above database. (Optional. Default: binder)
+* DJANGO_DB_PASSWORD: Binder Database password (Required)
+
+If you wish to use MySQL as the backing database, you must specify all required
+parameters.
 
 ### Manually ###
 
