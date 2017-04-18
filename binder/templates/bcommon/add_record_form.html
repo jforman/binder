@@ -1,8 +1,18 @@
 {% extends "base.html" %}
 
-{% block pageheader %}Add record in {{ form.zone_name.value }}{% endblock pageheader %}
+{% block pageheader %}
+{% if 'add_record' in request.path %}
+Add
+{% elif 'edit_record' in request.path %}
+Edit
+{% else %}
+Unknown Action!
+{% endif %}
+record in {{ form.zone_name.value }}
+{% endblock pageheader %}
 
 {% block body %}
+
 <form class="form-horizontal" action="{% url "add_record" dns_server=dns_server zone_name=form.zone_name.value %}" method="POST">{% csrf_token %}
   <legend>Create Record</legend>
 
@@ -25,7 +35,7 @@
     <label for="record_name" class="col-sm-3 control-label">Record Name:</label>
     <div class="col-sm-5 col-md-4">
       <div class="input-group">
-        <input id="record_name" name="record_name" type="text" class="form-control"{% if form.record_name.value %} value="{{ form.record_name.value }}"{% endif %} />
+        <input id="record_name" name="record_name" type="text" class="form-control"{% if form.record_name.value %} value="{{ form.record_name.value }}" readonly="readonly"{% endif %}/>
         <span class="input-group-addon">.{{ form.zone_name.value }}</span>
         <input type="hidden" name="zone_name" value="{{ form.zone_name.value }}" />
       </div>
@@ -45,7 +55,7 @@
       <select id="record_type" name="record_type" class="form-control">
       {% if "in-addr.arpa" not in form.zone_name.value and "ip6.arpa" not in form.zone_name.value %}
           {% for choice in form.record_type %}
-              <option value="{{ choice.choice_value }}">{{ choice.choice_label }}</option>
+            {{ choice }}
           {% endfor %}
       {% else %}
         <option value="PTR">PTR</option>
@@ -81,7 +91,7 @@
     <div class="col-sm-5 col-md-4">
       <select id="ttl" name="ttl" class="form-control">
         {% for choice in form.ttl %}
-        <option value="{{ choice.choice_value }}">{{ choice.choice_value }} ({{ choice.choice_label }})</option>
+          {{ choice }}
         {% endfor %}
       </select>
     </div>
@@ -108,10 +118,8 @@
     <label for="key_name" class="col-sm-3 control-label">TSIG Key:</label>
     <div class="col-sm-5 col-md-4">
       <select id="key_name" name="key_name" class="form-control">
-        {% for key in form.key_name %}
-          <option value="{{ key.choice_value }}"{% if key.choice_value|add:0 == dns_server.default_transfer_key.id %} selected="selected"{% endif %}>{{ key.choice_label }}</option>
-        {% empty %}
-          <option selected="selected" value="" />
+        {% for choice in form.key_name %}
+          {{ choice }}
         {% endfor %}
       </select>
     </div>

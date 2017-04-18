@@ -39,10 +39,8 @@
     <label for="key_name" class="col-sm-3 control-label">TSIG Key:</label>
     <div class="col-sm-5 col-md-4">
       <select id="key_name" name="key_name" class="form-control">
-        {% for key in form.key_name %}
-          <option value="{{ key.choice_value }}"{% if key.choice_value|add:0 == dns_server.default_transfer_key.id %} selected="selected"{% endif %}>{{ key.choice_label }}</option>
-        {% empty %}
-          <option selected="selected" value="" />
+        {% for choice in form.key_name %}
+         {{ choice }}
         {% endfor %}
       </select>
     </div>
