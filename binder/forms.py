@@ -54,18 +54,12 @@ class FormAddForwardRecord(forms.Form):
     record_name = forms.RegexField(max_length=100,
                                    regex="^[a-zA-Z0-9-_]+$",
                                    required=False)
-    record_type = forms.ChoiceField(choices=settings.RECORD_TYPE_CHOICES,
-                                    widget=forms.RadioSelect)
+    record_type = forms.ChoiceField(choices=settings.RECORD_TYPE_CHOICES)
     zone_name = forms.CharField(max_length=100)
     record_data = forms.CharField(max_length=100)
-    ttl = forms.ChoiceField(choices=settings.TTL_CHOICES,
-                            widget=forms.RadioSelect)
+    ttl = forms.ChoiceField(choices=settings.TTL_CHOICES)
     create_reverse = forms.BooleanField(required=False)
-    key_name = forms.ModelChoiceField(queryset=Key.objects.all(),
-                                      required=False,
-                                      widget=forms.RadioSelect,
-                                      empty_label=None)
-
+    key_name = forms.ModelChoiceField(queryset=Key.objects.all(), required=True)
 
     def clean(self):
         cleaned_data = super(FormAddForwardRecord, self).clean()
@@ -89,13 +83,9 @@ class FormAddReverseRecord(forms.Form):
                                                   "is PTR."})
     zone_name = forms.CharField(max_length=100)
     record_data = CustomStringPeriodSuffix(required=True)
-    ttl = forms.ChoiceField(choices=settings.TTL_CHOICES,
-                            widget=forms.RadioSelect)
-    key_name = forms.ModelChoiceField(queryset=Key.objects.all(),
-                                      required=False,
-                                      widget=forms.RadioSelect,
-                                      empty_label=None)
+    ttl = forms.ChoiceField(choices=settings.TTL_CHOICES)
     create_reverse = forms.BooleanField(required=False)
+    key_name = forms.ModelChoiceField(queryset=Key.objects.all(), required=True)
 
 
 class FormAddCnameRecord(forms.Form):
@@ -106,12 +96,8 @@ class FormAddCnameRecord(forms.Form):
     originating_record = forms.CharField(max_length=100)
     cname = forms.RegexField(max_length=100, regex="^[a-zA-Z0-9-_]+$")
     zone_name = forms.CharField(max_length=256)
-    ttl = forms.ChoiceField(choices=settings.TTL_CHOICES,
-                            widget=forms.RadioSelect)
-    key_name = forms.ModelChoiceField(queryset=Key.objects.all(),
-                                      required=False,
-                                      widget=forms.RadioSelect,
-                                      empty_label=None)
+    ttl = forms.ChoiceField(choices=settings.TTL_CHOICES)
+    key_name = forms.ModelChoiceField(queryset=Key.objects.all(), required=True)
 
 
 class FormDeleteRecord(forms.Form):
@@ -121,7 +107,4 @@ class FormDeleteRecord(forms.Form):
     dns_server = forms.CharField(max_length=100)
     zone_name = forms.CharField(max_length=256)
     rr_list = CustomUnicodeListField()
-    key_name = forms.ModelChoiceField(queryset=Key.objects.all(),
-                                      required=False,
-                                      widget=forms.RadioSelect,
-                                      empty_label=None)
+    key_name = forms.ModelChoiceField(queryset=Key.objects.all(), required=True)
