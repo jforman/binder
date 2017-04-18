@@ -63,7 +63,6 @@ def view_zone_records(request, dns_server, zone_name):
 def view_add_record(request, dns_server, zone_name):
     """View to add an RR record to DNS zone."""
     this_server = get_object_or_404(models.BindServer, hostname=dns_server)
-
     if request.method == 'POST':
         if "in-addr.arpa" in zone_name or "ip6.arpa" in zone_name:
             form = forms.FormAddReverseRecord(request.POST)
@@ -92,7 +91,59 @@ def view_add_record(request, dns_server, zone_name):
         else:
             messages.error(request, "Form data was invalid. Check all inputs.")
     else:
-        form = forms.FormAddForwardRecord(initial={'zone_name': zone_name})
+        # TODO: do this key_id logic on all forms for default key.
+        key_id = models.BindServer.objects.get(
+            hostname=dns_server).default_transfer_key.id
+        form = forms.FormAddForwardRecord(initial={
+                                            'zone_name': zone_name,
+                                            'key_name': key_id
+                                            })
+
+    return render(request, "bcommon/add_record_form.html",
+                  {"dns_server": this_server,
+                   "form": form})
+
+def view_edit_record(request, dns_server, zone_name, record_name=None,
+                     record_type=None, record_data=None, record_ttl=None):
+    """View to edit an RR record to DNS zone."""
+    this_server = get_object_or_404(models.BindServer, hostname=dns_server)
+    if request.method == 'POST':
+        if "in-addr.arpa" in zone_name or "ip6.arpa" in zone_name:
+            form = forms.FormAddReverseRecord(request.POST)
+        else:
+            form = forms.FormAddForwardRecord(request.POST)
+        if form.is_valid():
+            form_cleaned = form.cleaned_data
+            try:
+                helpers.add_record(form_cleaned["dns_server"],
+                                   str(form_cleaned["zone_name"]),
+                                   str(form_cleaned["record_name"]),
+                                   str(form_cleaned["record_type"]),
+                                   str(form_cleaned["record_data"]),
+                                   form_cleaned["ttl"],
+                                   form_cleaned["key_name"],
+                                   form_cleaned["create_reverse"])
+            except (KeyringException, RecordException) as exc:
+                messages.error(request, "Modifying %s.%s failed: %s" %
+                               (form_cleaned["record_name"], zone_name, exc))
+            else:
+                messages.success(request, "%s.%s was modified successfully." %
+                                 (form_cleaned["record_name"], zone_name))
+                return redirect('zone_list',
+                                dns_server=dns_server,
+                                zone_name=zone_name)
+        else:
+            messages.error(request, "Form data was invalid. Check all inputs.")
+    else:
+        key_id = models.BindServer.objects.get(
+            hostname=dns_server).default_transfer_key.id
+        form = forms.FormAddForwardRecord(initial={'zone_name': zone_name,
+                                                   'record_name': record_name,
+                                                   'record_data': record_data,
+                                                   'ttl': record_ttl,
+                                                   'record_type': record_type,
+                                                   'key_name': key_id
+        })
 
     return render(request, "bcommon/add_record_form.html",
                   {"dns_server": this_server,
@@ -125,8 +176,12 @@ def view_add_cname_record(request, dns_server, zone_name, record_name):
                                 dns_server=dns_server,
                                 zone_name=zone_name)
     else:
-        form = forms.FormAddCnameRecord(initial={'originating_record': record_name,
-                                                 'zone_name': zone_name})
+        key_id = models.BindServer.objects.get(
+            hostname=dns_server).default_transfer_key.id
+        form = forms.FormAddCnameRecord(initial={
+            'originating_record': record_name,
+            'zone_name': zone_name,
+            'key_name': key_id})
 
     return render(request, "bcommon/add_cname_record_form.html",
                   {"dns_server": this_server,
@@ -169,7 +224,12 @@ def view_delete_record(request, dns_server, zone_name):
                                 dns_server=dns_server,
                                 zone_name=zone_name)
     else:
-        form = forms.FormDeleteRecord(initial={'zone_name': zone_name})
+        key_id = models.BindServer.objects.get(
+            hostname=dns_server).default_transfer_key.id
+        form = forms.FormDeleteRecord(initial={
+            'zone_name': zone_name,
+            'key_name': key_id
+            })
 
     return render(request, "bcommon/delete_record.html",
                   {"dns_server": dns_server,

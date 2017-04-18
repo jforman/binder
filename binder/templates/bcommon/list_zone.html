@@ -32,7 +32,7 @@
           Record Actions <span class="caret"></span>
         </button>
         <ul class="dropdown-menu">
-          <li><a href="#">Edit Record (Coming Soon)</a></li>
+          <li><a href="{% url "edit_record" dns_server=dns_server.hostname zone_name=zone_name record_name=current_record.rr_name record_data=current_record.rr_data record_ttl=current_record.rr_ttl%}">Edit Record</a></li>
           {% if current_record.rr_type == "A" %}
           <li><a href="{% url "add_cname" dns_server=dns_server.hostname zone_name=zone_name record_name=current_record.rr_name %}">Add CNAME Pointer</a></li>
           {% endif %}
