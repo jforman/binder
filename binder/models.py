@@ -5,6 +5,7 @@ import binascii
 import socket
 
 # 3rd Party
+from cryptography.fernet import Fernet, InvalidToken
 from pybindxml import reader as bindreader
 import dns.exception
 import dns.query
@@ -14,6 +15,7 @@ import dns.zone
 # App Imports
 from binder import exceptions
 from django.db import models
+from django.conf import settings
 
 TSIG_ALGORITHMS = (('HMAC-MD5.SIG-ALG.REG.INT', 'MD5'),
                    ('hmac-sha1', 'SHA1'),
@@ -24,10 +26,7 @@ TSIG_ALGORITHMS = (('HMAC-MD5.SIG-ALG.REG.INT', 'MD5'),
 
 class Key(models.Model):
 
-    """Store and reference TSIG keys.
-
-    TODO: Should/Can we encrypt these DNS keys in the DB?
-    """
+    """Store and reference TSIG keys."""
 
     name = models.CharField(max_length=255,
                             unique=True,
@@ -46,16 +45,37 @@ class Key(models.Model):
     class Meta:
         ordering = ["name"]
 
+
+    def save(self, *args, **kwargs):
+        f = Fernet(settings.FERNET_KEY)
+        crypted_key = f.encrypt(bytes(self.data))
+        self.data = crypted_key
+        super(Key, self).save(*args, **kwargs)
+
     def create_keyring(self):
         if self.name is None:
             return None
 
         try:
-            keyring = dns.tsigkeyring.from_text({self.name: self.data})
+            key_data = self.decrypt_keydata()
+            keyring = dns.tsigkeyring.from_text({self.name: key_data})
         except binascii.Error, err:
             raise exceptions.KeyringException("Incorrect key data. Verify key: %s. Reason: %s" % (self.name, err))
 
         return keyring
+
+    def decrypt_keydata(self, key=None):
+        if key:
+            fernet_key=key
+        else:
+            fernet_key=settings.FERNET_KEY
+        try:
+            f = Fernet(fernet_key)
+            decrypted_key = f.decrypt(bytes(self.data))
+        except InvalidToken:
+            raise exceptions.KeyringException()
+
+        return decrypted_key
 
 
 class BindServer(models.Model):

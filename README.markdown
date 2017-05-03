@@ -90,6 +90,14 @@ python manage.py createsuperuser
 python manage.py dumpdata -o binder/fixtures/initial_data.json
 ```
 
+### Encrypted TSIG Keys ###
+
+Starting with version 1.5, TSIG keys inside the database are encrypted using the [Crytography](https://cryptography.io/en/latest/fernet/) library and Fernet facilities.
+
+Normally on startup, a new Fernet encryption key is created. This will change upon reboot as the process dies and restarts.
+
+If you wish to use a statically configured encryption/decryption key, one must pass the DJANGO_FERNET_KEY environment variable, containing this key string. This *should* be used in production. This key *MUST* be kept secret or your TSIG keys will be able to be decrypted.
+
 ## External configuration ##
 
 Aside from the Binder application itself, other infrastructure is required

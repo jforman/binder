@@ -53,6 +53,13 @@ def view_zone_records(request, dns_server, zone_name):
         return render(request, "bcommon/list_zone.html",
                       {"zone_name": zone_name,
                        "dns_server": this_server})
+    except KeyringException:
+        messages.error(request, "Unable to get zone list. A problem was encountered "
+                       "decrypting your TSIG key. Ensure the key is correctly "
+                       "specified in the Binder Database.")
+        return render(request, "bcommon/list_zone.html",
+                      { "dns_server": this_server,
+                        "zone_name" :zone_name })
 
     return render(request, "bcommon/list_zone.html",
                   {"zone_array": zone_array,

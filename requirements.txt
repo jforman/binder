@@ -1,3 +1,4 @@
+cryptography
 Django>=1.10
 dnspython>=1.11
 git+https://github.com/jforman/pybindxml@0.6.1

@@ -1,6 +1,7 @@
 # Django settings for binder project.
 import logging
 import os
+from cryptography.fernet import Fernet
 from django.contrib.messages import constants as messages
 
 logger = logging.getLogger(__name__)
@@ -162,6 +163,16 @@ RECORD_TYPE_CHOICES = (("A", "A"),
                        ("CNAME", "CNAME"))
 
 LOGIN_REDIRECT_URL = '/'
+
+# TSIG Encryption Key
+# If not passed as an environment variable,
+# create a new Fernet key for encrypting the TSIG key.
+
+# NOTE: In production, you'll want to pass your own key in.
+# Otherwise, on successive Binder restarts, you will not be able
+# to decrypt your TSIG Key and perform DNS updates because the keys
+# would have changed.
+FERNET_KEY=os.environ.get("DJANGO_FERNET_KEY", Fernet.generate_key())
 
 try:
     from local_settings import *
