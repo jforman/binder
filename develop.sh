@@ -1,3 +1,4 @@
 #!/bin/bash
 
-docker run -it --rm -v `pwd`:/code/ -w /code/ python:2.7 /bin/bash
+docker build -t jforman/binder:latest .
+docker run -it --rm -v `pwd`:/code/ -w /code/ jforman/binder:latest /bin/bash
