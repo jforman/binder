@@ -11,6 +11,7 @@ RUN apk add --no-cache nsd build-base python3-dev libffi-dev openssl-dev libc-de
 
 EXPOSE 8000
 
+RUN ["python", "manage.py", "makemigrations", "binder"]
 RUN ["python", "manage.py", "migrate"]
 RUN ["python", "manage.py", "loaddata", "binder/fixtures/initial_data.json"]
 
