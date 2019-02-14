@@ -1,6 +1,6 @@
 import binascii
 import dns.tsigkeyring
-from models import BindServer, Key
+from binder.models import BindServer, Key
 from django.contrib import admin
 from django.forms import ModelForm, ValidationError
 

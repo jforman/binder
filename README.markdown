@@ -86,7 +86,6 @@ bootstrapping.
 ```
 python manage.py migrate
 python manage.py createsuperuser
-...
 python manage.py dumpdata -o binder/fixtures/initial_data.json
 ```
 

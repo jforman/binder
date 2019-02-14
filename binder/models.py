@@ -48,7 +48,7 @@ class Key(models.Model):
 
     def save(self, *args, **kwargs):
         f = Fernet(settings.FERNET_KEY)
-        crypted_key = f.encrypt(bytes(self.data))
+        crypted_key = f.encrypt(bytes(self.data, encoding="utf8"))
         self.data = crypted_key
         super(Key, self).save(*args, **kwargs)
 
@@ -59,7 +59,7 @@ class Key(models.Model):
         try:
             key_data = self.decrypt_keydata()
             keyring = dns.tsigkeyring.from_text({self.name: key_data})
-        except binascii.Error, err:
+        except (binascii.Error, err):
             raise exceptions.KeyringException("Incorrect key data. Verify key: %s. Reason: %s" % (self.name, err))
 
         return keyring
@@ -99,6 +99,7 @@ class BindServer(models.Model):
     default_transfer_key = models.ForeignKey(Key,
                                              null=True,
                                              blank=True,
+                                             on_delete=models.CASCADE,
                                              help_text="The default key to use for all actions "
                                              "with this DNS server as long as no other key is "
                                              "specified explicitly.")
@@ -153,7 +154,7 @@ class BindServer(models.Model):
         except dns.tsig.PeerBadKey:
             # The incorrect TSIG key was selected for transfers.
             raise exceptions.TransferException("Unable to list zone records because of a TSIG key mismatch.")
-        except socket.error, err:
+        except socket.error as err:
             # Thrown when the DNS server does not respond for a zone transfer (XFR).
             raise exceptions.TransferException("DNS server did not respond for transfer. Reason: %s" % err)
         except dns.exception.FormError:

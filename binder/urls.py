@@ -1,14 +1,16 @@
 from django.conf.urls import include, url
 from django.contrib import admin
-import django.contrib.auth.views
+from django.contrib.auth import login
+from django.contrib.auth.views import logout_then_login
+from django.contrib.auth import views as auth_views
 import binder.views
 admin.autodiscover()
 
 urlpatterns = [
-    url(r'^admin/', include(admin.site.urls)),
+    url(r'^admin/', admin.site.urls),
 
-    url(r'^accounts/login/$', django.contrib.auth.views.login, name='login'),
-    url(r'^accounts/logout/$', django.contrib.auth.views.logout_then_login, name='logout'),
+    url(r'^accounts/login/$', auth_views.LoginView.as_view(), name='login'),
+    url(r'^accounts/logout/$', logout_then_login, name='logout'),
 
     url(r'^$', binder.views.home_index, name="index"),
     url(r'^server_list/$', binder.views.view_server_list, name="server_list"),

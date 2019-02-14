@@ -1,6 +1,5 @@
+Django
 cryptography
-Django>=1.10
 dnspython>=1.11
 pybindxml>=0.7
 lxml
-mysqlclient

@@ -170,7 +170,7 @@ def ip_info(host_name):
             if s_family == 10 and s_type == 1:
                 ipv6_count += 1
                 info.append(["IPv6 (%d)" % ipv6_count, s_sockaddr[0]])
-    except socket.gaierror, err:
+    except (socket.gaierror, err):
         info.append(["Error", "Unable to resolve %s: %s" % (host_name, err)])
 
     return info

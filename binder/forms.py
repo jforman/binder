@@ -8,7 +8,7 @@ from django.core import validators
 from django.forms import ValidationError
 
 # App Imports
-from models import Key
+from binder.models import Key
 
 
 class CustomUnicodeListField(forms.CharField):

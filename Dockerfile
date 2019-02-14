@@ -1,16 +1,13 @@
-FROM python:2.7
+FROM python:3-alpine
 
 MAINTAINER Jeffrey Forman <code@jeffreyforman.net>
-
-ENV DEBIAN_FRONTEND noninteractive
-
-RUN apt-get update \
-     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /code
 COPY . /code/
 
-RUN pip install -r requirements.txt
+RUN apk add --no-cache nsd build-base python3-dev libffi-dev openssl-dev libc-dev libxslt-dev \
+  && pip install --upgrade pip \
+  && pip install --no-cache-dir -r requirements.txt
 
 EXPOSE 8000
 
