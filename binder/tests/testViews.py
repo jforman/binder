@@ -1,7 +1,7 @@
 from django.test import TestCase
 from django.test.client import Client
 from django.contrib.auth.models import User
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 
 from binder import models
 
@@ -80,7 +80,7 @@ class PostTests(TestCase):
         self.assertContains(response,
                             '<input type="hidden" id="zone_name" name="zone_name" value="testzone1.test.net" />', html=True)
         self.assertContains(response,
-                            '<input type="hidden" id="rr_list" name="rr_list" value="[u&#39;testrecord1.testzone1.test.net&#39;, u&#39;testrecord2.testzone1.test.net&#39;]"/>',
+                            '<input type="hidden" id="rr_list" name="rr_list" value="[&#39;testrecord1.testzone1.test.net&#39;, &#39;testrecord2.testzone1.test.net&#39;]"/>',
                             html=True)
         self.assertContains(response,
                             '<input type="hidden" id="dns_server" name="dns_server" value="testserver.test.net" />',

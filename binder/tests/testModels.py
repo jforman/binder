@@ -54,7 +54,8 @@ class Model_Key_Tests(TestCase):
         key_1.save()
         decrypt_key = Fernet(settings.FERNET_KEY)
         decrypted_tsig_key = decrypt_key.decrypt(bytes(key_1.data))
-        self.assertEqual(original_tsig_key, decrypted_tsig_key)
+        self.assertEqual(bytes(original_tsig_key, encoding="utf8"),
+                        decrypted_tsig_key)
 
     @override_settings(FERNET_KEY='yfE1kyYLNlpR-2ybdB-Mvs_k1ZoDMFFVtE_PpWYxVgs=')
     def test_FernetKeyDecryptionFailure(self):
