@@ -45,7 +45,6 @@ class Key(models.Model):
     class Meta:
         ordering = ["name"]
 
-
     def save(self, *args, **kwargs):
         f = Fernet(settings.FERNET_KEY)
         crypted_key = f.encrypt(bytes(self.data, encoding="utf8"))
@@ -105,6 +104,9 @@ class BindServer(models.Model):
                                              "specified explicitly.")
 
     def __unicode__(self):
+        return self.hostname
+
+    def __str__(self):
         return self.hostname
 
     class Meta:
