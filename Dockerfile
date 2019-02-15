@@ -13,6 +13,4 @@ EXPOSE 8000
 
 RUN ["python", "manage.py", "makemigrations", "binder"]
 RUN ["python", "manage.py", "migrate"]
-RUN ["python", "manage.py", "loaddata", "binder/fixtures/initial_data.json"]
-
 CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
