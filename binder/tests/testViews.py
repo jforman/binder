@@ -42,7 +42,7 @@ class PostTests(TestCase):
     def setUp(self):
         self.client = Client()
         models.BindServer(hostname="testserver.test.net",
-                          statistics_port=1234).save()
+                          control_port=1234).save()
 
         user = User.objects.create_user('testuser',
                                         'testuser@example.com',

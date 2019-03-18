@@ -9,11 +9,11 @@ class Form_Tests(TestCase):
     def setUp(self):
         self.ns1_key = Key.objects.create(name='test1', data='testdata1234', algorithm='MD5')
         self.ns1 = BindServer.objects.create(hostname='ns1.test.net',
-                                             statistics_port=8053,
+                                             control_port=8053,
                                              default_transfer_key=self.ns1_key)
         self.ns2_key = Key.objects.create(name='test2', data='testdata1234', algorithm='MD5')
         self.ns2 = BindServer.objects.create(hostname='ns2.test.net',
-                                             statistics_port=8053,
+                                             control_port=8053,
                                              default_transfer_key=self.ns2_key)
 
     def test_Valid_FormAddRecordWithoutReverseRecord(self):

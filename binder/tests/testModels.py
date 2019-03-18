@@ -12,23 +12,16 @@ class Model_BindServer_Tests(TestCase):
         """Test that adding a well-formed BindServer works."""
         self.assertEqual(models.BindServer.objects.count(), 0)
         bindserver_1 = models.BindServer(hostname="test1",
-                                         statistics_port=1234)
+                                         control_port=1234)
         bindserver_1.save()
         self.assertEqual(models.BindServer.objects.count(), 1)
 
-    def test_BindServerMissingStatisticsPort(self):
-        """Attempt to add a BindServer without a statistics port."""
-        bindserver_1 = models.BindServer(hostname="badtest1")
-        with self.assertRaises(IntegrityError):
-            bindserver_1.save()
-
-    def test_BindServerNonIntStatisticsPort(self):
-        """Attempt to add a Bindserver with a non-integer statistics port."""
+    def test_BindServerNonIntControlPort(self):
+        """Attempt to add a Bindserver with a non-integer control port."""
         bindserver_1 = models.BindServer(hostname="foo",
-                                         statistics_port="bar1")
+                                         control_port="bar1")
         with self.assertRaisesMessage(ValueError, "invalid literal for int() with base 10: 'bar1'"):
             bindserver_1.save()
-
 
 class Model_Key_Tests(TestCase):
     def test_KeyModel(self):
