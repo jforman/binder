@@ -1,5 +1,6 @@
 Django
 cryptography
-dnspython>=1.11
+dnspython>=1.16.0
 pybindxml>=0.7
 lxml
+Jinja2
