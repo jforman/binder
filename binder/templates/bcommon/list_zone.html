@@ -27,6 +27,7 @@
   <td>{{ current_record.rr_data }}</td>
   <td>
     <div class="btn-toolbar" style="margin: 0;">
+      {% if dynamic_dns_available %}
       <div class="btn-group">
         <button class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
           Record Actions <span class="caret"></span>
@@ -38,6 +39,9 @@
           {% endif %}
         </ul>
       </div>
+      {% else %}
+        Actions not available.
+      {% endif %}
     </div>
   </td>
 </tr>

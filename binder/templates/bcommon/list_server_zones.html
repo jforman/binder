@@ -9,8 +9,8 @@
     <th>View</th>
     <th>Serial Number</th>
   </tr>
-{% for current_zone, cz_data in zone_array.stats.zone_stats.iteritems %}
-  {% for current_view, cv_data in cz_data.iteritems %}
+{% for current_zone, cz_data in zone_array.stats.zone_stats.items %}
+  {% for current_view, cv_data in cz_data.items %}
     <tr>
       <td>
         <a href="{% url "zone_list" dns_server=dns_server.hostname zone_name=current_zone %}"> {{ current_zone }}</a>

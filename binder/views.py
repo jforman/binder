@@ -1,12 +1,15 @@
-# Binder VIews
+# Binder Views
+
+import subprocess
 
 # 3rd Party
+import dns.query
 from django.contrib import messages
 from django.shortcuts import get_object_or_404, redirect, render
 
 # App Imports
 from binder import forms, helpers, models
-from binder.exceptions import KeyringException, RecordException, TransferException, ZoneException
+from binder import exceptions
 
 def home_index(request):
     """List the main index page for Binder."""
@@ -19,7 +22,8 @@ def view_server_list(request):
     server_info = []
     for current in server_list:
         server_info.append({"host_name": current,
-                            "ip_address": helpers.ip_info(current.hostname)})
+                            "ip_address": helpers.ip_info(current.hostname),
+                            "server_type": current.server_type})
 
     return render(request, "bcommon/list_servers.html",
                   {"server_info": server_info})
@@ -33,8 +37,10 @@ def view_server_zones(request, dns_server):
 
     try:
         zone_array = this_server.list_zones()
-    except ZoneException as exc:
+    except exceptions.ZoneException as exc:
         messages.error(request, "Unable to list server zones. Error: %s" % exc)
+    except subprocess.CalledProcessError as err:
+        messages.error(request, "Error in retrieving zones: %s." % str(err.output))
 
     return render(request, "bcommon/list_server_zones.html",
                   {"dns_server": this_server,
@@ -49,22 +55,31 @@ def view_zone_records(request, dns_server, zone_name):
 
     try:
         zone_array = this_server.list_zone_records(zone_name)
-    except TransferException as exc:
+    except exceptions.TransferException as exc:
+        messages.error(request, "TransferException: %s." % exc)
         return render(request, "bcommon/list_zone.html",
                       {"zone_name": zone_name,
                        "dns_server": this_server})
-    except KeyringException:
+    except exceptions.KeyringException:
         messages.error(request, "Unable to get zone list. A problem was encountered "
                        "decrypting your TSIG key. Ensure the key is correctly "
                        "specified in the Binder Database.")
         return render(request, "bcommon/list_zone.html",
                       { "dns_server": this_server,
                         "zone_name" :zone_name })
+    except dns.query.TransferError as err:
+        messages.error(request, "TransferError: %s." % err)
+        return render(request, "bcommon/list_zone.html",
+                      {"zone_name": zone_name,
+                       "dns_server": this_server})
 
     return render(request, "bcommon/list_zone.html",
                   {"zone_array": zone_array,
                    "dns_server": this_server,
-                   "zone_name": zone_name})
+                   "zone_name": zone_name,
+                   # NOTE: A hack because NSD doesn't support dynamic updates
+                   # so merely display the zone.
+                   "dynamic_dns_available": this_server.server_type in ['BIND']})
 
 
 def view_add_record(request, dns_server, zone_name):
@@ -86,7 +101,8 @@ def view_add_record(request, dns_server, zone_name):
                                    form_cleaned["ttl"],
                                    form_cleaned["key_name"],
                                    form_cleaned["create_reverse"])
-            except (KeyringException, RecordException) as exc:
+            except (exceptions.KeyringException,
+                    exceptions.RecordException) as exc:
                 messages.error(request, "Adding %s.%s failed: %s" %
                                (form_cleaned["record_name"], zone_name, exc))
             else:
@@ -130,7 +146,8 @@ def view_edit_record(request, dns_server, zone_name, record_name=None,
                                    form_cleaned["ttl"],
                                    form_cleaned["key_name"],
                                    form_cleaned["create_reverse"])
-            except (KeyringException, RecordException) as exc:
+            except (exceptions.KeyringException,
+                    exceptions.RecordException) as exc:
                 messages.error(request, "Modifying %s.%s failed: %s" %
                                (form_cleaned["record_name"], zone_name, exc))
             else:
@@ -173,7 +190,8 @@ def view_add_cname_record(request, dns_server, zone_name, record_name):
                                                     str(form_cleaned["zone_name"])),
                                          form_cleaned["ttl"],
                                          form_cleaned["key_name"])
-            except (KeyringException, RecordException) as exc:
+            except (exceptions.KeyringException,
+                    exceptions.RecordException) as exc:
                 messages.error(request, "Adding %s.%s failed: %s" %
                                (form_cleaned["cname"], zone_name, exc))
             else:
@@ -215,7 +233,7 @@ def view_delete_record(request, dns_server, zone_name):
                 response = helpers.delete_record(form_cleaned["dns_server"],
                                                  rr_list,
                                                  form_cleaned["key_name"])
-            except KeyringException as exc:
+            except exceptions.KeyringException as exc:
                 for record in rr_list:
                     messages.error(request, "Deleting %s.%s failed: %s" %
                                    (record, zone_name, exc))

@@ -7,6 +7,7 @@
   <tr>
     <th>Hostname</th>
     <th>IP Address</th>
+    <th>Server Type</th>
   </tr>
 {% for current_server in server_info %}
   <tr>
@@ -15,6 +16,7 @@
       {{type}}: {{data}}<br>
       {% endfor %}
     </td>
+    <td> {{ current_server.server_type}}</td>
   </tr>
 {% endfor %}
 </table>
