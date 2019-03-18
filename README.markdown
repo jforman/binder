@@ -5,6 +5,9 @@
 
 A Django web application for viewing and editing BIND DNS zone records.
 
+It has support for NSD-hosted DNS zones, but as NSD does not support dynamic updates,
+that feature is not available.
+
 ## Download ##
 
 ```
@@ -21,7 +24,8 @@ pip install -r requirements.txt
 
 ## Running Binder ##
 
-Over the course of developing Binder, it has come to the fore that using a container makes development and runnin Binder much easier.
+Over the course of developing Binder, it has come to the fore that using a container makes
+development and running Binder much easier.
 
 ### Local Sqlite database ###
 
@@ -101,6 +105,18 @@ If you wish to use a statically configured encryption/decryption key, one must p
 
 Aside from the Binder application itself, other infrastructure is required
 to make Binder useful.
+
+### NSD DNS Server ###
+
+If you wish to access an NSD DNS server, the credentials are expected to be found in `/creds` creds directory,
+where each subdirectory matches the configured hostname.
+
+For example, for NSD host ns1.university.edu, the NSD remote control certificates would be found at the following paths:
+
+```
+/creds/ns1.university.edu/nsd_control.key
+/creds/ns1.university.edu/nsd_control.pem
+```
 
 ### BIND DNS Server ###
 
