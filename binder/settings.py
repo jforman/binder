@@ -180,3 +180,9 @@ try:
     from local_settings import *
 except ImportError:
     pass
+
+
+# Base directory where credentials are to be stored.
+# For NSD, a subdirectory under CREDS_DIR should be created with th e
+# appropriate certificates for nsd-control to execute.
+CREDS_DIR = "/creds"
