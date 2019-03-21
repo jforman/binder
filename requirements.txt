@@ -1,6 +1,7 @@
-Django
 cryptography
+Django
+django-mysql
 dnspython>=1.16.0
-pybindxml>=0.7
-lxml
 Jinja2
+lxml
+pybindxml>=0.7
