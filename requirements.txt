@@ -5,3 +5,4 @@ dnspython>=1.16.0
 Jinja2
 lxml
 pybindxml>=0.7
+mysqlclient
